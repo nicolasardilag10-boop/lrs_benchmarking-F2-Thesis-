@@ -13,6 +13,7 @@ CWD = os.getcwd()
 DB_DIR = "/mnt/storage/db"
 FASTA = "references/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta"
 ADOTTO_TRF = "assets/anno.trf.bed.gz"
+TRF_EXE = "/mnt/storage/groups/genetics/VarCAD-dev/external/Miniforge3/envs/truvari/bin/trf409.linux64"
 
 MAMBA = "/mnt/storage/groups/genetics/VarCAD-dev/external/Miniforge3/condabin/mamba run --live-stream"
 
@@ -53,8 +54,8 @@ rule truvari_anno_gcpct:
         vcf_gz="{cwd}/truvari/{truvari_dir}/{vcftype}.vcf.gz",
         fasta=FASTA_PATH
     output:
-        vcf="{cwd}/truvari/{truvari_dir}/{vcftype}.gcpct.vcf"
-    log:     "{cwd}/truvari/{truvari_dir}/{vcftype}.gcpct.vcf.log"
+        vcf_gz="{cwd}/truvari/{truvari_dir}/{vcftype}.gcpct.vcf.gz"
+    log:     "{cwd}/truvari/{truvari_dir}/{vcftype}.gcpct.vcf.gz.log"
     message: "executing {rule} with output {output} and input {input}"
     threads: 2
     resources:
@@ -66,15 +67,16 @@ rule truvari_anno_gcpct:
             umask 0027; \
             {MAMBA} -n truvari truvari anno gcpct \
                 -r {input.fasta} \
-                -o {output.vcf} \
-                {input.vcf_gz}; \
+                {input.vcf_gz} \
+                | bgzip -c -@ {threads} > {output.vcf_gz}; \
+            tabix -p vcf {output.vcf_gz}; \
             printf 'End time:\\t'; date; \" \
         &> {log};"
 
 
 rule truvari_anno_trf:
     input:
-        vcf="{cwd}/truvari/{truvari_dir}/{vcftype}.gcpct.vcf",
+        vcf_gz="{cwd}/truvari/{truvari_dir}/{vcftype}.gcpct.vcf.gz",
         fasta=FASTA_PATH,
         adotto=ADOTTO_TRF_PATH
     output:
@@ -90,8 +92,9 @@ rule truvari_anno_trf:
             printf 'Start time:\\t'; date; \
             umask 0027; \
             {MAMBA} -n truvari truvari anno trf \
-                -i {input.vcf} \
+                -i {input.vcf_gz} \
                 -o {output.vcf} \
+                -e {TRF_EXE} \
                 -r {input.adotto} \
                 -f {input.fasta} \
                 -t {threads}; \
