@@ -13,7 +13,7 @@ CWD = os.getcwd()
 DB_DIR = "/mnt/storage/db"
 FASTA = "references/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta"
 ADOTTO_TRF = "assets/anno.trf.bed.gz"
-TRF_EXE = "/mnt/storage/groups/genetics/VarCAD-dev/external/Miniforge3/envs/truvari/bin/trf409.linux64"
+TRF_EXE = "/mnt/storage/groups/genetics/VarCAD-dev/external/Miniforge3/envs/truvari/bin/trf"
 
 MAMBA = "/mnt/storage/groups/genetics/VarCAD-dev/external/Miniforge3/condabin/mamba run --live-stream"
 
