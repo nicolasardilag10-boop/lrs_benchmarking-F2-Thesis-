@@ -5,19 +5,21 @@
 import os
 
 
+#Get current working directory
+CWD = os.getcwd()
+
+
 #Define variables
 DB_DIR = "/mnt/storage/db"
 FASTA = "references/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta"
-ADOTTO_TRF = "adotto/tr_annotated.bed.gz"
+ADOTTO_TRF = "assets/tr_annotated.bed.gz"
 
 MAMBA = "/mnt/storage/groups/genetics/VarCAD-dev/external/Miniforge3/condabin/mamba run --live-stream"
 
 #Set FASTA_PATH
 FASTA_PATH = DB_DIR + "/" + FASTA
-ADOTTO_TRF_PATH = DB_DIR + "/" + ADOTTO_TRF
+ADOTTO_TRF_PATH = CWD + "/" + ADOTTO_TRF
 
-#Get current working directory
-CWD = os.getcwd()
 
 # Discover existing truvari pbsv result directories with fn/fp VCFs
 TRUVARI_DIRS, VCF_TYPES = glob_wildcards(CWD + "/truvari/{truvari_dir,[A-Za-z0-9\-\._]+}/{vcftype,fn|fp}.vcf.gz")
