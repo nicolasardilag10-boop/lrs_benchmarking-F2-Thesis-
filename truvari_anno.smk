@@ -197,7 +197,8 @@ rule truvari_anno_dpcnt:
 rule truvari_anno_grm:
     """
     Run truvari anno grm separately — outputs a joblib DataFrame, not a VCF.
-    Requires a BWA-indexed reference FASTA.
+    Requires bwapy installed in the truvari conda env:
+        mamba install -n truvari -c bioconda bwapy
     """
     input:
         vcf_gz="{cwd}/truvari/{truvari_dir}/{vcftype}.vcf.gz",
@@ -214,13 +215,11 @@ rule truvari_anno_grm:
             printf 'Container ID:\\t'; hostname; \
             printf 'Start time:\\t'; date; \
             umask 0027; \
-            {MAMBA} -n bwa bash -c ' \
-                {MAMBA} -n truvari truvari anno grm \
-                    -i {input.vcf_gz} \
-                    -r {input.fasta} \
-                    -o {output.jl} \
-                    -t {threads}; \
-            '; \
+            {MAMBA} -n truvari truvari anno grm \
+                -i {input.vcf_gz} \
+                -r {input.fasta} \
+                -o {output.jl} \
+                -t {threads}; \
             printf 'End time:\\t'; date; \" \
         &> {log};"
 
