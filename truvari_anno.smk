@@ -37,9 +37,6 @@ OUTPUT = []
 OUTPUT = OUTPUT + expand(CWD + "/truvari/{truvari_dir}/{vcftype}.anno.vcf.gz",
     zip, truvari_dir=TRUVARI_DIRS, vcftype=VCF_TYPES)
 
-OUTPUT = OUTPUT + expand(CWD + "/truvari/{truvari_dir}/{vcftype}.grm.jl",
-    zip, truvari_dir=TRUVARI_DIRS, vcftype=VCF_TYPES)
-
 
 # ************************************************************************************************
 
