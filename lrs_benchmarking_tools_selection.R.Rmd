@@ -1,0 +1,33 @@
+
+library(jsonlite)
+library(dplyr)
+
+txt <- readLines("/Users/Yu_J/Downloads/tools.json", encoding = "UTF-8", warn = FALSE)
+txt <- iconv(txt, from = "latin1", to = "UTF-8")  # or try "Windows-1252"
+
+data <- jsonlite::fromJSON(paste(txt, collapse = "\n"), flatten = TRUE)
+
+
+
+
+data_clean <- data %>%
+  mutate(
+    Technologies = sapply(Technologies, paste, collapse = ","),
+    Categories   = sapply(Categories, paste, collapse = ","),
+    PubDates     = sapply(PubDates, paste, collapse = ",")
+  )
+
+data_clean[] <- lapply(data_clean, function(x) {
+  if (is.list(x)) {
+    sapply(x, function(y) paste(y, collapse = ","))
+  } else {
+    x
+  }
+})
+write.table(
+  data_clean,
+  file = "/Users/Yu_J/Downloads/tools_output.csv",
+  sep = ";",
+  row.names = FALSE,
+  quote = TRUE
+)

@@ -1,0 +1,1152 @@
+---
+title: "LRS benchmarking"
+author: "Jiangyan Yu (jiangyan.yu@ukw.de)"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    code_folding: hide
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+# libraries
+
+```{r,include=FALSE}
+lapply(c("data.table","magrittr","ggplot2","dplyr","tidyr","vcfR","cowplot","ComplexHeatmap","UpSetR","scales","stringr","lubridate"), require, character.only = TRUE)
+
+
+```
+
+# working directory
+
+```{r}
+working_dir = "/Users/Yu_J/Documents/GitHub/lrs_benchmarking"
+
+
+files = list.files(paste0(working_dir,"/truvari"))
+
+files = files[files %like% "30x"]
+files = files[!files %like% "log"]
+
+```
+
+# refine.regions.txt
+
+## load all files
+
+```{r}
+
+
+## append F1 column from each file
+
+df = lapply(files, FUN = function(f) {
+  df_temp = read.table(paste0(working_dir,"/truvari/",f,"/refine.regions.txt"), header = TRUE)
+
+  df_temp$seq_tech = str_split_fixed(f, "\\.", n = 6)[,2]
+  df_temp$aligner = str_split_fixed(f, "\\.", n = 6)[,5]
+  df_temp$SVcaller = str_split_fixed(f, "\\.", n = 6)[,6]
+  df_temp$size = df_temp$end - df_temp$start + 1
+
+  df_metrics <- df_temp %>%
+    mutate(
+      TP = in_tp,
+      FP = in_fp,
+      FN = in_fn,
+      precision = ifelse((TP + FP) > 0, TP / (TP + FP), NA_real_),
+      recall    = ifelse((TP + FN) > 0, TP / (TP + FN), NA_real_),
+      F1        = ifelse((2*TP + FP + FN) > 0,
+                         2*TP / (2*TP + FP + FN),
+                         NA_real_)
+    )
+
+  ## append F1 to df_temp and rename the column name as f
+  df_metrics$sample = f
+  return(df_metrics)
+}) %>% do.call(rbind,.)
+
+
+```
+
+## compare sv caller differences across regions
+
+```{r}
+## perform statisical test to compare F1 across different SV callers per region
+df$region_id = paste(df$chr, df$start, df$end, sep = "_")
+summary_state <- df %>%
+  group_by(region_id) %>%
+  summarise(
+    chr = first(chrom),
+    start = first(start),
+    mean_F1 = mean(F1, na.rm = TRUE),
+    median_F1 = median(F1, na.rm = TRUE),
+    sd_F1 = sd(F1, na.rm = TRUE)
+  )
+
+
+```
+
+### plot sd of F1 across regions
+
+```{r, fig.width=10,fig.height=5}
+## order the chr from chr1 to chr22
+summary_state$chr <- factor(summary_state$chr, levels = paste0("chr", c(1:22)))
+
+
+summary_state = summary_state[order(summary_state$start,decreasing = FALSE),]
+summary_state = summary_state[order(summary_state$chr),]
+
+## split by chromosome and plot sd of F1 across regions
+p_sd <- ggplot(summary_state, aes(x = start, y = sd_F1,colour = chr)) +
+  geom_point(alpha = 0.5) +
+  theme_bw() +
+  theme(legend.position = "none") +
+  labs(title = "SD of F1 across regions")+
+  facet_wrap(~chr, scales = "free_x",ncol=6)
+
+
+p_sd
+```
+
+### histogram of sd
+
+```{r, fig.width=5,fig.height=3}
+ggplot(summary_state, aes(x = sd_F1)) +
+  geom_histogram(binwidth = 0.05, fill = "steelblue", color = "black") +
+  theme_bw() +
+  theme(text = element_text(size = 12)) +
+  labs(title = "Distribution of SD of F1 across regions", x = "SD of F1", y = "Count")
+```
+
+## generally poor performance of SV callers across regions
+
+```{r, fig.width=10,fig.height=5}
+## plot the distribution of F1 across regions
+ggplot(summary_state, aes(x = start, y = mean_F1,colour = chr)) +
+  geom_point(alpha = 0.5) +
+  theme_bw() +
+  theme(legend.position = "none") +
+  labs(title = "Mean of F1 across regions")+
+  facet_wrap(~chr, scales = "free_x",ncol=6)
+```
+
+## rm temp obj
+
+```{r}
+rm(df,summary_state,p_sd)
+```
+
+#---FN.vcf.gz and summary.json contains information before refine step---
+
+# log.txt
+
+```{r}
+f1 = lapply(files, FUN= function(f){
+
+  df = read.csv(paste0(working_dir,"/truvari/",f,"/log.txt"),header = FALSE)
+  
+  ## take the last 10 rows
+  df = df[(nrow(df)-9):(nrow(df)-3),]
+  ## remove space 
+  df = df %>% mutate(V1 = str_replace_all(V1, " ", ""))
+  df$parameter = str_split_fixed(df$V1, ":", n = 2)[,1]
+  df$value = str_split_fixed(df$V1, ":", n = 2)[,2] %>% as.numeric()
+  
+  df1 = data.frame(setting = f,
+                   precision = df[df$parameter == "precision", "value"],
+                   recall = df[df$parameter == "recall", "value"],
+                   F1 = df[df$parameter == "f1", "value"],
+                   FP = df[df$parameter == "FP", "value"],
+                   FN = df[df$parameter == "FN", "value"])
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  return(df1)
+  
+}) %>% do.call(rbind,.)
+```
+
+
+## F1
+
+```{r,fig.height=3,fig.width=12}
+ggplot(f1,aes(y=SVcaller,x=F1, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  coord_cartesian(xlim = c(0.8, 1)) +
+  geom_vline(xintercept = 0.9, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "F1 score per setting", x = "F1 score")+
+  facet_grid(seq_tech~aligner)
+```
+
+## F1
+
+```{r,fig.height=8,fig.width=6}
+df = f1
+df = df[order(df$F1, decreasing = FALSE),]
+df$setting = factor(df$setting, levels = df$setting)
+ggplot(df,aes(y=setting,x=F1,fill=SVcaller))+
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() 
+```
+
+## precision
+
+```{r,fig.height=3,fig.width=12}
+ggplot(f1,aes(y=SVcaller,x=precision, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  coord_cartesian(xlim = c(0.9, 1)) +
+  geom_vline(xintercept = 0.92, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "precision score per setting", x = "precision score")+
+  facet_grid(seq_tech~aligner)
+```
+
+## recall
+
+```{r,fig.height=3,fig.width=12}
+ggplot(f1,aes(y=SVcaller,x=recall, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  coord_cartesian(xlim = c(0.7, 0.95)) +
+  geom_vline(xintercept = 0.75, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "recall score per setting", x = "recall score")+
+  facet_grid(seq_tech~aligner)
+```
+
+## FP
+
+
+```{r,fig.height=3,fig.width=12}
+ggplot(f1,aes(y=SVcaller,x=FP, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  # coord_cartesian(xlim = c(0.7, 0.95)) +
+  # geom_vline(xintercept = 0.75, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "FP calls per setting", x = "Count")+
+  facet_grid(seq_tech~aligner)
+```
+
+
+## FN
+
+
+```{r,fig.height=3,fig.width=12}
+ggplot(f1,aes(y=SVcaller,x=FN, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  # coord_cartesian(xlim = c(0.7, 0.95)) +
+  # geom_vline(xintercept = 0.75, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "FN calls per setting", x = "Count")+
+  facet_grid(seq_tech~aligner)
+```
+
+
+# FN.vcf.gz
+
+```{r}
+
+
+## append F1 column from each file
+
+fn = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/fn.vcf.gz"))
+  ### set the name of the list
+
+  
+  return(df_temp)
+}) 
+
+names(fn) = files
+```
+
+## SV length difference
+
+TRF: tandom repeat finder
+
+```{r}
+
+fn_len = lapply(names(fn), FUN = function(f) {
+  df1 = fn[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+fn_len_df = do.call(rbind,fn_len)
+
+
+```
+
+
+### total number of FN calls per setting
+
+```{r,fig.height=3,fig.width=12}
+df1 = table(fn_len_df$setting) %>% as.data.frame()
+colnames(df1) = c("setting","count")
+
+df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+
+df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+
+ggplot(df1,aes(y=SVcaller,x=count, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  ## add a vertical line at 6000
+  geom_vline(xintercept = 6000, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "Total number of FN calls per setting", x = "Sequencing technology and aligner", y = "Count")+
+  facet_grid(seq_tech~aligner)
+```
+
+
+### histogram per setting
+
+```{r,fig.height=8,fig.width=12}
+ggplot(fn_len_df, aes(x = affected_length, fill = SVcaller)) +
+   geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   scale_x_log10()+
+  # scale_y_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of affected SV length in FN calls", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~SVcaller,scales = "free")
+
+ggplot(fn_len_df,aes(x=affected_length, colour = SVcaller)) +
+  geom_density() +
+  theme_bw() +
+  scale_x_log10()+
+  theme(text = element_text(size = 12)) +
+  labs(title = "Density of affected SV length in FN calls", x = "Affected SV length", y = "Density")+
+  facet_grid(aligner~seq_tech, scales = "free_y")
+```
+
+
+### histogram per setting (<250)
+
+```{r}
+
+
+
+ggplot(subset(fn_len_df,affected_length<250),aes(x=affected_length, colour = SVcaller)) +
+  geom_density() +
+  theme_bw() +
+  # scale_y_log10()+
+  theme(text = element_text(size = 12)) +
+  labs(title = "Density of affected SV length (<250) in FN calls", x = "Affected SV length", y = "Density")+
+  facet_grid(aligner~seq_tech, scales = "free_y")
+```
+
+### histogram per setting (<1000)
+
+```{r}
+
+ggplot(subset(fn_len_df,affected_length<1000), aes(x = affected_length, fill = SVcaller)) +
+   geom_bar(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of affected SV length (<1kb) in FN calls", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~SVcaller)
+
+ggplot(subset(fn_len_df,affected_length<1000),aes(x=affected_length, colour = SVcaller)) +
+  geom_density() +
+  theme_bw() +
+  # scale_y_log10()+
+  theme(text = element_text(size = 12)) +
+  labs(title = "Density of affected SV length (<1kb) in FN calls", x = "Affected SV length", y = "Density")+
+  facet_grid(aligner~seq_tech, scales = "free_y")
+```
+
+## group SV length
+
+```{r}
+fn_len_df$length_group = cut(fn_len_df$affected_length, breaks = c(0, 50, 100, 250, 500, 1000,5000, 10000,20000,30000,Inf), 
+                             labels = c("0-50", "50-100", "100-250", "250-500", "500-1000", "1k-5k","5k-10k","10k-20k","20k-30k",">30k"), right = FALSE)
+```
+
+### barplot of counts of each group
+
+```{r, fig.width=10,fig.height=4}
+
+  
+ggplot(fn_len_df, aes(x = length_group, fill = SVcaller)) +
+   geom_bar(position = "dodge") +
+  scale_y_log10()+
+   theme_bw() +
+   theme(text = element_text(size = 12)) +
+   labs(title = "Counts of FN calls in different length groups", x = "Affected SV length group", y = "Count")+
+   facet_grid(aligner~seq_tech, scales = "free_y")
+  
+
+```
+
+## any variants missed by all caller?
+
+```{r}
+fn_overlap = lapply(names(fn), FUN = function(f) {
+  df1 = fn[[f]]@fix %>% as.data.frame()
+  df1$var = paste0(df1$CHROM,"_",df1$POS,"_",df1$REF,"_",df1$ALT)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("var","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+
+fn_overlap_df = do.call(rbind,fn_overlap)
+```
+
+### missed variants overlapped between SVcallers 
+
+```{r}
+## Upset plot to show the overlapped variants missed by different callers per seq_aligner
+## per tech_aligner generate the upset figure
+for(i in unique(fn_overlap_df$tech_aligner)) {
+  df_temp = subset(fn_overlap_df, tech_aligner == i)
+  
+  listinput = list(sawfish=subset(df_temp,SVcaller=="sawfish")$var,
+                   cuteSV=subset(df_temp,SVcaller=="cuteSV")$var,
+                   pbsv=subset(df_temp,SVcaller=="pbsv")$var,
+                   sniffles2=subset(df_temp,SVcaller=="sniffles2")$var)
+  
+  p = upset(fromList(listinput), 
+            order.by = "freq", 
+            mainbar.y.label = i,
+            main.bar.color = "steelblue", 
+            sets.bar.color = "steelblue", 
+            text.scale = c(2, 2, 2, 1.5, 2, 1.5))
+  print(p)
+
+}
+
+
+```
+
+### pb-pbmm2
+
+```{r}
+df_temp = subset(fn_overlap_df, tech_aligner == "pb_pbmm2-pb")
+```
+
+
+# FP.vcf.gz
+
+```{r}
+
+
+fp = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/fp.vcf.gz"))
+
+  
+  return(df_temp)
+}) 
+
+names(fp) = files
+```
+
+## SV length difference
+
+TRF: tandom repeat finder
+
+```{r}
+
+fp_len = lapply(names(fp), FUN = function(f) {
+  df1 = fp[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+fp_len_df = do.call(rbind,fp_len)
+
+
+```
+
+### total number of FP calls per setting
+
+```{r,fig.height=3,fig.width=12}
+df1 = table(fp_len_df$setting) %>% as.data.frame()
+colnames(df1) = c("setting","count")
+
+df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+
+df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+
+ggplot(df1,aes(y=SVcaller,x=count, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  ## add a vertical line at 1500
+  geom_vline(xintercept = 1500, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "Total number of FP calls per setting", x = "Sequencing technology and aligner", y = "Count")+
+  facet_grid(seq_tech~aligner)
+```
+
+
+### histogram per setting
+
+```{r,fig.height=8,fig.width=12}
+
+ggplot(fp_len_df, aes(x = affected_length, fill = SVcaller)) +
+   geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   scale_y_log10()+
+  # scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of affected SV length in FP calls", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~SVcaller,scales = "free")
+
+# ggplot(fp_len_df,aes(x=affected_length, colour = SVcaller)) +
+#   geom_density() +
+#   theme_bw() +
+#   scale_x_log10()+
+#   theme(text = element_text(size = 12)) +
+#   labs(title = "Density of affected SV length in FP calls", x = "Affected SV length", y = "Density")+
+#   facet_grid(aligner~seq_tech, scales = "free_y")
+```
+
+### cuteSV FP calls are mostly small SVs
+
+```{r,fig.height=6,fig.width=5}
+
+ggplot(fp_len_df, aes(x = affected_length, color = SVcaller)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of affected SV length in FP calls", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~.,scales = "free")
+
+```
+
+### ONT produces more FP large SVs
+
+```{r,fig.height=6,fig.width=12}
+
+ggplot(fp_len_df, aes(x = affected_length, color = seq_tech)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of affected SV length in FP calls", x = "Affected SV length group", y = "Density")+
+   facet_grid(aligner~SVcaller,scales = "free")
+
+```
+
+
+## group SV length
+
+```{r}
+fp_len_df$length_group = cut(fp_len_df$affected_length, breaks = c(0, 50, 100, 250, 500, 1000, 5000,10000,20000,30000,Inf), 
+                             labels = c("0-50", "50-100", "100-250", "250-500", "500-1000", "1k-5k","5k-10k","10k-20k","20k-30k",">30k"), right = FALSE)
+```
+
+### barplot of counts of each group
+
+```{r, fig.width=12,fig.height=4}
+
+  
+ggplot(fp_len_df, aes(x = length_group, fill = SVcaller)) +
+   geom_bar(position = "dodge") +
+   theme_bw() +
+  scale_y_log10()+
+   theme(text = element_text(size = 12)) +
+   labs(title = "Counts of FP calls in different length groups", x = "Affected SV length group", y = "Count")+
+   facet_grid(aligner~seq_tech, scales = "free_y")
+  
+table(fp_len_df$setting,fp_len_df$length_group)
+```
+
+## rm temp obj
+
+```{r}
+## remove all objects
+rm(list = ls())
+
+```
+
+
+# ---summary on files after refine step---
+
+```{r}
+working_dir = "/Users/Yu_J/Documents/GitHub/lrs_benchmarking"
+
+
+files = list.files(paste0(working_dir,"/truvari"))
+
+files = files[files %like% "30x"]
+files = files[!files %like% "log"]
+```
+
+# refine.variant_summary.json
+
+```{r}
+## append F1 column from each file
+
+refine_sum = lapply(files, FUN = function(f) {
+  df1 = jsonlite::read_json(paste0(working_dir,"/truvari/",f,"/refine.variant_summary.json"))
+  df1 = unlist(df1) %>% t() %>% as.data.frame()
+  
+
+  ## append F1 to df_temp and rename the column name as f
+  df1$setting = f
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1)
+  
+}) %>% do.call(rbind,.)
+```
+
+## F1
+
+```{r,fig.height=3,fig.width=12}
+ggplot(refine_sum,aes(y=SVcaller,x=f1, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  coord_cartesian(xlim = c(0.8, 1)) +
+  geom_vline(xintercept = 0.85, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "F1 score per setting (refine.variant_summary.json)", x = "F1 score")+
+  facet_grid(seq_tech~aligner)
+```
+
+## precision
+
+```{r,fig.height=3,fig.width=12}
+ggplot(refine_sum,aes(y=SVcaller,x=precision, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  coord_cartesian(xlim = c(0.9, 1)) +
+  geom_vline(xintercept = 0.92, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "precision score per setting (refine.variant_summary.json)", x = "precision score")+
+  facet_grid(seq_tech~aligner)
+```
+
+## recall
+
+```{r,fig.height=3,fig.width=12}
+ggplot(refine_sum,aes(y=SVcaller,x=recall, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  coord_cartesian(xlim = c(0.7, 0.95)) +
+  geom_vline(xintercept = 0.75, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "recall score per setting (refine.variant_summary.json)", x = "recall score")+
+  facet_grid(seq_tech~aligner)
+```
+
+## FP
+
+
+```{r,fig.height=3,fig.width=12}
+ggplot(refine_sum,aes(y=SVcaller,x=FP, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  # coord_cartesian(xlim = c(0.7, 0.95)) +
+  geom_vline(xintercept = 1000, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "FP events per setting (refine.variant_summary.json)", x = "Count")+
+  facet_grid(seq_tech~aligner)
+```
+
+
+## FN
+
+
+```{r,fig.height=3,fig.width=12}
+ggplot(refine_sum,aes(y=SVcaller,x=FN, fill = SVcaller)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_bw() +
+  # coord_cartesian(xlim = c(0.7, 0.95)) +
+  geom_vline(xintercept = 5000, linetype = "dashed", color = "red") +
+  theme(text = element_text(size = 12),
+        strip.text.y = element_text(angle = 0)) +
+  labs(title = "FN events per setting (refine.variant_summary.json)", x = "Count")+
+  facet_grid(seq_tech~aligner)
+```
+
+# refine.base.vcf.gz
+
+## load vcf files
+
+```{r}
+## append F1 column from each file
+
+refine_base = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/refine.base.vcf.gz"))
+  
+  ### set the name of the list
+
+  
+  return(df_temp)
+}) 
+
+names(refine_base) = files
+```
+
+## length
+
+```{r}
+refine_base_len = lapply(names(refine_base), FUN = function(f) {
+  df1 = refine_base[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+refine_base_len_df = do.call(rbind,refine_base_len)
+```
+
+
+## his
+
+```{r,fig.height=6,fig.width=5}
+
+ggplot(refine_base_len_df, aes(x = affected_length, color = SVcaller)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of SV length in refine.base.vcf.gz", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~.,scales = "free")
+
+```
+
+
+# refine.comp.vcf.gz
+
+## load vcf files
+
+```{r}
+## append F1 column from each file
+
+refine_comp = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/refine.comp.vcf.gz"))
+  
+  ### set the name of the list
+
+  
+  return(df_temp)
+}) 
+
+names(refine_comp) = files
+```
+
+## length
+
+```{r}
+refine_comp_len = lapply(names(refine_comp), FUN = function(f) {
+  df1 = refine_comp[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+refine_comp_len_df = do.call(rbind,refine_comp_len)
+```
+
+
+## his
+
+```{r,fig.height=6,fig.width=5}
+
+ggplot(refine_comp_len_df, aes(x = affected_length, color = SVcaller)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of SV length in refine.comp.vcf.gz", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~.,scales = "free")
+
+```
+
+# tp-base.vcf.gz
+
+## load vcf files
+
+```{r}
+## append F1 column from each file
+
+tp_base = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/tp-base.vcf.gz"))
+  
+  ### set the name of the list
+
+  
+  return(df_temp)
+}) 
+
+names(tp_base) = files
+```
+
+## length
+
+```{r}
+tp_base_len = lapply(names(tp_base), FUN = function(f) {
+  df1 = tp_base[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+tp_base_len_df = do.call(rbind,tp_base_len)
+```
+
+
+## his
+
+```{r,fig.height=6,fig.width=5}
+
+ggplot(tp_base_len_df, aes(x = affected_length, color = SVcaller)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of SV length in tp-base.vcf.gz", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~.,scales = "free")
+
+```
+
+
+# tp-comp.vcf.gz
+
+## load vcf files
+
+```{r}
+## append F1 column from each file
+
+tp_comp = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/tp-comp.vcf.gz"))
+  
+  ### set the name of the list
+
+  
+  return(df_temp)
+}) 
+
+names(tp_comp) = files
+```
+
+## length
+
+```{r}
+tp_comp_len = lapply(names(tp_comp), FUN = function(f) {
+  df1 = tp_comp[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+tp_comp_len_df = do.call(rbind,tp_comp_len)
+```
+
+
+## his
+
+```{r,fig.height=6,fig.width=5}
+
+ggplot(tp_comp_len_df, aes(x = affected_length, color = SVcaller)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of SV length in tp-comp.vcf.gz", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~.,scales = "free")
+
+```
+
+# fp.vcf.gz
+
+## load vcf files
+
+```{r}
+## append F1 column from each file
+
+fp = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/fp.vcf.gz"))
+  
+  ### set the name of the list
+
+  
+  return(df_temp)
+}) 
+
+names(fp) = files
+```
+
+## length
+
+```{r}
+fp_len = lapply(names(fp), FUN = function(f) {
+  df1 = fp[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+fp_len_df = do.call(rbind,fp_len)
+```
+
+
+## his
+
+```{r,fig.height=6,fig.width=5}
+
+ggplot(fp_len_df, aes(x = affected_length, color = SVcaller)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of SV length in fp.vcf.gz", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~.,scales = "free")
+
+```
+
+
+# fn.vcf.gz
+
+## load vcf files
+
+```{r}
+## append F1 column from each file
+
+fn = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/fn.vcf.gz"))
+  
+  ### set the name of the list
+
+  
+  return(df_temp)
+}) 
+
+names(fn) = files
+```
+
+## length
+
+```{r}
+fn_len = lapply(names(fn), FUN = function(f) {
+  df1 = fn[[f]]@fix %>% as.data.frame()
+  df1$ref_length = nchar(df1$REF)
+  df1$alt_length = nchar(df1$ALT)
+  df1$affected_length = apply(df1[,c("ref_length","alt_length")], 1, max)
+  df1$setting = f
+  
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1[,c("affected_length","setting","seq_tech","aligner","SVcaller","tech_aligner")])
+}) 
+
+fn_len_df = do.call(rbind,fn_len)
+```
+
+
+## his
+
+```{r,fig.height=6,fig.width=5}
+
+ggplot(fn_len_df, aes(x = affected_length, color = SVcaller)) +
+   # geom_histogram(position = "dodge") +
+   ## overlay intensity plot using y axis on the right
+   geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+   theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of SV length in fn.vcf.gz", x = "Affected SV length group", y = "Count")+
+   facet_grid(tech_aligner~.,scales = "free")
+
+```
+
+# session info
+
+```{r}
+sessionInfo()
+```
+
