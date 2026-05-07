@@ -125,33 +125,9 @@ rule truvari_anno_repmask:
         &> {log};"
 
 
-rule truvari_anno_remap:
-    input:
-        vcf="{cwd}/truvari/{truvari_dir}/{vcftype}.repmask.vcf",
-        fasta=FASTA_PATH
-    output:
-        vcf="{cwd}/truvari/{truvari_dir}/{vcftype}.remap.vcf"
-    log:     "{cwd}/truvari/{truvari_dir}/{vcftype}.remap.vcf.log"
-    message: "executing {rule} with output {output} and input {input}"
-    threads: 2
-    resources:
-        mem_gb=8
-    shell:   "umask 0027; \
-        srun -p all -c {threads} --mem={resources.mem_gb}GB /bin/bash -c \" \
-            printf 'Container ID:\\t'; hostname; \
-            printf 'Start time:\\t'; date; \
-            umask 0027; \
-            {MAMBA} -n truvari truvari anno remap \
-                -r {input.fasta} \
-                -o {output.vcf} \
-                {input.vcf}; \
-            printf 'End time:\\t'; date; \" \
-        &> {log};"
-
-
 rule truvari_anno_lcr:
     input:
-        vcf="{cwd}/truvari/{truvari_dir}/{vcftype}.remap.vcf"
+        vcf="{cwd}/truvari/{truvari_dir}/{vcftype}.repmask.vcf"
     output:
         vcf="{cwd}/truvari/{truvari_dir}/{vcftype}.lcr.vcf"
     log:     "{cwd}/truvari/{truvari_dir}/{vcftype}.lcr.vcf.log"
