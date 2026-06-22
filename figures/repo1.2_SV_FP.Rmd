@@ -1,0 +1,134 @@
+---
+title: "LRS benchmarking"
+author: "Jiangyan Yu (jiangyan.yu@ukw.de)"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    code_folding: hide
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+# libraries
+
+```{r,include=FALSE}
+lapply(c("data.table","magrittr","ggplot2","dplyr","tidyr","vcfR","cowplot","ComplexHeatmap","UpSetR","scales","stringr","lubridate"), require, character.only = TRUE)
+
+
+```
+
+# working directory
+
+```{r}
+working_dir = "/Users/Yu_J/Documents/GitHub/lrs_benchmarking"
+
+
+files = list.files(paste0(working_dir,"/truvari"))
+
+files = files[files %like% "30x"]
+files = files[!files %like% "log"]
+
+```
+
+
+
+# refine.variant_summary.json
+
+```{r}
+## append F1 column from each file
+
+refine_sum = lapply(files, FUN = function(f) {
+  df1 = jsonlite::read_json(paste0(working_dir,"/truvari/",f,"/refine.variant_summary.json"))
+  df1 = unlist(df1) %>% t() %>% as.data.frame()
+  
+
+  ## append F1 to df_temp and rename the column name as f
+  df1$setting = f
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  
+  
+  return(df1)
+  
+}) %>% do.call(rbind,.)
+```
+
+
+# refine.base.vcf.gz
+
+## load vcf files
+
+```{r}
+## append F1 column from each file
+
+refine_base = lapply(files, FUN = function(f) {
+  ## load vcf.gz file
+  
+  df_temp = read.vcfR(paste0(working_dir,"/truvari/",f,"/refine.base.vcf.gz"))
+  df_remp1 = df_temp@fix %>% as.data.frame()
+
+  ### separeted by ; and keep the one contains SVTYPE as the value
+  df_remp1$SVTYPE = sapply(str_split(df_remp1$INFO, ";"), function(x) {
+    x[grepl("SVTYPE", x)]
+  }) %>% str_replace("SVTYPE=", "") 
+  df_remp1$SVLEN = sapply(str_split(df_remp1$INFO, ";"), function(x) {
+    x[grepl("SVLEN", x)]
+  }) %>% str_replace("SVLEN=", "") %>% as.numeric()
+  
+  
+  df_temp2 = df_temp@gt %>% as.data.frame()
+  df_temp2$category = str_split_fixed(df_temp2$HG002, ":", n = 4)[,3]
+  
+  df1 = cbind(df_remp1,df_temp2)
+  df1$setting = f
+  
+  df1$seq_tech = str_split_fixed(df1$setting, "\\.", n = 6)[,2]
+  df1$aligner = str_split_fixed(df1$setting, "\\.", n = 6)[,5]
+  df1$SVcaller = str_split_fixed(df1$setting, "\\.", n = 6)[,6]
+  
+  df1$tech_aligner = paste0(df1$seq_tech,"_",df1$aligner)
+  ### set the name of the list
+
+  
+  return(df1)
+})  %>% do.call(rbind,.)
+
+
+```
+
+## FN length
+
+```{r}
+ggplot(subset(refine_base,category=="FN"), aes(x = SVLEN,color=SVcaller)) +
+  geom_density(aes(y = ..count..), alpha = 0.2, position = "identity") +
+  scale_x_log10(labels = comma) +
+  theme_bw() +
+   # scale_y_log10()+
+  scale_x_log10()+
+   theme(text = element_text(size = 12),
+         strip.text.y = element_text(angle = 0)) +
+   labs(title = "Density of FN-SV length", x = "Affected SV length group", y = "Count")+
+   facet_grid(seq_tech~aligner,scales = "free")
+```
+
+
+```{r}
+df = refine_base$`HG002.ont.30x.hg38.mm2-ont.cuteSV`@gt %>% as.data.frame()
+df1 = df[df$INFO %like% "FN",]
+```
+
+
+# session info
+
+```{r}
+sessionInfo()
+```
+
