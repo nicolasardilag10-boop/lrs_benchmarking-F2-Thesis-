@@ -48,3 +48,17 @@ tmp/
 # whitelist the truvari directory and its contents
 !/truvari/
 !/truvari/**
+*.fastq
+*.fastq.gz
+*.bam
+*.bai
+*.cram
+*.crai
+*.sam
+
+# Local sequencing input files
+samples_try/
+Samples_try/
+
+# Local shell history and logs
+alignment_analysis/logs/
