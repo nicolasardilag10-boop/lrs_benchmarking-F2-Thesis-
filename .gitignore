@@ -62,3 +62,6 @@ Samples_try/
 
 # Local shell history and logs
 alignment_analysis/logs/
+
+# Local path configuration
+alignment_analysis/resume_paths.sh
