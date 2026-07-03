@@ -48,7 +48,7 @@ PATTERN = re.compile(
     r"^(HG00[234])\."
     r"(ont|pb)\."
     r"(1k|test)"
-    r"(?:\.(pbmm2-ccs))?"
+    r"(?:\.(pbmm2-(?:ccs|subread)))?"
     r"\.samtools_stats\.txt$"
 )
 
@@ -60,14 +60,20 @@ PATTERN = re.compile(
 EXPECTED = {
     ("HG002", "ont", "minimap2"),
     ("HG002", "pb", "minimap2"),
+    ("HG002", "ont", "pbmm2-subread"),
+    ("HG002", "pb", "pbmm2-subread"),
     ("HG002", "pb", "pbmm2-ccs"),
 
     ("HG003", "ont", "minimap2"),
     ("HG003", "pb", "minimap2"),
+    ("HG003", "ont", "pbmm2-subread"),
+    ("HG003", "pb", "pbmm2-subread"),
     ("HG003", "pb", "pbmm2-ccs"),
 
     ("HG004", "ont", "minimap2"),
     ("HG004", "pb", "minimap2"),
+    ("HG004", "ont", "pbmm2-subread"),
+    ("HG004", "pb", "pbmm2-subread"),
     ("HG004", "pb", "pbmm2-ccs"),
 }
 
@@ -152,7 +158,10 @@ def describe_alignment(
     """
 
     if method_tag == "pbmm2-ccs":
-        return "pbmm2", "CCS", "pbmm2-pb"
+        return "pbmm2", "CCS/HIFI", "pbmm2-pb"
+
+    if method_tag == "pbmm2-subread":
+        return "pbmm2", "SUBREAD", "pbmm2-ont"
 
     if technology == "ont":
         return "minimap2", "map-ont", "mm2-ont"
@@ -389,7 +398,8 @@ def sorting_key(row: dict[str, object]) -> tuple[int, int, int]:
     configuration_order = {
         "mm2-ont": 0,
         "mm2-pb": 1,
-        "pbmm2-pb": 2,
+        "pbmm2-ont": 2,
+        "pbmm2-pb": 3,
     }
 
     return (
