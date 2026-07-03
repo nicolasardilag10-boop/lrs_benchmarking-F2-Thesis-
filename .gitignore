@@ -73,3 +73,15 @@ __pycache__/
 alignment_analysis/alignments/
 alignment_analysis/tmp/
 path/to/file
+
+# Local backup files
+alignment_analysis/scripts/*.before_*.py
+alignment_analysis/scripts/*.before_*.sh
+alignment_analysis/tables/*.before_*.tsv
+
+# Large raw pbmm2 samtools reports
+alignment_analysis/tables/*.pbmm2-subread.samtools_stats.txt
+alignment_analysis/tables/*.pbmm2-ccs.samtools_stats.txt
+
+# Older non-indexed helper script
+alignment_analysis/scripts/run_pbmm2_ccs.sh
