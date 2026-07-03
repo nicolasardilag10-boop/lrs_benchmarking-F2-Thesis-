@@ -1,32 +1,83 @@
 #!/usr/bin/env python3
 
+"""
+Build one combined alignment summary table from samtools stats reports.
+
+Currently supported alignment configurations:
+
+1. ONT reads aligned with minimap2 map-ont
+2. PacBio reads aligned with minimap2 map-hifi
+3. PacBio reads aligned with pbmm2 CCS
+
+Input files are read from:
+
+    alignment_analysis/tables/
+
+The combined table is written to:
+
+    alignment_analysis/tables/alignment_summary.tsv
+"""
+
 import csv
 import re
 import sys
 from pathlib import Path
 
 
+# ---------------------------------------------------------------------
+# Project paths
+# ---------------------------------------------------------------------
+
 PROJECT = Path.home() / "lrs_benchmarking"
 TABLES = PROJECT / "alignment_analysis" / "tables"
 OUTPUT = TABLES / "alignment_summary.tsv"
 
-# Accept both standardized ".1k" files and older ".test" files.
+
+# ---------------------------------------------------------------------
+# Supported filename structures
+# ---------------------------------------------------------------------
+
+# Examples accepted:
+#
+# HG002.ont.1k.samtools_stats.txt
+# HG002.pb.1k.samtools_stats.txt
+# HG002.pb.1k.pbmm2-ccs.samtools_stats.txt
+#
+# Older ".test" files are also accepted.
 PATTERN = re.compile(
-    r"^(HG00[234])\.(ont|pb)\.(1k|test)\.samtools_stats\.txt$"
+    r"^(HG00[234])\."
+    r"(ont|pb)\."
+    r"(1k|test)"
+    r"(?:\.(pbmm2-ccs))?"
+    r"\.samtools_stats\.txt$"
 )
 
+
+# ---------------------------------------------------------------------
+# Expected results at the current stage of the project
+# ---------------------------------------------------------------------
+
 EXPECTED = {
-    ("HG002", "ont"),
-    ("HG002", "pb"),
-    ("HG003", "ont"),
-    ("HG003", "pb"),
-    ("HG004", "ont"),
-    ("HG004", "pb"),
+    ("HG002", "ont", "minimap2"),
+    ("HG002", "pb", "minimap2"),
+    ("HG002", "pb", "pbmm2-ccs"),
+
+    ("HG003", "ont", "minimap2"),
+    ("HG003", "pb", "minimap2"),
+    ("HG003", "pb", "pbmm2-ccs"),
+
+    ("HG004", "ont", "minimap2"),
+    ("HG004", "pb", "minimap2"),
+    ("HG004", "pb", "pbmm2-ccs"),
 }
 
 
+# ---------------------------------------------------------------------
+# Read the SN section of a samtools stats file
+# ---------------------------------------------------------------------
+
 def parse_sn_file(path: Path) -> dict[str, str]:
-    """Read the SN summary section from one samtools stats file."""
+    """Read the SN summary fields from one samtools stats report."""
 
     values: dict[str, str] = {}
 
@@ -48,6 +99,10 @@ def parse_sn_file(path: Path) -> dict[str, str]:
     return values
 
 
+# ---------------------------------------------------------------------
+# Convert one samtools value to a number
+# ---------------------------------------------------------------------
+
 def get_number(
     statistics: dict[str, str],
     name: str,
@@ -55,7 +110,12 @@ def get_number(
     integer: bool = False,
     default=None,
 ):
-    """Return a numeric SN value, or a default when it is absent."""
+    """
+    Return one numeric SN value.
+
+    Samtools values sometimes contain explanatory text after the number.
+    Only the first field is converted.
+    """
 
     raw_value = statistics.get(name)
 
@@ -72,15 +132,55 @@ def get_number(
     return int(number) if integer else number
 
 
-def choose_files() -> dict[tuple[str, str], Path]:
-    """
-    Find the six reports.
+# ---------------------------------------------------------------------
+# Determine the aligner metadata from the filename
+# ---------------------------------------------------------------------
 
-    When both '.1k' and '.test' exist for the same dataset,
-    prefer the standardized '.1k' file.
+def describe_alignment(
+    technology: str,
+    method_tag: str | None,
+) -> tuple[str, str, str]:
+    """
+    Return:
+
+        aligner
+        preset
+        configuration
+
+    The configuration column contains the compact labels intended for
+    the final comparison figures.
     """
 
-    selected: dict[tuple[str, str], Path] = {}
+    if method_tag == "pbmm2-ccs":
+        return "pbmm2", "CCS", "pbmm2-pb"
+
+    if technology == "ont":
+        return "minimap2", "map-ont", "mm2-ont"
+
+    if technology == "pb":
+        return "minimap2", "map-hifi", "mm2-pb"
+
+    raise ValueError(f"Unsupported technology: {technology}")
+
+
+# ---------------------------------------------------------------------
+# Select input files
+# ---------------------------------------------------------------------
+
+def choose_files() -> dict[tuple[str, str, str], Path]:
+    """
+    Find all supported samtools stats reports.
+
+    The selection key is:
+
+        sample, technology, alignment method
+
+    When both ".1k" and ".test" versions exist for the same condition,
+    the standardized ".1k" file is preferred.
+    """
+
+    selected: dict[tuple[str, str, str], Path] = {}
+    selected_suffix: dict[tuple[str, str, str], str] = {}
 
     for path in sorted(TABLES.glob("*.samtools_stats.txt")):
         match = PATTERN.match(path.name)
@@ -91,19 +191,35 @@ def choose_files() -> dict[tuple[str, str], Path]:
         sample = match.group(1)
         technology = match.group(2)
         suffix = match.group(3)
+        method_tag = match.group(4)
 
-        dataset = (sample, technology)
+        method = method_tag if method_tag else "minimap2"
+        dataset = (sample, technology, method)
 
         if dataset not in selected:
             selected[dataset] = path
-        elif suffix == "1k":
+            selected_suffix[dataset] = suffix
+            continue
+
+        # Prefer ".1k" over the older ".test" filename.
+        if suffix == "1k" and selected_suffix[dataset] != "1k":
             selected[dataset] = path
+            selected_suffix[dataset] = suffix
 
     return selected
 
 
-def build_row(path: Path, sample: str, technology: str) -> dict[str, object]:
-    """Create one combined-table row."""
+# ---------------------------------------------------------------------
+# Build one table row
+# ---------------------------------------------------------------------
+
+def build_row(
+    path: Path,
+    sample: str,
+    technology: str,
+    method: str,
+) -> dict[str, object]:
+    """Create one combined summary row."""
 
     stats = parse_sn_file(path)
 
@@ -166,6 +282,20 @@ def build_row(path: Path, sample: str, technology: str) -> dict[str, object]:
         default=0.0,
     )
 
+    insertions = get_number(
+        stats,
+        "insertions",
+        integer=True,
+        default=None,
+    )
+
+    deletions = get_number(
+        stats,
+        "deletions",
+        integer=True,
+        default=None,
+    )
+
     average_length = get_number(
         stats,
         "average length",
@@ -179,30 +309,14 @@ def build_row(path: Path, sample: str, technology: str) -> dict[str, object]:
         default=0,
     )
 
-    non_primary = get_number(
+    non_primary_alignments = get_number(
         stats,
         "non-primary alignments",
         integer=True,
         default=0,
     )
 
-    # These fields are optional because some samtools versions
-    # do not include them in the SN section.
-    insertions = get_number(
-        stats,
-        "insertions",
-        integer=True,
-        default="",
-    )
-
-    deletions = get_number(
-        stats,
-        "deletions",
-        integer=True,
-        default="",
-    )
-
-    mapping_percent = (
+    mapped_reads_percent = (
         reads_mapped / raw_total * 100
         if raw_total > 0
         else 0.0
@@ -214,84 +328,146 @@ def build_row(path: Path, sample: str, technology: str) -> dict[str, object]:
         else 0.0
     )
 
-    technology_label = "ONT" if technology == "ont" else "PacBio"
+    error_percent = error_rate * 100
+
+    method_tag = None if method == "minimap2" else method
+
+    aligner, preset, configuration = describe_alignment(
+        technology,
+        method_tag,
+    )
+
+    technology_label = {
+        "ont": "ONT",
+        "pb": "PacBio",
+    }[technology]
 
     return {
         "sample": sample,
-        "technology": technology_label,
-        "stats_file": path.name,
+        "read_technology": technology_label,
+        "aligner": aligner,
+        "preset": preset,
+        "configuration": configuration,
+        "statistics_file": path.name,
         "raw_total_sequences": raw_total,
         "reads_mapped": reads_mapped,
         "reads_unmapped": reads_unmapped,
-        "mapping_percent": f"{mapping_percent:.4f}",
+        "mapped_reads_percent": f"{mapped_reads_percent:.4f}",
         "total_length": total_length,
         "bases_mapped": bases_mapped,
         "bases_mapped_cigar": bases_mapped_cigar,
         "mapped_bases_percent": f"{mapped_bases_percent:.4f}",
         "mismatches": mismatches,
         "error_rate": f"{error_rate:.8f}",
-        "error_percent": f"{error_rate * 100:.4f}",
+        "error_percent": f"{error_percent:.4f}",
         "insertions": insertions,
         "deletions": deletions,
         "average_length": f"{average_length:.2f}",
         "maximum_length": maximum_length,
-        "non_primary_alignments": non_primary,
+        "non_primary_alignments": non_primary_alignments,
     }
 
 
-def main() -> None:
-    TABLES.mkdir(parents=True, exist_ok=True)
+# ---------------------------------------------------------------------
+# Sort rows consistently
+# ---------------------------------------------------------------------
 
-    selected = choose_files()
-    missing = EXPECTED - set(selected)
+def sorting_key(row: dict[str, object]) -> tuple[int, int, int]:
+    """Define the presentation order in the output table."""
 
-    if missing:
-        missing_text = ", ".join(
-            f"{sample}-{technology}"
-            for sample, technology in sorted(missing)
-        )
-        raise FileNotFoundError(
-            f"Missing samtools stats files: {missing_text}"
-        )
-
-    rows = []
-
-    for sample, technology in sorted(EXPECTED):
-        path = selected[(sample, technology)]
-
-        try:
-            row = build_row(
-                path,
-                sample,
-                technology,
-            )
-        except Exception as error:
-            raise RuntimeError(
-                f"Could not process {path.name}: {error}"
-            ) from error
-
-        rows.append(row)
+    sample_order = {
+        "HG002": 0,
+        "HG003": 1,
+        "HG004": 2,
+    }
 
     technology_order = {
         "ONT": 0,
         "PacBio": 1,
     }
 
-    rows.sort(
-        key=lambda row: (
-            row["sample"],
-            technology_order[row["technology"]],
-        )
+    configuration_order = {
+        "mm2-ont": 0,
+        "mm2-pb": 1,
+        "pbmm2-pb": 2,
+    }
+
+    return (
+        sample_order[str(row["sample"])],
+        technology_order[str(row["read_technology"])],
+        configuration_order[str(row["configuration"])],
     )
+
+
+# ---------------------------------------------------------------------
+# Main workflow
+# ---------------------------------------------------------------------
+
+def main() -> int:
+    """Build and write the combined TSV table."""
+
+    if not TABLES.is_dir():
+        print(
+            f"ERROR: tables directory not found: {TABLES}",
+            file=sys.stderr,
+        )
+        return 1
+
+    selected = choose_files()
+
+    missing = sorted(EXPECTED - set(selected))
+
+    if missing:
+        print(
+            "ERROR: the following expected statistics files are missing:",
+            file=sys.stderr,
+        )
+
+        for sample, technology, method in missing:
+            print(
+                f"  {sample} | {technology} | {method}",
+                file=sys.stderr,
+            )
+
+        return 1
+
+    rows: list[dict[str, object]] = []
+
+    for dataset, path in selected.items():
+        if dataset not in EXPECTED:
+            continue
+
+        sample, technology, method = dataset
+
+        try:
+            row = build_row(
+                path,
+                sample,
+                technology,
+                method,
+            )
+        except ValueError as error:
+            print(
+                f"ERROR: {path.name}: {error}",
+                file=sys.stderr,
+            )
+            return 1
+
+        rows.append(row)
+
+    rows.sort(key=sorting_key)
 
     fieldnames = [
         "sample",
-        "technology",
-        "stats_file",
+        "read_technology",
+        "aligner",
+        "preset",
+        "configuration",
+        "statistics_file",
         "raw_total_sequences",
         "reads_mapped",
         "reads_unmapped",
-        "mapping_percent",
+        "mapped_reads_percent",
         "total_length",
         "bases_mapped",
         "bases_mapped_cigar",
@@ -306,36 +482,22 @@ def main() -> None:
         "non_primary_alignments",
     ]
 
-    with OUTPUT.open(
-        "w",
-        encoding="utf-8",
-        newline="",
-    ) as handle:
+    with OUTPUT.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(
             handle,
             fieldnames=fieldnames,
             delimiter="\t",
+            extrasaction="raise",
         )
 
         writer.writeheader()
         writer.writerows(rows)
 
-    print("SUCCESS: alignment summary created")
-    print(OUTPUT)
-    print()
+    print(f"Alignment summary written to: {OUTPUT}")
+    print(f"Data rows written: {len(rows)}")
 
-    for row in rows:
-        print(
-            f"{row['sample']} "
-            f"{row['technology']:<6} "
-            f"mapped={row['mapping_percent']}% "
-            f"error={row['error_percent']}%"
-        )
+    return 0
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as error:
-        print(f"ERROR: {error}", file=sys.stderr)
-        sys.exit(1)
+    raise SystemExit(main())

@@ -1,7 +1,10 @@
-sample	technology	stats_file	raw_total_sequences	reads_mapped	reads_unmapped	mapping_percent	total_length	bases_mapped	bases_mapped_cigar	mapped_bases_percent	mismatches	error_rate	error_percent	insertions	deletions	average_length	maximum_length	non_primary_alignments
-HG002	ONT	HG002.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	18663418	18663418	18601777	99.6697	673855	0.03622530	3.6225			18663.00	315783	4266
-HG002	PacBio	HG002.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13462607	99.9474	195885	0.01455030	1.4550			13470.00	32674	4345
-HG003	ONT	HG003.ont.1k.samtools_stats.txt	1000	999	1	99.9000	12808634	12805799	12492154	97.5292	417741	0.03344027	3.3440			12809.00	74299	4452
-HG003	PacBio	HG003.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	14032287	99.9977	271241	0.01932978	1.9330			14033.00	32907	4282
-HG004	ONT	HG004.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	13605899	13605899	13436376	98.7540	548148	0.04079582	4.0796			13606.00	78490	4486
-HG004	PacBio	HG004.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14362861	99.9437	292286	0.02035012	2.0350			14371.00	32998	4190
+sample	read_technology	aligner	preset	configuration	statistics_file	raw_total_sequences	reads_mapped	reads_unmapped	mapped_reads_percent	total_length	bases_mapped	bases_mapped_cigar	mapped_bases_percent	mismatches	error_rate	error_percent	insertions	deletions	average_length	maximum_length	non_primary_alignments
+HG002	ONT	minimap2	map-ont	mm2-ont	HG002.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	18663418	18663418	18601777	99.6697	673855	0.03622530	3.6225			18663.00	315783	4266
+HG002	PacBio	minimap2	map-hifi	mm2-pb	HG002.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13462607	99.9474	195885	0.01455030	1.4550			13470.00	32674	4345
+HG002	PacBio	pbmm2	CCS	pbmm2-pb	HG002.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13387151	99.3872	171472	0.01280870	1.2809			13470.00	32674	0
+HG003	ONT	minimap2	map-ont	mm2-ont	HG003.ont.1k.samtools_stats.txt	1000	999	1	99.9000	12808634	12805799	12492154	97.5292	417741	0.03344027	3.3440			12809.00	74299	4452
+HG003	PacBio	minimap2	map-hifi	mm2-pb	HG003.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	14032287	99.9977	271241	0.01932978	1.9330			14033.00	32907	4282
+HG003	PacBio	pbmm2	CCS	pbmm2-pb	HG003.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	13886669	98.9600	210242	0.01513984	1.5140			14033.00	32907	0
+HG004	ONT	minimap2	map-ont	mm2-ont	HG004.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	13605899	13605899	13436376	98.7540	548148	0.04079582	4.0796			13606.00	78490	4486
+HG004	PacBio	minimap2	map-hifi	mm2-pb	HG004.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14362861	99.9437	292286	0.02035012	2.0350			14371.00	32998	4190
+HG004	PacBio	pbmm2	CCS	pbmm2-pb	HG004.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14251638	99.1697	247926	0.01739632	1.7396			14371.00	32998	0
