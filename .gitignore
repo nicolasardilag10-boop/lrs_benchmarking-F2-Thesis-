@@ -65,3 +65,10 @@ alignment_analysis/logs/
 
 # Local path configuration
 alignment_analysis/resume_paths.sh
+reference/
+__pycache__/
+*.py[cod]
+/miniconda.sh
+/pbmm2
+alignment_analysis/alignments/
+alignment_analysis/tmp/
