@@ -48,7 +48,7 @@ PATTERN = re.compile(
     r"^(HG00[234])\."
     r"(ont|pb)\."
     r"(1k|test)"
-    r"(?:\.(pbmm2-(?:ccs|subread)))?"
+    r"(?:\.((?:mm2-(?:ont|pb))|(?:pbmm2-(?:ccs|subread))))?"
     r"\.samtools_stats\.txt$"
 )
 
@@ -59,20 +59,29 @@ PATTERN = re.compile(
 
 EXPECTED = {
     ("HG002", "ont", "minimap2"),
-    ("HG002", "pb", "minimap2"),
+    ("HG002", "ont", "mm2-pb"),
     ("HG002", "ont", "pbmm2-subread"),
+    ("HG002", "ont", "pbmm2-ccs"),
+    ("HG002", "pb", "mm2-ont"),
+    ("HG002", "pb", "minimap2"),
     ("HG002", "pb", "pbmm2-subread"),
     ("HG002", "pb", "pbmm2-ccs"),
 
     ("HG003", "ont", "minimap2"),
-    ("HG003", "pb", "minimap2"),
+    ("HG003", "ont", "mm2-pb"),
     ("HG003", "ont", "pbmm2-subread"),
+    ("HG003", "ont", "pbmm2-ccs"),
+    ("HG003", "pb", "mm2-ont"),
+    ("HG003", "pb", "minimap2"),
     ("HG003", "pb", "pbmm2-subread"),
     ("HG003", "pb", "pbmm2-ccs"),
 
     ("HG004", "ont", "minimap2"),
-    ("HG004", "pb", "minimap2"),
+    ("HG004", "ont", "mm2-pb"),
     ("HG004", "ont", "pbmm2-subread"),
+    ("HG004", "ont", "pbmm2-ccs"),
+    ("HG004", "pb", "mm2-ont"),
+    ("HG004", "pb", "minimap2"),
     ("HG004", "pb", "pbmm2-subread"),
     ("HG004", "pb", "pbmm2-ccs"),
 }
@@ -156,6 +165,12 @@ def describe_alignment(
     The configuration column contains the compact labels intended for
     the final comparison figures.
     """
+
+    if method_tag == "mm2-ont":
+        return "minimap2", "map-ont", "mm2-ont"
+
+    if method_tag == "mm2-pb":
+        return "minimap2", "map-hifi", "mm2-pb"
 
     if method_tag == "pbmm2-ccs":
         return "pbmm2", "CCS/HIFI", "pbmm2-pb"
@@ -332,7 +347,7 @@ def build_row(
     )
 
     mapped_bases_percent = (
-        bases_mapped_cigar / total_length * 100
+        bases_mapped / total_length * 100
         if total_length > 0
         else 0.0
     )
@@ -357,7 +372,7 @@ def build_row(
         "aligner": aligner,
         "preset": preset,
         "configuration": configuration,
-        "statistics_file": path.name,
+        "statistics_file": str(path.relative_to(PROJECT)),
         "raw_total_sequences": raw_total,
         "reads_mapped": reads_mapped,
         "reads_unmapped": reads_unmapped,
