@@ -646,16 +646,17 @@ for axis, sample in zip(
 # ============================================================
 
 figure.suptitle(
-    "Mapped bases across alignment configurations",
-    x=0.055,
+    "Mapped bases (CIGAR)",
+    x=0.5,
     y=0.985,
-    ha="left",
+    ha="center",
     fontsize=12,
 )
 
 figure.supxlabel(
-    "Alignment configuration",
+    "Alignment",
     y=0.055,
+    ha="center",
     fontsize=10,
 )
 
