@@ -1,0 +1,13 @@
+sample_sheet: config/samples.assemblers.tsv
+
+active_assemblers:
+  - flye
+  - goldrush
+  - verkko
+  - ntlink
+
+genome_size: 46709983
+threads: 4
+local_memory_gb: 9
+
+results_root: results/assembler_benchmark

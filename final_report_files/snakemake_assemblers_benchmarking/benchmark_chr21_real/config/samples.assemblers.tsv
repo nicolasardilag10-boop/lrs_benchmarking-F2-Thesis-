@@ -1,0 +1,7 @@
+sample	technology	fastq
+HG002	pb	inputs/final_normalized/HG002/HG002.hifi.chr21.primary.mapq20.30x.fastq.gz
+HG002	ont	inputs/final_normalized/HG002/HG002.ont.chr21.primary.mapq20.30x.fastq.gz
+HG003	pb	inputs/final_normalized/HG003/HG003.hifi.chr21.primary.mapq20.30x.fastq.gz
+HG003	ont	inputs/final_normalized/HG003/HG003.ont.chr21.primary.mapq20.30x.fastq.gz
+HG004	pb	inputs/final_normalized/HG004/HG004.hifi.chr21.primary.mapq20.30x.fastq.gz
+HG004	ont	inputs/final_normalized/HG004/HG004.ont.chr21.primary.mapq20.30x.fastq.gz

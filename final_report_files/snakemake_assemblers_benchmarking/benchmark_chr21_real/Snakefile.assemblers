@@ -1,0 +1,720 @@
+################################################################################
+# REAL CHROMOSOME 21 ASSEMBLER BENCHMARK
+#
+# Samples:
+#   HG002, HG003, HG004
+#
+# Inputs:
+#   PacBio HiFi 30x
+#   Oxford Nanopore 30x
+#
+# Tools:
+#   Flye
+#   GoldRush
+#   Verkko
+#   ntLink using the corresponding GoldRush draft
+################################################################################
+
+configfile: workflow.source_path("config/config.assemblers.yaml")
+
+from pathlib import Path
+import yaml
+import csv
+
+
+# ------------------------------------------------------------------------------
+# Paths and configuration
+# ------------------------------------------------------------------------------
+
+BASE_DIR = Path(workflow.basedir).resolve()
+PROJECT_DIR = BASE_DIR.parent
+
+
+# -----------------------------------------------------------------------------
+# Pinned OCI container images used by the assembler rules
+# -----------------------------------------------------------------------------
+
+CONTAINER_CONFIG = BASE_DIR / "config" / "containers.yaml"
+
+if not CONTAINER_CONFIG.is_file():
+    raise FileNotFoundError(
+        f"Container configuration not found: {CONTAINER_CONFIG}"
+    )
+
+with CONTAINER_CONFIG.open("r", encoding="utf-8") as handle:
+    CONTAINER_CONFIG_DATA = yaml.safe_load(handle) or {}
+
+CONTAINERS = CONTAINER_CONFIG_DATA.get("containers", {})
+
+REQUIRED_CONTAINER_KEYS = {
+    "flye2",
+    "goldrush",
+    "ntlink",
+    "verkko2",
+}
+
+MISSING_CONTAINER_KEYS = REQUIRED_CONTAINER_KEYS - set(CONTAINERS)
+
+if MISSING_CONTAINER_KEYS:
+    raise ValueError(
+        "Missing container definitions: "
+        + ", ".join(sorted(MISSING_CONTAINER_KEYS))
+    )
+SAMPLE_SHEET = BASE_DIR / config["sample_sheet"]
+RESULTS_ROOT = BASE_DIR / config.get(
+    "results_root",
+    "results/assembler_benchmark",
+)
+
+GENOME_SIZE = str(config.get("genome_size", "46709983"))
+THREADS = int(config.get("threads", 4))
+LOCAL_MEMORY_GB = int(config.get("local_memory_gb", 9))
+
+ACTIVE_ASSEMBLERS = set(
+    config.get(
+        "active_assemblers",
+        ["flye", "goldrush", "verkko", "ntlink"],
+    )
+)
+
+SUPPORTED_ASSEMBLERS = {
+    "flye",
+    "goldrush",
+    "verkko",
+    "ntlink",
+}
+
+UNKNOWN_ASSEMBLERS = (
+    ACTIVE_ASSEMBLERS - SUPPORTED_ASSEMBLERS
+)
+
+if UNKNOWN_ASSEMBLERS:
+    raise ValueError(
+        f"Unsupported assemblers: "
+        f"{sorted(UNKNOWN_ASSEMBLERS)}"
+    )
+
+ENV_FLYE = str(PROJECT_DIR / "envs" / "flye.yaml")
+ENV_GOLDRUSH = str(PROJECT_DIR / "envs" / "goldrush.yaml")
+ENV_VERKKO = str(PROJECT_DIR / "envs" / "verkko.yaml")
+ENV_NTLINK = str(PROJECT_DIR / "envs" / "ntlink.yaml")
+
+VALIDATION_OK = str(
+    RESULTS_ROOT / "checkpoints" / "inputs_validated.ok"
+)
+
+WORKFLOW_OK = str(
+    RESULTS_ROOT / "checkpoints" / "workflow_complete.ok"
+)
+
+
+# ------------------------------------------------------------------------------
+# Read and validate the sample sheet
+# ------------------------------------------------------------------------------
+
+def read_sample_sheet(path):
+    rows = []
+
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Sample sheet not found: {path}"
+        )
+
+    with path.open(newline="") as handle:
+        reader = csv.DictReader(
+            handle,
+            delimiter="\t",
+        )
+
+        expected_columns = {
+            "sample",
+            "technology",
+            "fastq",
+        }
+
+        observed_columns = set(
+            reader.fieldnames or []
+        )
+
+        missing_columns = (
+            expected_columns - observed_columns
+        )
+
+        if missing_columns:
+            raise ValueError(
+                f"Missing sample-sheet columns: "
+                f"{sorted(missing_columns)}"
+            )
+
+        for row in reader:
+            sample = row["sample"].strip()
+            technology = row["technology"].strip()
+            relative_fastq = row["fastq"].strip()
+
+            if technology not in {"pb", "ont"}:
+                raise ValueError(
+                    f"Unsupported technology: {technology}"
+                )
+
+            fastq = (
+                BASE_DIR / relative_fastq
+            ).resolve()
+
+            rows.append(
+                {
+                    "sample": sample,
+                    "technology": technology,
+                    "fastq": str(fastq),
+                }
+            )
+
+    if not rows:
+        raise ValueError(
+            f"Sample sheet is empty: {path}"
+        )
+
+    return rows
+
+
+SAMPLE_ROWS = read_sample_sheet(SAMPLE_SHEET)
+
+SAMPLES = list(
+    dict.fromkeys(
+        row["sample"]
+        for row in SAMPLE_ROWS
+    )
+)
+
+SAMPLE_TECH_PAIRS = [
+    (
+        row["sample"],
+        row["technology"],
+    )
+    for row in SAMPLE_ROWS
+]
+
+FASTQ_BY_SAMPLE_TECH = {
+    (
+        row["sample"],
+        row["technology"],
+    ): row["fastq"]
+    for row in SAMPLE_ROWS
+}
+
+
+def fastq_for(wildcards):
+    key = (
+        wildcards.sample,
+        wildcards.technology,
+    )
+
+    return FASTQ_BY_SAMPLE_TECH[key]
+
+
+def pb_fastq_for_sample(wildcards):
+    return FASTQ_BY_SAMPLE_TECH[
+        (
+            wildcards.sample,
+            "pb",
+        )
+    ]
+
+
+def ont_fastq_for_sample(wildcards):
+    return FASTQ_BY_SAMPLE_TECH[
+        (
+            wildcards.sample,
+            "ont",
+        )
+    ]
+
+
+def flye_read_option(wildcards):
+    if wildcards.technology == "ont":
+        return "--nano-raw"
+
+    return "--pacbio-hifi"
+
+
+# ------------------------------------------------------------------------------
+# Expected output files
+# ------------------------------------------------------------------------------
+
+EXPECTED_OUTPUTS = []
+
+if "flye" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        [
+            str(
+                RESULTS_ROOT
+                / "assemblies"
+                / "flye"
+                / f"{sample}.{technology}"
+                / "assembly.fasta"
+            )
+            for sample, technology
+            in SAMPLE_TECH_PAIRS
+        ]
+    )
+
+if "goldrush" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        [
+            str(
+                RESULTS_ROOT
+                / "assemblies"
+                / "goldrush"
+                / f"{sample}.{technology}"
+                / "assembly.fasta"
+            )
+            for sample, technology
+            in SAMPLE_TECH_PAIRS
+        ]
+    )
+
+if "verkko" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        [
+            str(
+                RESULTS_ROOT
+                / "assemblies"
+                / "verkko"
+                / sample
+                / "assembly.fasta"
+            )
+            for sample in SAMPLES
+        ]
+    )
+
+if "ntlink" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        [
+            str(
+                RESULTS_ROOT
+                / "assemblies"
+                / "ntlink_goldrush"
+                / f"{sample}.{technology}"
+                / "assembly.fasta"
+            )
+            for sample, technology
+            in SAMPLE_TECH_PAIRS
+        ]
+    )
+
+
+wildcard_constraints:
+    sample="HG002|HG003|HG004",
+    technology="pb|ont"
+
+
+# ------------------------------------------------------------------------------
+# Final targets
+# ------------------------------------------------------------------------------
+
+rule all:
+    input:
+        WORKFLOW_OK
+
+
+rule validate_inputs:
+    output:
+        VALIDATION_OK
+    run:
+        errors = []
+
+        for row in SAMPLE_ROWS:
+            fastq = Path(row["fastq"])
+
+            if not fastq.exists():
+                errors.append(
+                    f"Missing FASTQ: {fastq}"
+                )
+            elif fastq.stat().st_size == 0:
+                errors.append(
+                    f"Empty FASTQ: {fastq}"
+                )
+
+        required_environments = []
+
+        if "flye" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_FLYE
+            )
+
+        if "goldrush" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_GOLDRUSH
+            )
+
+        if "verkko" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_VERKKO
+            )
+
+        if "ntlink" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_NTLINK
+            )
+
+        for environment in required_environments:
+            if not Path(environment).exists():
+                errors.append(
+                    f"Missing environment: {environment}"
+                )
+
+        for sample in SAMPLES:
+            for technology in ("pb", "ont"):
+                key = (
+                    sample,
+                    technology,
+                )
+
+                if key not in FASTQ_BY_SAMPLE_TECH:
+                    errors.append(
+                        f"Missing input pair: "
+                        f"{sample} {technology}"
+                    )
+
+        if errors:
+            raise RuntimeError(
+                "\n".join(errors)
+            )
+
+        Path(output[0]).parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        Path(output[0]).write_text(
+            "Chromosome 21 assembler inputs validated.\n"
+        )
+
+
+# ------------------------------------------------------------------------------
+# Flye
+# ------------------------------------------------------------------------------
+
+rule flye_assembly:
+    input:
+        validation=VALIDATION_OK,
+        fastq=fastq_for
+    output:
+        assembly=str(
+            RESULTS_ROOT
+            / "assemblies"
+            / "flye"
+            / "{sample}.{technology}"
+            / "assembly.fasta"
+        )
+    log:
+        str(
+            RESULTS_ROOT
+            / "logs"
+            / "flye"
+            / "{sample}.{technology}.log"
+        )
+    container:
+        CONTAINERS["flye2"]
+    threads:
+        THREADS
+    resources:
+        mem_mb=8500
+    params:
+        outdir=lambda wildcards: str(
+            RESULTS_ROOT
+            / "assemblies"
+            / "flye"
+            / f"{wildcards.sample}.{wildcards.technology}"
+        ),
+        read_option=flye_read_option,
+        genome_size=GENOME_SIZE
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.outdir:q}
+        mkdir -p "$(dirname {log:q})"
+
+        if [[ -s "{params.outdir}/flye.log" ]]; then
+            flye \
+                {params.read_option} {input.fastq:q} \
+                --genome-size {params.genome_size} \
+                --threads {threads} \
+                --out-dir {params.outdir:q} \
+                --resume \
+                2>&1 | tee {log:q}
+        else
+            flye \
+                {params.read_option} {input.fastq:q} \
+                --genome-size {params.genome_size} \
+                --threads {threads} \
+                --out-dir {params.outdir:q} \
+                2>&1 | tee {log:q}
+        fi
+
+        test -s {output.assembly:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# GoldRush
+# ------------------------------------------------------------------------------
+
+rule goldrush_assembly:
+    input:
+        validation=VALIDATION_OK,
+        reads=fastq_for
+    output:
+        assembly=str(
+            RESULTS_ROOT
+            / "assemblies"
+            / "goldrush"
+            / "{sample}.{technology}"
+            / "assembly.fasta"
+        )
+    log:
+        str(
+            RESULTS_ROOT
+            / "logs"
+            / "goldrush"
+            / "{sample}.{technology}.log"
+        )
+    container:
+        CONTAINERS["goldrush"]
+    threads:
+        THREADS
+    resources:
+        mem_mb=9000
+    params:
+        workdir=lambda wildcards: str(
+            RESULTS_ROOT
+            / "work"
+            / "goldrush"
+            / f"{wildcards.sample}.{wildcards.technology}"
+        ),
+        prefix=lambda wildcards: (
+            f"{wildcards.sample}_"
+            f"{wildcards.technology}_goldrush"
+        ),
+        reads_basename=lambda wildcards: (
+            f"{wildcards.sample}_"
+            f"{wildcards.technology}"
+        ),
+        min_read_length=lambda wildcards: (
+            5000
+            if wildcards.technology == "ont"
+            else 10000
+        ),
+        genome_size=GENOME_SIZE
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.workdir:q}
+        mkdir -p "$(dirname {output.assembly:q})"
+        mkdir -p "$(dirname {log:q})"
+
+        READS_FASTQ="{params.workdir}/{params.reads_basename}.fastq"
+
+        if [[ ! -s "$READS_FASTQ" ]]; then
+            gzip -cd {input.reads:q} \
+                > "$READS_FASTQ.tmp"
+
+            mv "$READS_FASTQ.tmp" \
+               "$READS_FASTQ"
+        fi
+
+        cd {params.workdir:q}
+
+        goldrush run \
+            reads="{params.reads_basename}" \
+            G={params.genome_size} \
+            t={threads} \
+            m={params.min_read_length} \
+            P=0 \
+            p="{params.prefix}" \
+            track_time=1 \
+            2>&1 | tee {log:q}
+
+        FINAL_ASSEMBLY=$(
+            find goldrush_intermediate_files \
+                -type f \
+                -name "*ntLink-5rounds.polished.fa" \
+                -print \
+            | sort \
+            | tail -n 1
+        )
+
+        if [[ -z "$FINAL_ASSEMBLY" ]] \
+            || [[ ! -s "$FINAL_ASSEMBLY" ]]
+        then
+            echo "ERROR: GoldRush final assembly missing."
+            exit 1
+        fi
+
+        cp "$FINAL_ASSEMBLY" \
+           {output.assembly:q}
+
+        test -s {output.assembly:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# Verkko hybrid assembly
+# ------------------------------------------------------------------------------
+
+rule verkko_assembly:
+    input:
+        validation=VALIDATION_OK,
+        hifi=pb_fastq_for_sample,
+        ont=ont_fastq_for_sample
+    output:
+        assembly=str(
+            RESULTS_ROOT
+            / "assemblies"
+            / "verkko"
+            / "{sample}"
+            / "assembly.fasta"
+        )
+    log:
+        str(
+            RESULTS_ROOT
+            / "logs"
+            / "verkko"
+            / "{sample}.log"
+        )
+    container:
+        CONTAINERS["verkko2"]
+    threads:
+        THREADS
+    resources:
+        mem_mb=9000
+    params:
+        workdir=lambda wildcards: str(
+            RESULTS_ROOT
+            / "work"
+            / "verkko"
+            / wildcards.sample
+        )
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.workdir:q}
+        mkdir -p "$(dirname {output.assembly:q})"
+        mkdir -p "$(dirname {log:q})"
+
+        verkko \
+            -d {params.workdir:q} \
+            --hifi {input.hifi:q} \
+            --nano {input.ont:q} \
+            --local \
+            --local-cpus {threads} \
+            --local-memory {LOCAL_MEMORY_GB} \
+            2>&1 | tee {log:q}
+
+        cp "{params.workdir}/assembly.fasta" \
+           {output.assembly:q}
+
+        test -s {output.assembly:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# ntLink scaffolding using the corresponding GoldRush assembly
+# ------------------------------------------------------------------------------
+
+rule ntlink_scaffold:
+    input:
+        validation=VALIDATION_OK,
+        draft=str(
+            RESULTS_ROOT
+            / "assemblies"
+            / "goldrush"
+            / "{sample}.{technology}"
+            / "assembly.fasta"
+        ),
+        reads=fastq_for
+    output:
+        assembly=str(
+            RESULTS_ROOT
+            / "assemblies"
+            / "ntlink_goldrush"
+            / "{sample}.{technology}"
+            / "assembly.fasta"
+        )
+    log:
+        str(
+            RESULTS_ROOT
+            / "logs"
+            / "ntlink"
+            / "{sample}.{technology}.log"
+        )
+    container:
+        CONTAINERS["ntlink"]
+    threads:
+        THREADS
+    resources:
+        mem_mb=6000
+    params:
+        workdir=lambda wildcards: str(
+            RESULTS_ROOT
+            / "work"
+            / "ntlink_goldrush"
+            / f"{wildcards.sample}.{wildcards.technology}"
+        )
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.workdir:q}
+        mkdir -p "$(dirname {output.assembly:q})"
+        mkdir -p "$(dirname {log:q})"
+
+        cp {input.draft:q} \
+           "{params.workdir}/draft.fasta"
+
+        if [[ ! -s "{params.workdir}/reads.fastq" ]]; then
+            gzip -cd {input.reads:q} \
+                > "{params.workdir}/reads.fastq.tmp"
+
+            mv "{params.workdir}/reads.fastq.tmp" \
+               "{params.workdir}/reads.fastq"
+        fi
+
+        (
+            cd {params.workdir:q}
+
+            ntLink scaffold \
+                target=draft.fasta \
+                reads='reads.fastq' \
+                t={threads}
+        ) 2>&1 | tee {log:q}
+
+        cp \
+            "{params.workdir}/draft.fasta.k32.w100.z1000.ntLink.scaffolds.fa" \
+            {output.assembly:q}
+
+        test -s {output.assembly:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# Final checkpoint
+# ------------------------------------------------------------------------------
+
+rule workflow_complete:
+    input:
+        validation=VALIDATION_OK,
+        assemblies=EXPECTED_OUTPUTS
+    output:
+        WORKFLOW_OK
+    run:
+        Path(output[0]).parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        Path(output[0]).write_text(
+            "Chromosome 21 assembler workflow completed.\n"
+        )

@@ -85,3 +85,52 @@ alignment_analysis/tables/*.pbmm2-ccs.samtools_stats.txt
 
 # Older non-indexed helper script
 alignment_analysis/scripts/run_pbmm2_ccs.sh
+
+# BEGIN CHR21 ASSEMBLER CONTAINER WORKFLOW
+
+# Snakemake runtime state and local environments
+final_report_files/snakemake_assemblers_benchmarking/.snakemake/
+final_report_files/snakemake_assemblers_benchmarking/.conda/
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/.snakemake/
+
+# Large real chromosome 21 inputs
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/
+
+# Generated assemblies, logs, checkpoints and work directories
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/results/
+
+# Large smoke-test data and generated smoke-test results
+final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/
+final_report_files/snakemake_assemblers_benchmarking/smoke_test/results/
+
+# Local runner and monitoring helpers
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/scripts/run_chr21_assemblers.sh
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/scripts/monitor_chr21_assemblers.sh
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/scripts/monitor_chr21_assemblers_v2.sh
+
+# Local inspection and audit reports
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/containerization_audit.txt
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/container_versions.tsv
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/list_conda_envs.txt
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/workflow_inspection.txt
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/assembler_rule_details.txt
+final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/core_workflow_part*.txt
+
+# Local backups
+final_report_files/snakemake_assemblers_benchmarking/**/*.backup_*
+final_report_files/snakemake_assemblers_benchmarking/**/*.before_*
+final_report_files/snakemake_assemblers_benchmarking/backups/
+
+# Container build artifacts
+final_report_files/snakemake_assemblers_benchmarking/**/*.sif
+final_report_files/snakemake_assemblers_benchmarking/**/*.img
+final_report_files/snakemake_assemblers_benchmarking/**/*.tar
+final_report_files/snakemake_assemblers_benchmarking/**/*.tar.gz
+
+# Temporary files
+final_report_files/snakemake_assemblers_benchmarking/**/*.tmp
+final_report_files/snakemake_assemblers_benchmarking/**/*.temp
+final_report_files/snakemake_assemblers_benchmarking/**/__pycache__/
+final_report_files/snakemake_assemblers_benchmarking/**/*.pyc
+
+# END CHR21 ASSEMBLER CONTAINER WORKFLOW
