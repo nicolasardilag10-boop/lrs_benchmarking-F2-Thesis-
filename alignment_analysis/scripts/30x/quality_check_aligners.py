@@ -591,110 +591,6 @@ def load_run_metadata(path: Path) -> Dict[Tuple[str, str, str, str, str], Dict[s
         return data
 
 
-
-def discover_project_run_metrics(project: Path, ident: Dict[str, str]) -> Dict[str, str]:
-    """
-    Parse this repository's existing run_metrics/*.run_metrics.tsv files.
-
-    Example:
-      HG002<TAB>ont<TAB>30x<TAB>mm2-ont<TAB>
-      Real time: 8996.708 sec; CPU: ...; Peak RSS: 37.653 GB
-
-    Only an exact sample/technology/coverage/mapper_tag match is accepted.
-    Peak RSS is converted from GB to MB for the output schema.
-    """
-    root = project / "run_metrics"
-    if not root.is_dir():
-        return {}
-
-    target_tech = "ont" if ident["read_technology"] == "ONT" else "pb"
-    target = (
-        ident["sample"].upper(),
-        target_tech,
-        ident["coverage"].lower(),
-        ident["mapper_tag"].lower(),
-    )
-
-    matches = []
-    for p in sorted(root.glob("*.run_metrics.tsv")):
-        try:
-            with p.open(encoding="utf-8", errors="replace") as fh:
-                for raw in fh:
-                    parts = raw.rstrip("\n").split("\t", 4)
-                    if len(parts) != 5:
-                        continue
-                    sample, tech, coverage, tag, metrics = parts
-                    key = (
-                        sample.strip().upper(),
-                        tech.strip().lower(),
-                        coverage.strip().lower(),
-                        tag.strip().lower(),
-                    )
-                    if key != target:
-                        continue
-
-                    real_m = re.search(r"Real time:\s*([0-9.]+)\s*sec", metrics, re.I)
-                    rss_m = re.search(r"Peak RSS:\s*([0-9.]+)\s*(GB|MB)", metrics, re.I)
-                    parsed = {}
-                    if real_m:
-                        parsed["runtime_seconds"] = fmt(float(real_m.group(1)))
-                    if rss_m:
-                        rss = float(rss_m.group(1))
-                        unit = rss_m.group(2).upper()
-                        parsed["peak_ram_mb"] = fmt(rss * 1024.0 if unit == "GB" else rss)
-                    matches.append(parsed)
-        except OSError:
-            continue
-
-    if len(matches) != 1:
-        return {}
-    return matches[0]
-
-
-def discover_mapper_threads(project: Path, ident: Dict[str, str]) -> Dict[str, str]:
-    """
-    Read configured mapper threads from the real root-level mapping workflow.
-    """
-    tech_prefix = "ont" if ident["read_technology"] == "ONT" else "pb"
-    tool = {
-        "mm2-ont": "minimap2",
-        "mm2-pb": "minimap2",
-        "pbmm2-ont": "pbmm2",
-        "pbmm2-pb": "pbmm2",
-        "vacmap-ont": "vacmap",
-        "vacmap-pb": "vacmap",
-        "vg-ont": "vg",
-        "vg-pb": "vg",
-    }.get(ident["mapper_tag"].lower())
-    if not tool:
-        return {}
-
-    p = project / f"{tech_prefix}.read_mapping.{tool}.smk"
-    if not p.is_file():
-        return {}
-
-    try:
-        text = p.read_text(encoding="utf-8", errors="replace")
-    except OSError:
-        return {}
-
-    m = re.search(
-        rf"rule\s+[A-Za-z0-9_]*{re.escape(tool)}[A-Za-z0-9_]*\s*:.*?"
-        rf"^\s*threads\s*:\s*(\d+)\s*$",
-        text,
-        flags=re.I | re.M | re.S,
-    )
-    if not m:
-        m = re.search(
-            r"rule\s+(?:minimap2|pbmm2|vacmap|vg)[A-Za-z0-9_]*\s*:.*?"
-            r"^\s*threads\s*:\s*(\d+)\s*$",
-            text,
-            flags=re.I | re.M | re.S,
-        )
-
-    return {"threads": m.group(1)} if m else {}
-
-
 def discover_snakemake_benchmark(project: Path, ident: Dict[str, str]) -> Dict[str, str]:
     """
     Best-effort reader for standard Snakemake benchmark TSVs.
@@ -824,18 +720,9 @@ def build(args) -> List[Dict[str, str]]:
         for k in RUN_METADATA_COLUMNS:
             row[k] = NA
 
-        project_metrics = discover_project_run_metrics(project, ident)
-        for k, v in project_metrics.items():
-            row[k] = v
-
-        workflow_meta = discover_mapper_threads(project, ident)
-        for k, v in workflow_meta.items():
-            row[k] = v
-
         auto_bench = discover_snakemake_benchmark(project, ident)
         for k, v in auto_bench.items():
-            if row.get(k, NA) == NA:
-                row[k] = v
+            row[k] = v
 
         explicit = run_metadata.get(key, {})
         for k in RUN_METADATA_COLUMNS:

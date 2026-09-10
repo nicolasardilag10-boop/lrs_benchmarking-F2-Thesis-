@@ -96,19 +96,11 @@ workflow never recorded them**.
 
 The script therefore:
 
-1. reads this repository's real `run_metrics/*.run_metrics.tsv` files when an
-   exact sample/technology/coverage/mapper match exists;
-2. reads the configured mapper thread count from the corresponding root-level
-   `ont.read_mapping.*.smk` or `pb.read_mapping.*.smk` workflow;
-3. automatically looks for a uniquely matching Snakemake benchmark file and
+1. automatically looks for a uniquely matching Snakemake benchmark file and
    reads `s` as runtime and `max_rss` as peak RAM when available;
-4. reads exact run provenance from
+2. reads exact run provenance from
    `alignment_analysis/tables/alignment_run_metadata.tsv` when present;
-5. writes `NA` rather than inventing any missing value.
-
-For the existing `run_metrics/mm2.run_metrics.tsv` format, `Real time` is
-stored as `runtime_seconds`, while `Peak RSS` is converted from GB to MB for
-`peak_ram_mb`.
+3. writes `NA` rather than inventing any missing value.
 
 This is intentional.
 
