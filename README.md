@@ -177,6 +177,15 @@ However, before doing so you will likely need to adapt:
 - `VARCAD_PATH`
 - conda/mamba environments
 
+## Editor / VS Code setup
+
+The repository ships a `.vscode/` config so the workflows and helper scripts get proper editor support out of the box:
+
+- **Terminal shell integration** is enabled for the bash profile, giving command decorations, run-recent-command, and scroll-to-command in the integrated terminal — useful since most `.smk` workflows are launched via `snakemake` from the terminal and several helper scripts live under `alignment_analysis/scripts/`, `run_metrics/`, and `docs/`.
+- `.smk` files get Snakemake syntax highlighting via the recommended `Snakemake.snakemake-lang` extension.
+- `.sh` files get linting (`timonwong.shellcheck`) and formatting (`foxundermoon.shell-format`) on the recommended extensions list. Install `shellcheck` and `shfmt` locally (e.g. `brew install shellcheck shfmt` or your distro's package manager) for these to work.
+- Opening the repo in VS Code will prompt you to install the recommended extensions (`.vscode/extensions.json`); accept the prompt or run "Extensions: Show Recommended Extensions".
+
 ## Recommended next steps for this repository
 
 To make this project easier to use and maintain, the next improvements would likely be:

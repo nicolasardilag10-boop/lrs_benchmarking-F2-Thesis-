@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "Snakemake.snakemake-lang",
+    "timonwong.shellcheck",
+    "foxundermoon.shell-format",
+    "ms-azuretools.vscode-docker"
+  ]
+}
