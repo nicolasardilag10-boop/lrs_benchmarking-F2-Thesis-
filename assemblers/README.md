@@ -14,7 +14,7 @@ Generated from version-control candidates. Directories remain compact; use this 
 - **containers/** — 7 files
 - **debug/** — 1 file
 - **envs/** — 1 file
-- **results/** — 109 files
+- **results/** — 1 file
 - **scripts/** — 6 files
 - **whole_genome_asm/** — 11 files; [`guide`](whole_genome_asm/README.md)
 

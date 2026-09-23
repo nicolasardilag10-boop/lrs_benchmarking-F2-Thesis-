@@ -21,10 +21,10 @@ Generated from version-control candidates. Directories remain compact; use this 
 - [`README.md`](README.md)
 
 - **archive/** — 3 files; [`guide`](archive/README.md)
-- **figures/** — 119 files; [`guide`](figures/README.md)
+- **figures/** — 129 files; [`guide`](figures/README.md)
 - **run_metrics/** — 4 files
-- **scripts/** — 62 files; [`guide`](scripts/README.md)
-- **tables/** — 107 files; [`guide`](tables/README.md)
+- **scripts/** — 80 files; [`guide`](scripts/README.md)
+- **tables/** — 113 files; [`guide`](tables/README.md)
 - **tests/** — 5 files; [`guide`](tests/README.md)
 
 <!-- AUTO_REPOSITORY_TREE_END -->
