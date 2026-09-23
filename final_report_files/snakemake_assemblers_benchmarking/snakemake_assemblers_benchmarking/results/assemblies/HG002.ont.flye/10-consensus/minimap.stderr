@@ -1,0 +1,11 @@
+[M::mm_idx_gen::0.078*1.21] collected minimizers
+[M::mm_idx_gen::0.121*1.57] sorted minimizers
+[M::main::0.121*1.57] loaded/built the index for 1 target sequence(s)
+[M::mm_mapopt_update::0.129*1.54] mid_occ = 10
+[M::mm_idx_stat] kmer size: 15; skip: 10; is_hpc: 0; #seq: 1
+[M::mm_idx_stat::0.135*1.51] distinct minimizers: 186188 (99.94% are singletons); average occurrences: 1.001; average spacing: 5.360; total length: 998488
+[M::worker_pipeline::5.141*3.41] mapped 2000 sequences
+[M::main] Version: 2.24-r1155-dirty
+[M::main] CMD: flye-minimap2 -x map-ont -t 4 -a -p 0.5 -N 10 --sam-hit-only -L -K 1G -z 1000 -Q --secondary-seq -I 64G /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/assemblies/HG002.ont.flye/00-assembly/draft_assembly.fasta /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/reads/HG002.ont.smoke.fastq
+[M::main] Real time: 5.151 sec; CPU: 17.533 sec; Peak RSS: 0.045 GB
+[bam_sort_core] merging from 0 files and 4 in-memory blocks...

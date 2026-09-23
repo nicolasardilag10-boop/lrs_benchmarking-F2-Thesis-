@@ -1,0 +1,315 @@
+============================================================
+ASSEMBLER CONTAINERIZATION AUDIT
+============================================================
+
+Generated:
+2026-08-06T11:50:08+02:00
+
+============================================================
+GIT STATUS
+============================================================
+ M "../../SV aligners call/configs/aligner_validation.yaml"
+ M ../snakemake_aligners_benchmarking/results/figures/final_alignment_error_rate.pdf
+ M ../snakemake_aligners_benchmarking/results/figures/final_alignment_error_rate.png
+ M ../snakemake_aligners_benchmarking/results/figures/mapped_bases.pdf
+ M ../snakemake_aligners_benchmarking/results/figures/mapped_bases_cigar.pdf
+ M ../snakemake_aligners_benchmarking/results/tables/alignment_summary.tsv
+ M ../snakemake_aligners_benchmarking/results/tables/paired_alignment_tests.tsv
+ M ../snakemake_aligners_benchmarking/results/tables/plot_arrays.npz
+ M ../snakemake_aligners_benchmarking/results/tables/plot_data_clean.tsv
+ M ../snakemake_aligners_benchmarking/results/tables/plot_data_pivot.tsv
+ M rules/common.smk
+ M rules/goldrush.smk
+ M rules/ntlink.smk
+ M rules/verkko.smk
+?? ../../%1
+?? ../../FETCH_HEAD
+?? ../../Final_reports
+?? "../../SV aligners call/CONSTITUTION_NICOLAS.backup_before_aligner_rules_20260730_151529.md"
+?? "../../SV aligners call/CONSTITUTION_NICOLAS.backup_before_sv_rules_20260730_143948.md"
+?? "../../SV aligners call/CONSTITUTION_NICOLAS.before_sv_caller_rules.md"
+?? "../../SV aligners call/results/"
+?? ../../alignment_analysis/test_alignment/
+?? ../../container_validation/
+?? ../../docs/variant_caller_inventory.tsv
+?? ../../docs/variant_caller_validation/
+?? ../../file.sh
+?? ../2$
+?? ../commands_latex_files.tex
+?? ../final_f2_report.aux
+?? ../final_f2_report.bbl
+?? ../final_f2_report.fdb_latexmk
+?? ../final_f2_report.fls
+?? ../final_f2_report.out
+?? ../final_f2_report.pdf
+?? ../final_f2_report.tex
+?? ../final_f2_report.toc
+?? ../out.txt
+?? ../out2.txt
+?? ../out4.txt
+?? ../snakemake-last-mile-tutorial/
+?? ../snakemake-tutorial/
+?? ../snakemake_aligners_benchmarking/audit_aligners_from_start.sh
+?? ../snakemake_aligners_benchmarking/config.before_deactivate_graph_aligners.yaml
+?? ../snakemake_aligners_benchmarking/config.before_vg_giraffe_20260801_114400.yaml
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml.backup_20260729_104518
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/config.vg_test_working.yaml
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_103234
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_104518
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/dag.svg
+?? ../snakemake_aligners_benchmarking/data/
+?? ../snakemake_aligners_benchmarking/final_validation_snapshot/
+?? ../snakemake_aligners_benchmarking/results/audit/
+?? ../snakemake_aligners_benchmarking/results/provenance/
+?? ../snakemake_aligners_benchmarking/results/tables/alignment_summary.before_vg_error_fix.tsv
+?? ../snakemake_aligners_benchmarking/results/tables/alignment_summary.before_vg_na.tsv
+?? ../snakemake_aligners_benchmarking/results/vacmap_diagnostic/
+?? ../snakemake_aligners_benchmarking/results/vacmap_diagnostic_20260806/
+?? ../snakemake_aligners_benchmarking/results/vacmap_manual_test/
+?? ../snakemake_aligners_benchmarking/rulegraph_aligners.svg
+?? ../snakemake_aligners_benchmarking/run_dryrun_only_test.sh
+?? ../snakemake_aligners_benchmarking/samples.tsv
+?? ../snakemake_aligners_benchmarking/samples.tsv.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/samples.tsv.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/scripts/test_vacmap_hifi_fresh_regional_index.sh
+?? ../snakemake_aligners_benchmarking/scripts/test_vacmap_hifi_fresh_whole_genome_index.sh
+?? ../snakemake_aligners_benchmarking/scripts/test_vacmap_hifi_plain_vs_gzip.sh
+?? ../snakemake_aligners_benchmarking/setup_full_aligners_pipeline.sh
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_line58_fix.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_quality_name_cleanup.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_quality_report_fix.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_report_fix.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_validate_environment_backup.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.dryrun.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_103234
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_104518
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260731_123513
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_37_jobs_20260731_124349
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_before_brace_fix_20260731_143344
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_before_pbmm2_fix_20260731_123557
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_before_stage_checkpoints_20260731_143231
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.bak
+?? ../snakemake_aligners_benchmarking/tools/
+?? %1
+?? .conda/
+?? 1
+?? assembler_workflow_complete.txt
+?? backups/
+?? benchmark_1k/
+?? benchmark_chr21_real/
+?? benchmark_chr21_simulated/
+?? config.chr21.yaml
+?? config.real.yaml
+?? envs/goldrush.yaml
+?? envs/ntlink.yaml
+?? envs/verkko.yaml
+?? envs/verkko2.yaml
+?? prepare_chr21_reads.sh
+?? rules/common.smk.backup_before_env_path_fix_20260803_091412
+?? rules/common.smk.backup_env_fix_20260803_091443
+?? rules/common.smk.backup_env_paths_20260803_091238
+?? rules/goldrush.smk.backup_before_gzip_fix_20260805_090314
+?? rules/ntlink.smk.backup_before_gzip_fix_20260805_090315
+?? rules/ntlink.smk.backup_before_implementation_20260803_140610
+?? scripts/
+?? smoke_test/
+?? snakemake_assemblers.before_split_20260731_133203.smk
+?? ../../local_sv_validation/
+?? ../../scripts/
+?? ../../variant_caller_validation/
+?? ../../workflow/
+
+Current branch:
+variant-calling
+
+Configured remotes:
+origin	https://github.com/nicolasardilag10-boop/lrs_benchmarking-F2-Thesis-.git (fetch)
+origin	https://github.com/nicolasardilag10-boop/lrs_benchmarking-F2-Thesis-.git (push)
+
+============================================================
+DOCKER AVAILABILITY
+============================================================
+
+The command 'docker' could not be found in this WSL 2 distro.
+We recommend to activate the WSL integration in Docker Desktop settings.
+
+For details about using Docker Desktop with WSL 2, visit:
+
+https://docs.docker.com/go/wsl2/
+
+
+Docker daemon:
+WARNING: Docker command exists, but the daemon is unavailable.
+
+============================================================
+ASSEMBLER ENVIRONMENT FILES
+============================================================
+
+------------------------------------------------------------
+FILE: envs/flye.yaml
+------------------------------------------------------------
+     1	name: flye-assembly
+     2	
+     3	channels:
+     4	  - conda-forge
+     5	  - bioconda
+     6	
+     7	dependencies:
+     8	  - flye
+     9	  - seqkit
+
+------------------------------------------------------------
+FILE: envs/goldrush.yaml
+------------------------------------------------------------
+     1	name: goldrush
+     2	
+     3	channels:
+     4	  - conda-forge
+     5	  - bioconda
+     6	  - defaults
+     7	
+     8	dependencies:
+     9	  - goldrush
+
+------------------------------------------------------------
+FILE: envs/ntlink.yaml
+------------------------------------------------------------
+     1	name: ntlink
+     2	
+     3	channels:
+     4	  - conda-forge
+     5	  - bioconda
+     6	  - defaults
+     7	
+     8	dependencies:
+     9	  - ntlink
+
+------------------------------------------------------------
+FILE: envs/verkko.yaml
+------------------------------------------------------------
+     1	channels:
+     2	  - conda-forge
+     3	  - bioconda
+     4	  - defaults
+     5	
+     6	dependencies:
+     7	  - python=3.11
+     8	  - snakemake-minimal=7.32.4
+     9	  - verkko=2.3.2
+    10	  - "networkx>=2.6,<3.6"
+
+------------------------------------------------------------
+FILE: envs/verkko2.yaml
+------------------------------------------------------------
+     1	name: verkko
+     2	
+     3	channels:
+     4	  - conda-forge
+     5	  - bioconda
+     6	  - defaults
+     7	
+     8	dependencies:
+     9	  - verkko
+
+============================================================
+CURRENT SNAKEMAKE SOFTWARE DIRECTIVES
+============================================================
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:384:    conda:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:450:    conda:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:554:    conda:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:621:    conda:
+rules/flye.smk:23:    conda:
+rules/goldrush.smk:27:    conda:
+rules/ntlink.smk:36:    conda:
+rules/verkko.smk:13:    conda:
+
+============================================================
+CURRENT TOOL COMMANDS
+============================================================
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:44:        ["flye", "goldrush", "verkko", "ntlink"],
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:49:    "flye",
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:51:    "verkko",
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:65:ENV_FLYE = str(PROJECT_DIR / "envs" / "flye.yaml")
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:67:ENV_VERKKO = str(PROJECT_DIR / "envs" / "verkko.yaml")
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:200:def flye_read_option(wildcards):
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:213:if "flye" in ACTIVE_ASSEMBLERS:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:219:                / "flye"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:243:if "verkko" in ACTIVE_ASSEMBLERS:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:249:                / "verkko"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:307:        if "flye" in ACTIVE_ASSEMBLERS:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:317:        if "verkko" in ACTIVE_ASSEMBLERS:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:365:rule flye_assembly:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:373:            / "flye"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:381:            / "flye"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:394:            / "flye"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:397:        read_option=flye_read_option,
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:406:        if [[ -s "{params.outdir}/flye.log" ]]; then
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:407:            flye \
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:415:            flye \
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:497:        goldrush run \
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:534:rule verkko_assembly:
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:543:            / "verkko"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:551:            / "verkko"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:564:            / "verkko"
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:575:        verkko \
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:592:# ntLink scaffolding using the corresponding GoldRush assembly
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/Snakefile.assemblers:656:            ntLink scaffold \
+rules/common.smk:18:ACTIVE_ASSEMBLERS = config.get("active_assemblers", ["flye"])
+rules/common.smk:30:ENV_FLYE = str(PROJECT_DIR / "envs" / "flye.yaml")
+rules/common.smk:33:ENV_VERKKO = str(PROJECT_DIR / "envs" / "verkko.yaml")
+rules/common.smk:38:    "flye",
+rules/common.smk:41:    "verkko",
+rules/common.smk:221:def flye_read_option(wildcards):
+rules/common.smk:242:if "flye" in ACTIVE_ASSEMBLERS:
+rules/common.smk:247:                f"{sample}.{technology}.flye/"
+rules/flye.smk:13:rule flye_assembly:
+rules/flye.smk:20:            "{sample}.{technology}.flye/"
+rules/flye.smk:28:            "{sample}.{technology}.flye"
+rules/flye.smk:30:        read_option=flye_read_option,
+rules/flye.smk:38:        flye \
+rules/goldrush.smk:42:        goldrush run \
+rules/ntlink.smk:9:# Future Rule 4: ntLink scaffolding
+rules/ntlink.smk:57:            ntLink scaffold \
+rules/validation.smk:43:        if "flye" in ACTIVE_ASSEMBLERS:
+rules/validation.smk:58:        if "verkko" in ACTIVE_ASSEMBLERS:
+rules/verkko.smk:6:rule verkko_assembly:
+rules/verkko.smk:11:        assembly="results/smoke_test/verkko/{sample}/assembly.fasta"
+rules/verkko.smk:16:        workdir="results/smoke_test/verkko/{sample}/work"
+rules/verkko.smk:24:        verkko \
+
+============================================================
+EXISTING CONTAINER FILES
+============================================================
+./.conda/hg002_extract_htslib124/lib/python3.11/idlelib/config-extensions.def
+./.conda/hg002_extract_htslib124/lib/python3.11/idlelib/config-highlight.def
+./.conda/hg002_extract_htslib124/lib/python3.11/idlelib/config-keys.def
+./.conda/hg002_extract_htslib124/lib/python3.11/idlelib/config-main.def
+
+============================================================
+LARGE OR GENERATED TRACKED FILES
+============================================================
+No matching large/generated files are currently tracked.
+
+============================================================
+CURRENT GITIGNORE
+============================================================
+.gitignore does not exist.
+
+============================================================
+REPOSITORY SIZE
+============================================================
+50G	.
+
+Largest top-level project directories:
+24K	envs
+72K	rules
+1.1G	smoke_test
+1.3G	results
+45G	benchmark_chr21_real

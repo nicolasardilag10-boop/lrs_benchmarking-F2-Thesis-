@@ -1,0 +1,168 @@
+cuteSV.hg38.smk:70:			printf 'Container ID:\\t'; hostname; \
+cuteSV.hg38.smk:95:			printf 'Container ID:\\t'; hostname; \
+cuteSV.hg38.smk:117:			printf 'Container ID:\\t'; hostname; \
+header.smk:20:VARCAD_DOCKER = config['Docker']
+header.smk:21:print("VarCAD docker: " + str(VARCAD_DOCKER))
+header.smk:45:# Docker images
+header.smk:47:DOCKER_VARCAD = "storage-node:5000/own/varcad:" + VARCAD_VERSION
+header.smk:48:print("Docker image for VarCAD: " + DOCKER_VARCAD)
+header.smk:50:DOCKER_BCL2FASTQ2 = "nfcore/bcl2fastq:2.20.0.422"
+header.smk:51:print("Docker image for bcl2fastq2: " + DOCKER_BCL2FASTQ2)
+header.smk:53:DOCKER_VEP = "ensemblorg/ensembl-vep:release_112.0"
+header.smk:54:print("Docker image for VEP: " + DOCKER_VEP)
+ilmn.snv_calling.clair3.smk:29:print("Version of Docker image 'genetic_data_analysis': " + GDA_VERSION)
+ilmn.snv_calling.clair3.smk:30:print("Version of Docker image 'clair3': " + CLAIR3_VERSION)
+ilmn.snv_calling.clair3.smk:76:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro hkubal/clair3:{CLAIR3_VERSION} /bin/bash -c \" \
+ilmn.snv_calling.clair3.smk:77:			printf 'Container ID:\\t'; hostname; \
+ilmn.snv_calling.clair3.smk:103:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+ilmn.snv_calling.clair3.smk:104:			printf 'Container ID:\\t'; hostname; \
+ilmn.snv_calling.clair3.smk:124:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+ilmn.snv_calling.clair3.smk:125:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.minimap2.smk:68:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.minimap2.smk:111:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.minimap2.smk:155:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+ont.read_mapping.minimap2.smk:156:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.minimap2.smk:174:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+ont.read_mapping.minimap2.smk:175:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.minimap2.smk:197:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+ont.read_mapping.minimap2.smk:198:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.minimap2.smk:221:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.pbmm2.smk:68:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.pbmm2.smk:109:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.pbmm2.smk:148:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+ont.read_mapping.pbmm2.smk:149:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.pbmm2.smk:167:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+ont.read_mapping.pbmm2.smk:168:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.pbmm2.smk:190:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+ont.read_mapping.pbmm2.smk:191:			printf 'Container ID:\\t'; hostname; \
+ont.read_mapping.pbmm2.smk:214:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.clair3.smk:29:print("Version of Docker image 'genetic_data_analysis': " + GDA_VERSION)
+ont.snv_calling.clair3.smk:30:print("Version of Docker image 'clair3': " + CLAIR3_VERSION)
+ont.snv_calling.clair3.smk:76:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro hkubal/clair3:{CLAIR3_VERSION} /bin/bash -c \" \
+ont.snv_calling.clair3.smk:77:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.clair3.smk:103:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+ont.snv_calling.clair3.smk:104:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.clair3.smk:124:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+ont.snv_calling.clair3.smk:125:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.deepvariant.smk:29:print("Version of Docker image 'genetic_data_analysis': " + GDA_VERSION)
+ont.snv_calling.deepvariant.smk:30:print("Version of Docker image 'deepvariant': " + DEEPVARIANT_VERSION)
+ont.snv_calling.deepvariant.smk:96:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_calling.deepvariant.smk:97:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.deepvariant.smk:117:					--pileup_image_width '99' \
+ont.snv_calling.deepvariant.smk:129:#/opt/deepvariant/bin/make_examples --mode calling --ref "/mnt/storage/db/references/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta" --reads "/mnt/storage/genetic_data/WGS_LR/Tests/lrs_benchmarking/cram/HG002_ont_30x_1k.hg38.mm2-pb.cram" --examples "/mnt/storage/genetic_data/WGS_LR/Tests/lrs_benchmarking/vcf_called/deepvariant/tmp/HG002_ont_30x_1k.hg38.mm2-pb/intermediate_results_dir/make_examples.tfrecord@64.gz" --checkpoint "/opt/models/ont_r104" --alt_aligned_pileup "diff_channels" --call_small_model_examples --gvcf "/mnt/storage/genetic_data/WGS_LR/Tests/lrs_benchmarking/vcf_called/deepvariant/tmp/HG002_ont_30x_1k.hg38.mm2-pb/intermediate_results_dir/gvcf.tfrecord@64.gz" --max_reads_per_partition "600" --min_mapping_quality "5" --parse_sam_aux_fields --partition_size "25000" --phase_reads --pileup_image_width "99" --norealign_reads --regions "chr1:0-10000000" --small_model_indel_gq_threshold "17" --small_model_snp_gq_threshold "9" --small_model_vaf_context_window_size "51" --sort_by_haplotypes --track_ref_reads --trained_small_model_path "/opt/smallmodels/ont_r104" --trim_reads_for_pileup --vsc_min_fraction_indels "0.12" --vsc_min_fraction_snps "0.08"
+ont.snv_calling.deepvariant.smk:145:		docker run --cpus {threads} -m {resources.mem_gb}g --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=\$CUDA_VISIBLE_DEVICES -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION}-gpu /bin/bash -c \\\" \
+ont.snv_calling.deepvariant.smk:146:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.deepvariant.smk:172:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_calling.deepvariant.smk:173:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.deepvariant.smk:205:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_calling.deepvariant.smk:206:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.deepvariant.smk:242:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_calling.deepvariant.smk:243:			printf 'Container ID:\\t'; hostname; \
+ont.snv_calling.deepvariant.smk:264:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+ont.snv_calling.deepvariant.smk:265:			printf 'Container ID:\\t'; hostname; \
+ont.snv_filtering.v3.smk:29:print("Version of Docker image 'genetic_data_analysis': " + GDA_VERSION)
+ont.snv_filtering.v3.smk:30:print("Version of Docker image 'deepvariant': " + DEEPVARIANT_VERSION)
+ont.snv_filtering.v3.smk:97:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_filtering.v3.smk:98:			printf 'Container ID:\\t'; hostname; \
+ont.snv_filtering.v3.smk:117:					--pileup_image_width \\\"199\\\" \
+ont.snv_filtering.v3.smk:144:		docker run --cpus {threads} -m {resources.mem_gb}g --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=\$CUDA_VISIBLE_DEVICES -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION}-gpu /bin/bash -c \\\" \
+ont.snv_filtering.v3.smk:145:			printf 'Container ID:\\t'; hostname; \
+ont.snv_filtering.v3.smk:170:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_filtering.v3.smk:171:			printf 'Container ID:\\t'; hostname; \
+ont.snv_filtering.v3.smk:204:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_filtering.v3.smk:205:			printf 'Container ID:\\t'; hostname; \
+ont.snv_filtering.v3.smk:243:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+ont.snv_filtering.v3.smk:244:			printf 'Container ID:\\t'; hostname; \
+ont.snv_filtering.v3.smk:265:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+ont.snv_filtering.v3.smk:266:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.minimap2.smk:68:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.minimap2.smk:111:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.minimap2.smk:155:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+pb.read_mapping.minimap2.smk:156:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.minimap2.smk:174:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+pb.read_mapping.minimap2.smk:175:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.minimap2.smk:197:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+pb.read_mapping.minimap2.smk:198:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.minimap2.smk:221:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.pbmm2.smk:68:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.pbmm2.smk:109:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.pbmm2.smk:148:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+pb.read_mapping.pbmm2.smk:149:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.pbmm2.smk:167:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+pb.read_mapping.pbmm2.smk:168:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.pbmm2.smk:190:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {VARCAD_DB_PATH}:{VARCAD_DB_PATH}:ro {DOCKER_VARCAD} /bin/bash -c \" \
+pb.read_mapping.pbmm2.smk:191:			printf 'Container ID:\\t'; hostname; \
+pb.read_mapping.pbmm2.smk:214:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.clair3.smk:29:print("Version of Docker image 'genetic_data_analysis': " + GDA_VERSION)
+pb.snv_calling.clair3.smk:30:print("Version of Docker image 'clair3': " + CLAIR3_VERSION)
+pb.snv_calling.clair3.smk:76:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro hkubal/clair3:{CLAIR3_VERSION} /bin/bash -c \" \
+pb.snv_calling.clair3.smk:77:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.clair3.smk:103:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+pb.snv_calling.clair3.smk:104:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.clair3.smk:124:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+pb.snv_calling.clair3.smk:125:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.deepvariant.smk:29:print("Version of Docker image 'genetic_data_analysis': " + GDA_VERSION)
+pb.snv_calling.deepvariant.smk:30:print("Version of Docker image 'deepvariant': " + DEEPVARIANT_VERSION)
+pb.snv_calling.deepvariant.smk:96:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+pb.snv_calling.deepvariant.smk:97:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.deepvariant.smk:117:					--pileup_image_width '147' \
+pb.snv_calling.deepvariant.smk:128:#/opt/snv_indel/bin/make_examples --mode calling --ref "/mnt/storage/db/references/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta" --reads "/mnt/storage/genetic_data/WGS_LR/Tests/lrs_benchmarking/cram/HG002_ont_30x_1k.hg38.mm2-ont.cram" --examples "/mnt/storage/genetic_data/WGS_LR/Tests/lrs_benchmarking/vcf_called/snv_indel/tmp/HG002_ont_30x_1k.hg38.mm2-ont/intermediate_results_dir/make_examples.tfrecord@64.gz" --checkpoint "/opt/models/pacbio" --alt_aligned_pileup "diff_channels" --call_small_model_examples --gvcf "/mnt/storage/genetic_data/WGS_LR/Tests/lrs_benchmarking/vcf_called/snv_indel/tmp/HG002_ont_30x_1k.hg38.mm2-ont/intermediate_results_dir/gvcf.tfrecord@64.gz" --max_reads_per_partition "600" --min_mapping_quality "1" --parse_sam_aux_fields --partition_size "25000" --phase_reads --pileup_image_width "147" --norealign_reads --small_model_indel_gq_threshold "16" --small_model_snp_gq_threshold "15" --small_model_vaf_context_window_size "51" --sort_by_haplotypes --track_ref_reads --trained_small_model_path "/opt/smallmodels/pacbio" --trim_reads_for_pileup --vsc_min_fraction_indels "0.12"
+pb.snv_calling.deepvariant.smk:143:		docker run --cpus {threads} -m {resources.mem_gb}g --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=\$CUDA_VISIBLE_DEVICES -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION}-gpu /bin/bash -c \\\" \
+pb.snv_calling.deepvariant.smk:144:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.deepvariant.smk:169:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+pb.snv_calling.deepvariant.smk:170:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.deepvariant.smk:202:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+pb.snv_calling.deepvariant.smk:203:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.deepvariant.smk:239:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+pb.snv_calling.deepvariant.smk:240:			printf 'Container ID:\\t'; hostname; \
+pb.snv_calling.deepvariant.smk:261:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+pb.snv_calling.deepvariant.smk:262:			printf 'Container ID:\\t'; hostname; \
+pbsv.hg38.smk:73:			printf 'Container ID:\\t'; hostname; \
+pbsv.hg38.smk:99:			printf 'Container ID:\\t'; hostname; \
+pbsv.hg38.smk:122:			printf 'Container ID:\\t'; hostname; \
+pbsv.hg38.smk:144:			printf 'Container ID:\\t'; hostname; \
+pbsv.hg38.smk:171:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+pbsv.hg38.smk:172:			printf 'Container ID:\\t'; hostname; \
+run_happy.smk:69:		docker run --cpus {threads} -m 128g -u $UID:$GROUPS --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/illumina/hap.py:{HAPPY_VERSION} \
+run_happy.smk:99:			printf 'Container ID:\\t'; hostname; \
+run_happy.smk:142:		    docker run --cpus {threads} -m 32g -u $UID:$GROUPS --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/illumina/hap.py:{HAPPY_VERSION} /bin/bash -c \" \
+run_happy.smk:143:		    	printf 'Container ID:\\t'; hostname; \
+sawfish.hg38.smk:75:			printf 'Container ID:\\t'; hostname; \
+sawfish.hg38.smk:102:			printf 'Container ID:\\t'; hostname; \
+sawfish.hg38.smk:124:			printf 'Container ID:\\t'; hostname; \
+sawfish.hg38.smk:146:			printf 'Container ID:\\t'; hostname; \
+sawfish.hg38.smk:173:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+sawfish.hg38.smk:174:			printf 'Container ID:\\t'; hostname; \
+sniffles2.hg38.smk:70:			printf 'Container ID:\\t'; hostname; \
+sniffles2.hg38.smk:96:			printf 'Container ID:\\t'; hostname; \
+sniffles2.hg38.smk:123:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+sniffles2.hg38.smk:124:			printf 'Container ID:\\t'; hostname; \
+truvari_anno.smk:65:            printf 'Container ID:\\t'; hostname; \
+truvari_anno.smk:91:            printf 'Container ID:\\t'; hostname; \
+truvari_anno.smk:117:            printf 'Container ID:\\t'; hostname; \
+truvari_anno.smk:140:            printf 'Container ID:\\t'; hostname; \
+truvari_anno.smk:162:            printf 'Container ID:\\t'; hostname; \
+truvari_anno.smk:191:            printf 'Container ID:\\t'; hostname; \
+wgs.snv_calling.deepvariant.smk:29:print("Version of Docker image 'genetic_data_analysis': " + GDA_VERSION)
+wgs.snv_calling.deepvariant.smk:30:print("Version of Docker image 'deepvariant': " + DEEPVARIANT_VERSION)
+wgs.snv_calling.deepvariant.smk:96:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+wgs.snv_calling.deepvariant.smk:97:			printf 'Container ID:\\t'; hostname; \
+wgs.snv_calling.deepvariant.smk:133:		docker run --cpus {threads} -m {resources.mem_gb}g --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=\$CUDA_VISIBLE_DEVICES -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION}-gpu /bin/bash -c \\\" \
+wgs.snv_calling.deepvariant.smk:134:			printf 'Container ID:\\t'; hostname; \
+wgs.snv_calling.deepvariant.smk:160:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+wgs.snv_calling.deepvariant.smk:161:			printf 'Container ID:\\t'; hostname; \
+wgs.snv_calling.deepvariant.smk:193:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+wgs.snv_calling.deepvariant.smk:194:			printf 'Container ID:\\t'; hostname; \
+wgs.snv_calling.deepvariant.smk:230:		docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} google/deepvariant:{DEEPVARIANT_VERSION} /bin/bash -c \" \
+wgs.snv_calling.deepvariant.smk:231:			printf 'Container ID:\\t'; hostname; \
+wgs.snv_calling.deepvariant.smk:252:                docker run --cpus {threads} -m {resources.mem_gb}g -u $UID:1002 --workdir /tmp --rm -v {CWD}:{CWD} -v {DB_DIR}:{DB_DIR}:ro storage-node:5000/own/genetic_data_analysis:{GDA_VERSION} /bin/bash -c \" \
+wgs.snv_calling.deepvariant.smk:253:			printf 'Container ID:\\t'; hostname; \
+header.smk:20:VARCAD_DOCKER = config['Docker']
+header.smk:21:print("VarCAD docker: " + str(VARCAD_DOCKER))
+header.smk:45:# Docker images
+header.smk:47:DOCKER_VARCAD = "storage-node:5000/own/varcad:" + VARCAD_VERSION
+header.smk:48:print("Docker image for VarCAD: " + DOCKER_VARCAD)
+header.smk:50:DOCKER_BCL2FASTQ2 = "nfcore/bcl2fastq:2.20.0.422"
+header.smk:51:print("Docker image for bcl2fastq2: " + DOCKER_BCL2FASTQ2)
+header.smk:53:DOCKER_VEP = "ensemblorg/ensembl-vep:release_112.0"
+header.smk:54:print("Docker image for VEP: " + DOCKER_VEP)

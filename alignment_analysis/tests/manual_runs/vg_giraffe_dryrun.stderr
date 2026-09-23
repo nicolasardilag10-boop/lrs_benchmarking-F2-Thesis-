@@ -1,0 +1,4 @@
+[vg giraffe] Rebuilding minimizer index to include zipcodes
+[IndexRegistry] Constructing minimizer index and associated zipcodes.
+[IndexRegistry]     using parameters -k 29 -w 11
+error[VPKG::load_one]: Correct input type not found while loading gbwtgraph::GBZ

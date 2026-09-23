@@ -1,0 +1,21 @@
+channels:
+  - bioconda
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  # Core bioinformatics tools
+  - minimap2
+  - samtools
+  - fastqc
+  - multiqc
+
+  # Python
+  - python=3.11
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib
+
+  # Useful for scripts and notebooks
+  - pip

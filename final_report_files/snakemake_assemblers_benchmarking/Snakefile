@@ -1,0 +1,43 @@
+#####################################################################################
+# ASSEMBLY PIPELINE: FLYE, GOLDRUSH, NTLINK, AND VERKKO
+# This workflow benchmarks long-read genome assembly and scaffolding tools using
+# HG002, HG003, and HG004 ONT and PacBio HiFi sequencing datasets.
+#####################################################################################
+
+# Load the main configuration file containing the sample table, active tools,
+# genome size, thread settings, and other workflow parameters
+configfile: "config/base.yaml"
+
+
+# -----------------------------------------------------------------------------
+# Load shared configuration, sample information, helper functions, and targets
+# -----------------------------------------------------------------------------
+
+# This file contains variables and Python functions shared by all assembler rules
+include: "rules/common.smk"
+
+
+# -----------------------------------------------------------------------------
+# Final target rule
+# -----------------------------------------------------------------------------
+
+# Define the complete collection of files that the active workflow must produce
+rule all:
+    input:
+        VALIDATION_OK,
+        EXPECTED_FINAL_OUTPUTS
+
+
+# -----------------------------------------------------------------------------
+# Load validation, assembler, scaffolding, and assessment rule modules
+# -----------------------------------------------------------------------------
+
+# Each tool is stored in a separate file to simplify testing, maintenance,
+# environment management, and migration to another computing system
+include: "rules/validation.smk"
+include: "rules/chr21.smk"
+include: "rules/flye.smk"
+include: "rules/goldrush.smk"
+include: "rules/ntlink.smk"
+include: "rules/verkko.smk"
+include: "rules/assessment.smk"

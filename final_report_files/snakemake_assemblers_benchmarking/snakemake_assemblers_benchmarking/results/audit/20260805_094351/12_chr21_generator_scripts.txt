@@ -1,0 +1,499 @@
+================================================================================
+FILE: smoke_test/scripts/generate_chr21_smoke_data.py
+================================================================================
+0001: #!/usr/bin/env python3
+0002: 
+0003: from pathlib import Path
+0004: import gzip
+0005: import sys
+0006: 
+0007: 
+0008: PROJECT = Path.cwd()
+0009: 
+0010: OUTPUT_REFERENCE = (
+0011:     PROJECT
+0012:     / "smoke_test"
+0013:     / "data"
+0014:     / "reference"
+0015:     / "chr21_1mb.fasta"
+0016: )
+0017: 
+0018: OUTPUT_READS = (
+0019:     PROJECT
+0020:     / "smoke_test"
+0021:     / "data"
+0022:     / "reads_chr21"
+0023: )
+0024: 
+0025: SAMPLES = ["HG002", "HG003", "HG004"]
+0026: 
+0027: REGION_LENGTH = 1_000_000
+0028: WINDOW_STEP = 100_000
+0029: MIN_ACGT_FRACTION = 0.98
+0030: 
+0031: 
+0032: def find_chr21_reference() -> Path:
+0033:     candidates = []
+0034: 
+0035:     for root in [PROJECT / "data", PROJECT / "smoke_test"]:
+0036:         if not root.exists():
+0037:             continue
+0038: 
+0039:         for path in root.rglob("*"):
+0040:             if not path.is_file():
+0041:                 continue
+0042: 
+0043:             name = path.name.lower()
+0044: 
+0045:             if "chr21" not in name:
+0046:                 continue
+0047: 
+0048:             if name.endswith((".fa", ".fasta", ".fa.gz", ".fasta.gz")):
+0049:                 if path.resolve() != OUTPUT_REFERENCE.resolve():
+0050:                     candidates.append(path)
+0051: 
+0052:     if not candidates:
+0053:         raise FileNotFoundError(
+0054:             "No chromosome 21 FASTA was found under data/ or smoke_test/."
+0055:         )
+0056: 
+0057:     candidates.sort(key=lambda path: len(str(path)))
+0058:     return candidates[0]
+0059: 
+0060: 
+0061: def open_text(path: Path):
+0062:     if path.name.lower().endswith(".gz"):
+0063:         return gzip.open(path, "rt")
+0064: 
+0065:     return path.open("r")
+0066: 
+0067: 
+0068: def read_fasta(path: Path) -> str:
+0069:     sequence_parts = []
+0070: 
+0071:     with open_text(path) as handle:
+0072:         for line in handle:
+0073:             line = line.strip()
+0074: 
+0075:             if not line or line.startswith(">"):
+0076:                 continue
+0077: 
+0078:             sequence_parts.append(line.upper())
+0079: 
+0080:     sequence = "".join(sequence_parts)
+0081: 
+0082:     if not sequence:
+0083:         raise ValueError(f"No sequence found in {path}")
+0084: 
+0085:     return sequence
+0086: 
+0087: 
+0088: def acgt_fraction(sequence: str) -> float:
+0089:     acgt_count = sum(base in "ACGT" for base in sequence)
+0090:     return acgt_count / len(sequence)
+0091: 
+0092: 
+0093: def choose_high_quality_region(sequence: str) -> tuple[int, str, float]:
+0094:     if len(sequence) < REGION_LENGTH:
+0095:         raise ValueError(
+0096:             f"Reference has only {len(sequence):,} bp; "
+0097:             f"{REGION_LENGTH:,} bp are required."
+0098:         )
+0099: 
+0100:     best_start = None
+0101:     best_region = None
+0102:     best_fraction = -1.0
+0103: 
+0104:     for start in range(
+0105:         0,
+0106:         len(sequence) - REGION_LENGTH + 1,
+0107:         WINDOW_STEP,
+0108:     ):
+0109:         region = sequence[start : start + REGION_LENGTH]
+0110:         fraction = acgt_fraction(region)
+0111: 
+0112:         if fraction > best_fraction:
+0113:             best_start = start
+0114:             best_region = region
+0115:             best_fraction = fraction
+0116: 
+0117:         if fraction >= MIN_ACGT_FRACTION:
+0118:             break
+0119: 
+0120:     if best_region is None:
+0121:         raise RuntimeError("Could not select a chromosome 21 region.")
+0122: 
+0123:     if best_fraction < 0.90:
+0124:         raise RuntimeError(
+0125:             f"Best 1 Mb region contains only "
+0126:             f"{best_fraction:.2%} A/C/G/T bases."
+0127:         )
+0128: 
+0129:     return best_start, best_region, best_fraction
+0130: 
+0131: 
+0132: def write_reference(
+0133:     region: str,
+0134:     start: int,
+0135:     fraction: float,
+0136: ) -> None:
+0137:     OUTPUT_REFERENCE.parent.mkdir(parents=True, exist_ok=True)
+0138: 
+0139:     with OUTPUT_REFERENCE.open("w") as handle:
+0140:         handle.write(
+0141:             f">chr21_smoke_1mb_"
+0142:             f"{start + 1}_{start + len(region)}_"
+0143:             f"acgt_{fraction:.4f}\n"
+0144:         )
+0145: 
+0146:         for position in range(0, len(region), 80):
+0147:             handle.write(region[position : position + 80] + "\n")
+0148: 
+0149: 
+0150: def write_fastq(
+0151:     region: str,
+0152:     sample: str,
+0153:     technology: str,
+0154:     read_length: int,
+0155:     step: int,
+0156: ) -> None:
+0157:     output = (
+0158:         OUTPUT_READS
+0159:         / f"{sample}.{technology}.chr21.smoke.fastq"
+0160:     )
+0161: 
+0162:     output.parent.mkdir(parents=True, exist_ok=True)
+0163: 
+0164:     read_count = 0
+0165:     total_bases = 0
+0166: 
+0167:     with output.open("w") as handle:
+0168:         for start in range(
+0169:             0,
+0170:             len(region) - read_length + 1,
+0171:             step,
+0172:         ):
+0173:             read = region[start : start + read_length]
+0174: 
+0175:             # Skip reads containing too many ambiguous bases.
+0176:             if acgt_fraction(read) < 0.98:
+0177:                 continue
+0178: 
+0179:             read_count += 1
+0180:             total_bases += len(read)
+0181: 
+0182:             read_name = (
+0183:                 f"{sample}_{technology}_"
+0184:                 f"{read_count:06d}_"
+0185:                 f"{start + 1}_{start + read_length}"
+0186:             )
+0187: 
+0188:             handle.write(f"@{read_name}\n")
+0189:             handle.write(f"{read}\n")
+0190:             handle.write("+\n")
+0191:             handle.write("I" * len(read) + "\n")
+0192: 
+0193:     if read_count == 0:
+0194:         raise RuntimeError(
+0195:             f"No valid reads generated for {sample} {technology}."
+0196:         )
+0197: 
+0198:     coverage = total_bases / len(region)
+0199: 
+0200:     print(
+0201:         f"{sample} {technology}: "
+0202:         f"{read_count:,} reads, "
+0203:         f"{total_bases:,} bases, "
+0204:         f"{coverage:.2f}x coverage"
+0205:     )
+0206: 
+0207: 
+0208: def main() -> None:
+0209:     reference = find_chr21_reference()
+0210:     sequence = read_fasta(reference)
+0211: 
+0212:     start, region, fraction = choose_high_quality_region(sequence)
+0213: 
+0214:     print(f"Source reference: {reference}")
+0215:     print(
+0216:         f"Selected region: "
+0217:         f"{start + 1:,}-{start + len(region):,}"
+0218:     )
+0219:     print(f"A/C/G/T fraction: {fraction:.4%}")
+0220: 
+0221:     write_reference(region, start, fraction)
+0222: 
+0223:     for sample in SAMPLES:
+0224:         write_fastq(
+0225:             region,
+0226:             sample,
+0227:             "ont",
+0228:             read_length=20_000,
+0229:             step=2_000,
+0230:         )
+0231: 
+0232:         write_fastq(
+0233:             region,
+0234:             sample,
+0235:             "pb",
+0236:             read_length=15_000,
+0237:             step=1_500,
+0238:         )
+0239: 
+0240:     print()
+0241:     print("Smoke data regenerated successfully.")
+0242:     print(f"Reference: {OUTPUT_REFERENCE}")
+0243:     print(f"Reads: {OUTPUT_READS}")
+0244: 
+0245: 
+0246: if __name__ == "__main__":
+0247:     try:
+0248:         main()
+0249:     except Exception as error:
+0250:         print(f"ERROR: {error}", file=sys.stderr)
+0251:         sys.exit(1)
+
+================================================================================
+FILE: smoke_test/scripts/generate_chr21_diploid_smoke.py
+================================================================================
+0001: #!/usr/bin/env python3
+0002: 
+0003: from pathlib import Path
+0004: import random
+0005: 
+0006: PROJECT = Path.cwd()
+0007: 
+0008: REFERENCE = (
+0009:     PROJECT
+0010:     / "smoke_test"
+0011:     / "data"
+0012:     / "reference"
+0013:     / "chr21_1mb.fasta"
+0014: )
+0015: 
+0016: OUTPUT_DIR = (
+0017:     PROJECT
+0018:     / "smoke_test"
+0019:     / "data"
+0020:     / "reads_chr21"
+0021: )
+0022: 
+0023: SAMPLES = ["HG002", "HG003", "HG004"]
+0024: 
+0025: BASES = "ACGT"
+0026: SEED = 20260804
+0027: 
+0028: HIFI_LENGTH = 15000
+0029: HIFI_STEP = 1500
+0030: HIFI_ERROR_RATE = 0.002
+0031: 
+0032: ONT_LENGTH = 20000
+0033: ONT_STEP = 2000
+0034: ONT_ERROR_RATE = 0.03
+0035: 
+0036: HETEROZYGOUS_RATE = 0.01
+0037: 
+0038: 
+0039: def read_fasta(path):
+0040:     sequence = []
+0041: 
+0042:     with path.open() as handle:
+0043:         for line in handle:
+0044:             line = line.strip()
+0045: 
+0046:             if not line or line.startswith(">"):
+0047:                 continue
+0048: 
+0049:             sequence.append(line.upper())
+0050: 
+0051:     result = "".join(sequence)
+0052: 
+0053:     if not result:
+0054:         raise RuntimeError(f"Empty reference: {path}")
+0055: 
+0056:     if any(base not in BASES for base in result):
+0057:         raise RuntimeError(
+0058:             "Reference contains characters other than A, C, G and T."
+0059:         )
+0060: 
+0061:     return result
+0062: 
+0063: 
+0064: def mutate_sequence(sequence, rate, rng):
+0065:     result = list(sequence)
+0066: 
+0067:     for index, base in enumerate(result):
+0068:         if rng.random() < rate:
+0069:             alternatives = [
+0070:                 candidate
+0071:                 for candidate in BASES
+0072:                 if candidate != base
+0073:             ]
+0074:             result[index] = rng.choice(alternatives)
+0075: 
+0076:     return "".join(result)
+0077: 
+0078: 
+0079: def add_errors(sequence, rate, rng):
+0080:     result = list(sequence)
+0081: 
+0082:     for index, base in enumerate(result):
+0083:         if rng.random() < rate:
+0084:             alternatives = [
+0085:                 candidate
+0086:                 for candidate in BASES
+0087:                 if candidate != base
+0088:             ]
+0089:             result[index] = rng.choice(alternatives)
+0090: 
+0091:     return "".join(result)
+0092: 
+0093: 
+0094: def reverse_complement(sequence):
+0095:     table = str.maketrans("ACGT", "TGCA")
+0096:     return sequence.translate(table)[::-1]
+0097: 
+0098: 
+0099: def write_fastq(
+0100:     haplotypes,
+0101:     sample,
+0102:     technology,
+0103:     read_length,
+0104:     step,
+0105:     error_rate,
+0106:     rng,
+0107: ):
+0108:     output = (
+0109:         OUTPUT_DIR
+0110:         / f"{sample}.{technology}.chr21.smoke.fastq"
+0111:     )
+0112: 
+0113:     count = 0
+0114:     total_bases = 0
+0115: 
+0116:     with output.open("w") as handle:
+0117:         for hap_number, haplotype in enumerate(
+0118:             haplotypes,
+0119:             start=1,
+0120:         ):
+0121:             offset = 0 if hap_number == 1 else step // 2
+0122: 
+0123:             for start in range(
+0124:                 offset,
+0125:                 len(haplotype) - read_length + 1,
+0126:                 step,
+0127:             ):
+0128:                 read = haplotype[
+0129:                     start : start + read_length
+0130:                 ]
+0131: 
+0132:                 if rng.random() < 0.5:
+0133:                     read = reverse_complement(read)
+0134:                     orientation = "rev"
+0135:                 else:
+0136:                     orientation = "fwd"
+0137: 
+0138:                 read = add_errors(
+0139:                     read,
+0140:                     error_rate,
+0141:                     rng,
+0142:                 )
+0143: 
+0144:                 count += 1
+0145:                 total_bases += len(read)
+0146: 
+0147:                 name = (
+0148:                     f"{sample}_{technology}_"
+0149:                     f"hap{hap_number}_"
+0150:                     f"{count:06d}_"
+0151:                     f"{start + 1}_"
+0152:                     f"{orientation}"
+0153:                 )
+0154: 
+0155:                 handle.write(f"@{name}\n")
+0156:                 handle.write(f"{read}\n")
+0157:                 handle.write("+\n")
+0158:                 handle.write("I" * len(read) + "\n")
+0159: 
+0160:     coverage = total_bases / len(haplotypes[0])
+0161: 
+0162:     print(
+0163:         f"{sample} {technology}: "
+0164:         f"{count} reads, "
+0165:         f"{coverage:.2f}x combined coverage"
+0166:     )
+0167: 
+0168: 
+0169: def main():
+0170:     if not REFERENCE.exists():
+0171:         raise FileNotFoundError(
+0172:             f"Reference not found: {REFERENCE}"
+0173:         )
+0174: 
+0175:     OUTPUT_DIR.mkdir(
+0176:         parents=True,
+0177:         exist_ok=True,
+0178:     )
+0179: 
+0180:     reference = read_fasta(REFERENCE)
+0181: 
+0182:     print(
+0183:         f"Reference length: "
+0184:         f"{len(reference):,} bp"
+0185:     )
+0186: 
+0187:     for sample_index, sample in enumerate(SAMPLES):
+0188:         rng = random.Random(
+0189:             SEED + sample_index
+0190:         )
+0191: 
+0192:         haplotype_1 = reference
+0193: 
+0194:         haplotype_2 = mutate_sequence(
+0195:             reference,
+0196:             HETEROZYGOUS_RATE,
+0197:             rng,
+0198:         )
+0199: 
+0200:         differences = sum(
+0201:             first != second
+0202:             for first, second in zip(
+0203:                 haplotype_1,
+0204:                 haplotype_2,
+0205:             )
+0206:         )
+0207: 
+0208:         print()
+0209:         print(
+0210:             f"{sample}: "
+0211:             f"{differences:,} haplotype differences "
+0212:             f"({differences / len(reference):.2%})"
+0213:         )
+0214: 
+0215:         write_fastq(
+0216:             [haplotype_1, haplotype_2],
+0217:             sample,
+0218:             "pb",
+0219:             HIFI_LENGTH,
+0220:             HIFI_STEP,
+0221:             HIFI_ERROR_RATE,
+0222:             rng,
+0223:         )
+0224: 
+0225:         write_fastq(
+0226:             [haplotype_1, haplotype_2],
+0227:             sample,
+0228:             "ont",
+0229:             ONT_LENGTH,
+0230:             ONT_STEP,
+0231:             ONT_ERROR_RATE,
+0232:             rng,
+0233:         )
+0234: 
+0235:     print()
+0236:     print("Diploid smoke reads created successfully.")
+0237: 
+0238: 
+0239: if __name__ == "__main__":
+0240:     main()
+

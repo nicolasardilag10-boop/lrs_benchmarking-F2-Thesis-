@@ -1,0 +1,13 @@
+READ_COUNT_MISMATCH: results/bam/HG002.ont.pbmm2.sorted.bam FASTQ=1000 BAM=998
+READ_COUNT_MISMATCH: results/bam/HG002.ont.vacmap.sorted.bam FASTQ=1000 BAM=37
+READ_COUNT_MISMATCH: results/bam/HG002.pb.vacmap.sorted.bam FASTQ=1000 BAM=0
+READ_COUNT_MISMATCH: results/bam/HG003.ont.pbmm2.sorted.bam FASTQ=1000 BAM=997
+READ_COUNT_MISMATCH: results/bam/HG003.ont.vacmap.sorted.bam FASTQ=1000 BAM=27
+READ_COUNT_MISMATCH: results/bam/HG003.pb.vacmap.sorted.bam FASTQ=1000 BAM=0
+READ_COUNT_MISMATCH: results/bam/HG004.ont.pbmm2.sorted.bam FASTQ=1000 BAM=992
+READ_COUNT_MISMATCH: results/bam/HG004.ont.vacmap.sorted.bam FASTQ=1000 BAM=39
+READ_COUNT_MISMATCH: results/bam/HG004.pb.vacmap.sorted.bam FASTQ=1000 BAM=0
+WARNING: pbmm2 ONT results exist but are not a standard PacBio pbmm2 benchmark.
+VACMAP_SUSPICIOUS: HG002 pb mapped_reads=0 mapped_percent=NA
+VACMAP_SUSPICIOUS: HG003 pb mapped_reads=0 mapped_percent=NA
+VACMAP_SUSPICIOUS: HG004 pb mapped_reads=0 mapped_percent=NA

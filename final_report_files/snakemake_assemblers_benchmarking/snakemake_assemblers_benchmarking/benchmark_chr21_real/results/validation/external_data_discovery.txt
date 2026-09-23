@@ -1,0 +1,35 @@
+=== STORAGE AVAILABLE ===
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdd       1007G   62G  894G   7% /
+C:\             450G  427G   24G  95% /mnt/c
+
+=== SEARCH ROOTS ===
+/home/nicolas
+/mnt/c/Users/Default User/Downloads
+/mnt/c/Users/Default/Downloads
+/mnt/c/Users/Public/Downloads
+/mnt/c/Users/nicol/Downloads
+/mnt/c/Users/All Users/Desktop
+/mnt/c/Users/Default User/Desktop
+/mnt/c/Users/Default/Desktop
+/mnt/c/Users/Public/Desktop
+/mnt/c/Users/All Users/Documents
+/mnt/c/Users/Default User/Documents
+/mnt/c/Users/Default/Documents
+/mnt/c/Users/Public/Documents
+/mnt/c/Users/nicol/Documents
+
+=== LARGE HG002/HG003/HG004 DATA FILES ===
+
+=== EXISTING REAL CHR21 CANDIDATES ===
+38M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq
+38M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq
+38M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq
+38M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq
+38M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq
+38M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq
+15M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/chr21_read_extraction/HG002.ont.chr21.sorted.bam
+9.6M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/chr21_read_extraction/HG003.ont.chr21.sorted.bam
+5.2M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/chr21_read_extraction/HG002.pb.chr21.sorted.bam
+4.7M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/chromosome_read_extraction/HG002/pb/HG002.pb.1k.chr21_only.sorted.bam
+4.7M	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/chromosome_read_extraction/HG002/pb/HG002.pb.1k.chr21.sorted.bam

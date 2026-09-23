@@ -1,0 +1,25 @@
+sample	read_technology	aligner	mapper_tag	status	source_type	source_file
+HG002	ONT	minimap2	mm2-ont	missing_full_stats_and_cram		
+HG002	ONT	pbmm2	pbmm2-ont	missing_full_stats_and_cram		
+HG002	ONT	VACmap	vacmap-ont	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG002.ont.30x.hg38.vacmap-ont.cram.stats
+HG002	ONT	VG Giraffe	vg-ont	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG002.ont.30x.hg38.vg-ont.cram.stats
+HG002	PacBio	minimap2	mm2-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG002.pb.30x.hg38.mm2-pb.cram.stats
+HG002	PacBio	pbmm2	pbmm2-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG002.pb.30x.hg38.pbmm2-pb.cram.stats
+HG002	PacBio	VACmap	vacmap-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG002.pb.30x.hg38.vacmap-pb.cram.stats
+HG002	PacBio	VG Giraffe	vg-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG002.pb.30x.hg38.vg-pb.cram.stats
+HG003	ONT	minimap2	mm2-ont	missing_full_stats_and_cram		
+HG003	ONT	pbmm2	pbmm2-ont	missing_full_stats_and_cram		
+HG003	ONT	VACmap	vacmap-ont	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG003.ont.30x.hg38.vacmap-ont.cram.stats
+HG003	ONT	VG Giraffe	vg-ont	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG003.ont.30x.hg38.vg-ont.cram.stats
+HG003	PacBio	minimap2	mm2-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG003.pb.30x.hg38.mm2-pb.cram.stats
+HG003	PacBio	pbmm2	pbmm2-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG003.pb.30x.hg38.pbmm2-pb.cram.stats
+HG003	PacBio	VACmap	vacmap-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG003.pb.30x.hg38.vacmap-pb.cram.stats
+HG003	PacBio	VG Giraffe	vg-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG003.pb.30x.hg38.vg-pb.cram.stats
+HG004	ONT	minimap2	mm2-ont	missing_full_stats_and_cram		
+HG004	ONT	pbmm2	pbmm2-ont	missing_full_stats_and_cram		
+HG004	ONT	VACmap	vacmap-ont	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG004.ont.30x.hg38.vacmap-ont.cram.stats
+HG004	ONT	VG Giraffe	vg-ont	missing_full_stats_and_cram		
+HG004	PacBio	minimap2	mm2-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG004.pb.30x.hg38.mm2-pb.cram.stats
+HG004	PacBio	pbmm2	pbmm2-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG004.pb.30x.hg38.pbmm2-pb.cram.stats
+HG004	PacBio	VACmap	vacmap-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG004.pb.30x.hg38.vacmap-pb.cram.stats
+HG004	PacBio	VG Giraffe	vg-pb	recovered	existing_full_samtools_stats	/home/nicolas/lrs_benchmarking/alignment_analysis/statistics_cram_files/HG004.pb.30x.hg38.vg-pb.cram.stats

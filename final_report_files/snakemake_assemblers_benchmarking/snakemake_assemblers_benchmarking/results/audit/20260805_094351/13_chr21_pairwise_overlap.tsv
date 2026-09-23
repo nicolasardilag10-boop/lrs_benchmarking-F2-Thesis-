@@ -1,0 +1,16 @@
+dataset_a	dataset_b	unique_a	unique_b	shared_sequences	fraction_a_shared	fraction_b_shared
+smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq	981	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq	981	981	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq	981	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq	981	981	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq	981	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq	1314	981	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq	1314	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq	1314	981	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq	1314	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq	981	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq	981	981	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq	981	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq	1314	981	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq	1314	1314	0	0.000000	0.000000
+smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq	981	1314	0	0.000000	0.000000

@@ -1,0 +1,11 @@
+4:active_aligners:
+5-  - minimap2
+6-  - pbmm2
+7-  - vacmap
+8-  - vg_giraffe
+9-
+10-vacmap_bin: "conda run -n vacmap_env vacmap"
+11-
+12-vg_gbz: data/graph/graph.gbz
+13-vg_min: data/graph/graph.min
+14-vg_dist: data/graph/graph.dist

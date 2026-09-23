@@ -1,0 +1,9 @@
+NORMALIZED INPUT READY
+Sample: HG002
+Technology: hifi
+Chromosome: chr21
+Seed: 21002
+Observed coverage: 29.999991x
+FASTQ: /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized/HG002/HG002.hifi.chr21.primary.mapq20.30x.fastq.gz
+SHA256: 06fd092bb6885ab390c737c080b589e8862e97fce53d8fd6544c62341b8ea731
+STATUS: PASS

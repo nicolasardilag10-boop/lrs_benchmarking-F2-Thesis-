@@ -1,0 +1,5 @@
+containers:
+  flye2: "docker://nicolasardila1/lrs-flye2:2.9.6"
+  goldrush: "docker://nicolasardila1/lrs-goldrush:1.2.2"
+  ntlink: "docker://nicolasardila1/lrs-ntlink:1.3.11"
+  verkko2: "docker://nicolasardila1/lrs-verkko2:2.3.2"

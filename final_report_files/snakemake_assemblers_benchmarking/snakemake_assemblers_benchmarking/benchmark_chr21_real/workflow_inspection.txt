@@ -1,0 +1,167 @@
+============================================================
+CHROMOSOME 21 ASSEMBLER WORKFLOW INSPECTION
+============================================================
+
+=== FINAL INPUT CHECKPOINT ===
+PASS: benchmark_chr21_real/results/checkpoints/final_inputs_ready.ok
+
+=== FINAL CHROMOSOME 21 FASTQ FILES ===
+benchmark_chr21_real/inputs/final_normalized/HG002/HG002.hifi.chr21.primary.mapq20.30x.fastq.gz	743460 KiB
+benchmark_chr21_real/inputs/final_normalized/HG002/HG002.ont.chr21.primary.mapq20.30x.fastq.gz	1441128 KiB
+benchmark_chr21_real/inputs/final_normalized/HG003/HG003.hifi.chr21.primary.mapq20.30x.fastq.gz	748028 KiB
+benchmark_chr21_real/inputs/final_normalized/HG003/HG003.ont.chr21.primary.mapq20.30x.fastq.gz	1633384 KiB
+benchmark_chr21_real/inputs/final_normalized/HG004/HG004.hifi.chr21.primary.mapq20.30x.fastq.gz	733232 KiB
+benchmark_chr21_real/inputs/final_normalized/HG004/HG004.ont.chr21.primary.mapq20.30x.fastq.gz	1624020 KiB
+
+Number of final FASTQ files:
+6
+
+=== ROOT WORKFLOW FILES ===
+./Snakefile
+./backups/snakemake_assemblers.before_modular_split_20260731_133617.smk
+./benchmark_1k/Snakefile
+./config.chr21.yaml
+./config.real.yaml
+./config.yaml
+./envs/flye.yaml
+./envs/goldrush.yaml
+./envs/ntlink.yaml
+./envs/verkko.yaml
+./envs/verkko2.yaml
+./results/flye_smoke_summary.tsv
+./rules/assessment.smk
+./rules/common.smk
+./rules/flye.smk
+./rules/goldrush.smk
+./rules/ntlink.smk
+./rules/validation.smk
+./rules/verkko.smk
+./samples.tsv
+./smoke_test/config.chr21.yaml
+./smoke_test/config.verkko.yaml
+./smoke_test/config.yaml
+./smoke_test/samples.chr21.tsv
+./smoke_test/samples.tsv
+./smoke_test/samples.verkko.tsv
+./snakemake_assemblers.before_split_20260731_133203.smk
+
+=== CHROMOSOME 21 WORKFLOW FILES ===
+benchmark_chr21_real/Snakefile.inputs
+benchmark_chr21_real/Snakefile.inputs.before_checkpoint_fix
+benchmark_chr21_real/Snakefile.inputs.before_dependency_fix_20260805_150712
+benchmark_chr21_real/Snakefile.inputs.before_forced_dependency_fix_20260805_151356
+benchmark_chr21_real/Snakefile.inputs.before_shell_brace_fix_20260805_151816
+benchmark_chr21_real/Snakefile.inputs.before_shell_variable_fix_20260805_151924
+benchmark_chr21_real/Snakefile.inputs.before_wildcard_brace_fix_20260805_151555
+benchmark_chr21_real/Snakefile.inputs.before_wildcard_fix_20260805_150841
+benchmark_chr21_real/config/normalized_inputs.tsv
+benchmark_chr21_real/config/sources.resolved.tsv
+benchmark_chr21_real/inputs/pacbio/HG002/HG002.remote.idxstats.tsv
+benchmark_chr21_real/results/tables/final_normalized_inputs.tsv
+benchmark_chr21_real/results/validation/HG002.hifi.chr21.extraction.tsv
+benchmark_chr21_real/results/validation/HG002.hifi.chr21.primary.mapq20.30x.tsv
+benchmark_chr21_real/results/validation/existing_chr21_bam_audit.tsv
+benchmark_chr21_real/results/validation/final_extracted/HG002.hifi.chr21.primary.mapq20.tsv
+benchmark_chr21_real/results/validation/final_extracted/HG002.ont.chr21.primary.mapq20.tsv
+benchmark_chr21_real/results/validation/final_extracted/HG003.hifi.chr21.primary.mapq20.tsv
+benchmark_chr21_real/results/validation/final_extracted/HG003.ont.chr21.primary.mapq20.tsv
+benchmark_chr21_real/results/validation/final_extracted/HG004.hifi.chr21.primary.mapq20.tsv
+benchmark_chr21_real/results/validation/final_extracted/HG004.ont.chr21.primary.mapq20.tsv
+benchmark_chr21_real/results/validation/final_normalized/HG002.hifi.chr21.primary.mapq20.30x.tsv
+benchmark_chr21_real/results/validation/final_normalized/HG002.ont.chr21.primary.mapq20.30x.tsv
+benchmark_chr21_real/results/validation/final_normalized/HG003.hifi.chr21.primary.mapq20.30x.tsv
+benchmark_chr21_real/results/validation/final_normalized/HG003.ont.chr21.primary.mapq20.30x.tsv
+benchmark_chr21_real/results/validation/final_normalized/HG004.hifi.chr21.primary.mapq20.30x.tsv
+benchmark_chr21_real/results/validation/final_normalized/HG004.ont.chr21.primary.mapq20.30x.tsv
+
+=== MAIN CONFIGURATION ===
+sample_sheet: samples.tsv
+
+active_assemblers:
+  - flye
+
+genome_size: 3.1g
+threads: 4
+
+=== CURRENT SAMPLE SHEET ===
+sample	technology	fastq
+HG002	ont	data/reads/HG002.ont.1k.fastq.gz
+HG002	pb	data/reads/HG002.pb.1k.fastq.gz
+HG003	ont	data/reads/HG003.ont.1k.fastq.gz
+HG003	pb	data/reads/HG003.pb.1k.fastq.gz
+HG004	ont	data/reads/HG004.ont.1k.fastq.gz
+HG004	pb	data/reads/HG004.pb.1k.fastq.gz
+
+=== SNAKEFILE STRUCTURE ===
+9:configfile: "config.yaml"
+17:include: "rules/common.smk"
+25:rule all:
+37:include: "rules/validation.smk"
+38:include: "rules/flye.smk"
+39:include: "rules/goldrush.smk"
+40:include: "rules/ntlink.smk"
+41:include: "rules/verkko.smk"
+42:include: "rules/assessment.smk"
+
+=== AVAILABLE ASSEMBLER RULES ===
+
+------------------------------------------------------------
+rules/flye.smk
+------------------------------------------------------------
+13:rule flye_assembly:
+14:    input:
+17:    output:
+25:    params:
+32:    threads:
+34:    shell:
+
+------------------------------------------------------------
+rules/goldrush.smk
+------------------------------------------------------------
+5:rule goldrush_assembly:
+6:    input:
+9:    output:
+11:    params:
+25:    threads:
+29:    shell:
+
+------------------------------------------------------------
+rules/verkko.smk
+------------------------------------------------------------
+6:rule verkko_assembly:
+7:    input:
+10:    output:
+12:    threads: 4
+15:    params:
+17:    shell:
+
+------------------------------------------------------------
+rules/ntlink.smk
+------------------------------------------------------------
+26:rule ntlink_scaffold:
+27:    input:
+31:    output:
+34:    threads: 4
+39:    params:
+42:    shell:   #start the bash command for the rule
+
+------------------------------------------------------------
+rules/assessment.smk
+------------------------------------------------------------
+
+------------------------------------------------------------
+rules/validation.smk
+------------------------------------------------------------
+14:rule validate_inputs:
+15:    output:
+
+------------------------------------------------------------
+rules/common.smk
+------------------------------------------------------------
+
+=== CONDA ENVIRONMENTS ===
+flye.yaml
+goldrush.yaml
+ntlink.yaml
+verkko.yaml
+verkko2.yaml

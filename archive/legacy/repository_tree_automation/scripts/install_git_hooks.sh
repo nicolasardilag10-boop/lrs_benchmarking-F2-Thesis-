@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit
+
+echo "Configured Git hooks path: .githooks"
+echo "The repository tree will now refresh automatically before each commit."

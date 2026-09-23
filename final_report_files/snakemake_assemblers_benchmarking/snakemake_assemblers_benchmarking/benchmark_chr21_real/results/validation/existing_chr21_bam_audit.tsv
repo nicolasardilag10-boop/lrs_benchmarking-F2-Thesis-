@@ -1,0 +1,4 @@
+bam	integrity	chr21_name	primary_chr21_alignments	unique_primary_reads	reads_with_sequence	total_read_bases	estimated_sequence_coverage	first_read_name	read_name_type
+results/chr21_read_extraction/HG002.ont.chr21.sorted.bam	PASS	chr21	0	0	0	0	0.000000	NA	NA
+results/chr21_read_extraction/HG002.pb.chr21.sorted.bam	PASS	chr21	0	0	0	0	0.000000	NA	NA
+results/chr21_read_extraction/HG003.ont.chr21.sorted.bam	PASS	chr21	0	0	0	0	0.000000	NA	NA

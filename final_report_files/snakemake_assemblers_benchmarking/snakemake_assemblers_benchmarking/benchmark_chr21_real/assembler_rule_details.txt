@@ -1,0 +1,854 @@
+============================================================
+EXACT ASSEMBLER WORKFLOW CONTENT
+============================================================
+
+============================================================
+FILE: Snakefile
+============================================================
+     1	#####################################################################################
+     2	# ASSEMBLY PIPELINE: FLYE, GOLDRUSH, NTLINK, AND VERKKO
+     3	# This workflow benchmarks long-read genome assembly and scaffolding tools using
+     4	# HG002, HG003, and HG004 ONT and PacBio HiFi sequencing datasets.
+     5	#####################################################################################
+     6	
+     7	# Load the main configuration file containing the sample table, active tools,
+     8	# genome size, thread settings, and other workflow parameters
+     9	configfile: "config.yaml"
+    10	
+    11	
+    12	# -----------------------------------------------------------------------------
+    13	# Load shared configuration, sample information, helper functions, and targets
+    14	# -----------------------------------------------------------------------------
+    15	
+    16	# This file contains variables and Python functions shared by all assembler rules
+    17	include: "rules/common.smk"
+    18	
+    19	
+    20	# -----------------------------------------------------------------------------
+    21	# Final target rule
+    22	# -----------------------------------------------------------------------------
+    23	
+    24	# Define the complete collection of files that the active workflow must produce
+    25	rule all:
+    26	    input:
+    27	        VALIDATION_OK,
+    28	        EXPECTED_FINAL_OUTPUTS
+    29	
+    30	
+    31	# -----------------------------------------------------------------------------
+    32	# Load validation, assembler, scaffolding, and assessment rule modules
+    33	# -----------------------------------------------------------------------------
+    34	
+    35	# Each tool is stored in a separate file to simplify testing, maintenance,
+    36	# environment management, and migration to another computing system
+    37	include: "rules/validation.smk"
+    38	include: "rules/flye.smk"
+    39	include: "rules/goldrush.smk"
+    40	include: "rules/ntlink.smk"
+    41	include: "rules/verkko.smk"
+    42	include: "rules/assessment.smk"
+
+============================================================
+FILE: rules/common.smk
+============================================================
+     1	#####################################################################################
+     2	# SHARED ASSEMBLER WORKFLOW CONFIGURATION
+     3	# This module reads the sample table, validates configuration values, defines
+     4	# helper functions, and generates the expected outputs used by the workflow.
+     5	#####################################################################################
+     6	
+     7	# Import packages used to verify paths and read tab-separated sample information
+     8	from pathlib import Path
+     9	import csv
+    10	
+    11	
+    12	# -----------------------------------------------------------------------------
+    13	# General workflow configuration
+    14	# -----------------------------------------------------------------------------
+    15	
+    16	# Define the sample table and general assembler settings
+    17	SAMPLE_SHEET = config.get("sample_sheet", "samples.tsv")
+    18	ACTIVE_ASSEMBLERS = config.get("active_assemblers", ["flye"])
+    19	GENOME_SIZE = config.get("genome_size", "3.1g")
+    20	DEFAULT_THREADS = int(config.get("threads", 4))
+    21	
+    22	# Marker file created after all required inputs have been validated
+    23	VALIDATION_OK = "results/logs/validate_inputs.ok"
+    24	
+    25	# Conda environments used by the individual assembler and assessment modules
+    26	# Use absolute paths so included rule files do not incorrectly search under rules/envs/
+    27	PROJECT_DIR = Path(workflow.basedir).resolve()
+    28	
+    29	
+    30	ENV_FLYE = str(PROJECT_DIR / "envs" / "flye.yaml")
+    31	ENV_GOLDRUSH = str(PROJECT_DIR / "envs" / "goldrush.yaml")
+    32	ENV_NTLINK = str(PROJECT_DIR / "envs" / "ntlink.yaml")
+    33	ENV_VERKKO = str(PROJECT_DIR / "envs" / "verkko.yaml")
+    34	ENV_ASSESSMENT = str(PROJECT_DIR / "envs" / "assessment.yaml")
+    35	
+    36	# Define all assembler and scaffolding names accepted by this workflow
+    37	SUPPORTED_ASSEMBLERS = {
+    38	    "flye",
+    39	    "goldrush",
+    40	    "ntlink",
+    41	    "verkko",
+    42	}
+    43	
+    44	# Stop immediately if config.yaml contains an unknown tool name
+    45	UNKNOWN_ASSEMBLERS = set(ACTIVE_ASSEMBLERS) - SUPPORTED_ASSEMBLERS
+    46	
+    47	if UNKNOWN_ASSEMBLERS:
+    48	    raise ValueError(
+    49	        f"Unsupported assembler names in config.yaml: "
+    50	        f"{sorted(UNKNOWN_ASSEMBLERS)}"
+    51	    )
+    52	
+    53	
+    54	# -----------------------------------------------------------------------------
+    55	# Read the sample table
+    56	# -----------------------------------------------------------------------------
+    57	
+    58	# Read samples.tsv, verify its required columns, reject missing values, and
+    59	# return the sample name, sequencing technology, and FASTQ path for each row
+    60	def read_sample_sheet(path):
+    61	    path = Path(path)
+    62	
+    63	    if not path.exists():
+    64	        raise FileNotFoundError(
+    65	            f"Missing sample sheet: {path}"
+    66	        )
+    67	
+    68	    rows = []
+    69	
+    70	    with path.open(newline="") as handle:
+    71	        reader = csv.DictReader(
+    72	            handle,
+    73	            delimiter="\t"
+    74	        )
+    75	
+    76	        required_columns = {
+    77	            "sample",
+    78	            "technology",
+    79	            "fastq",
+    80	        }
+    81	
+    82	        observed_columns = set(
+    83	            reader.fieldnames or []
+    84	        )
+    85	
+    86	        missing_columns = (
+    87	            required_columns - observed_columns
+    88	        )
+    89	
+    90	        if missing_columns:
+    91	            raise ValueError(
+    92	                f"Sample sheet is missing columns: "
+    93	                f"{sorted(missing_columns)}"
+    94	            )
+    95	
+    96	        for row in reader:
+    97	            sample = row["sample"].strip()
+    98	            technology = row["technology"].strip()
+    99	            fastq = row["fastq"].strip()
+   100	
+   101	            if not sample or not technology or not fastq:
+   102	                raise ValueError(
+   103	                    f"Invalid empty value in sample sheet row: {row}"
+   104	                )
+   105	
+   106	            if technology not in {"ont", "pb"}:
+   107	                raise ValueError(
+   108	                    f"Unsupported sequencing technology: {technology}"
+   109	                )
+   110	
+   111	            rows.append(
+   112	                {
+   113	                    "sample": sample,
+   114	                    "technology": technology,
+   115	                    "fastq": fastq,
+   116	                }
+   117	            )
+   118	
+   119	    if not rows:
+   120	        raise ValueError(
+   121	            f"Sample sheet is empty: {path}"
+   122	        )
+   123	
+   124	    return rows
+   125	
+   126	
+   127	# Transform samples.tsv into structures used to generate Snakemake jobs
+   128	SAMPLE_ROWS = read_sample_sheet(SAMPLE_SHEET)
+   129	
+   130	SAMPLES = list(
+   131	    dict.fromkeys(
+   132	        row["sample"]
+   133	        for row in SAMPLE_ROWS
+   134	    )
+   135	)
+   136	
+   137	TECHNOLOGIES = list(
+   138	    dict.fromkeys(
+   139	        row["technology"]
+   140	        for row in SAMPLE_ROWS
+   141	    )
+   142	)
+   143	
+   144	SAMPLE_TECH_PAIRS = list(
+   145	    dict.fromkeys(
+   146	        (
+   147	            row["sample"],
+   148	            row["technology"],
+   149	        )
+   150	        for row in SAMPLE_ROWS
+   151	    )
+   152	)
+   153	
+   154	FASTQ_BY_SAMPLE_TECH = {
+   155	    (
+   156	        row["sample"],
+   157	        row["technology"],
+   158	    ): row["fastq"]
+   159	    for row in SAMPLE_ROWS
+   160	}
+   161	
+   162	
+   163	# -----------------------------------------------------------------------------
+   164	# Shared input helper functions
+   165	# -----------------------------------------------------------------------------
+   166	
+   167	# Return the FASTQ associated with one sample and sequencing technology
+   168	def fastq_for(wildcards):
+   169	    key = (
+   170	        wildcards.sample,
+   171	        wildcards.technology,
+   172	    )
+   173	
+   174	    if key not in FASTQ_BY_SAMPLE_TECH:
+   175	        raise ValueError(
+   176	            f"No FASTQ defined for "
+   177	            f"sample={wildcards.sample}, "
+   178	            f"technology={wildcards.technology}"
+   179	        )
+   180	
+   181	    return FASTQ_BY_SAMPLE_TECH[key]
+   182	
+   183	
+   184	# Return the ONT FASTQ associated with one sample
+   185	def ont_fastq_for_sample(wildcards):
+   186	    key = (
+   187	        wildcards.sample,
+   188	        "ont",
+   189	    )
+   190	
+   191	    if key not in FASTQ_BY_SAMPLE_TECH:
+   192	        raise ValueError(
+   193	            f"No ONT FASTQ defined for "
+   194	            f"sample={wildcards.sample}"
+   195	        )
+   196	
+   197	    return FASTQ_BY_SAMPLE_TECH[key]
+   198	
+   199	
+   200	# Return the PacBio HiFi FASTQ associated with one sample
+   201	def pb_fastq_for_sample(wildcards):
+   202	    key = (
+   203	        wildcards.sample,
+   204	        "pb",
+   205	    )
+   206	
+   207	    if key not in FASTQ_BY_SAMPLE_TECH:
+   208	        raise ValueError(
+   209	            f"No PacBio HiFi FASTQ defined for "
+   210	            f"sample={wildcards.sample}"
+   211	        )
+   212	
+   213	    return FASTQ_BY_SAMPLE_TECH[key]
+   214	
+   215	
+   216	# -----------------------------------------------------------------------------
+   217	# Technology-specific parameter functions
+   218	# -----------------------------------------------------------------------------
+   219	
+   220	# Select the correct Flye input option for ONT or PacBio HiFi reads
+   221	def flye_read_option(wildcards):
+   222	    if wildcards.technology == "ont":
+   223	        return "--nano-raw"
+   224	
+   225	    if wildcards.technology == "pb":
+   226	        return "--pacbio-hifi"
+   227	
+   228	    raise ValueError(
+   229	        f"Unsupported sequencing technology: "
+   230	        f"{wildcards.technology}"
+   231	    )
+   232	
+   233	
+   234	# -----------------------------------------------------------------------------
+   235	# Expected workflow outputs
+   236	# -----------------------------------------------------------------------------
+   237	
+   238	# Build the final output collection according to the tools enabled in config.yaml
+   239	EXPECTED_FINAL_OUTPUTS = []
+   240	
+   241	# Flye generates one independent assembly for each sample and technology
+   242	if "flye" in ACTIVE_ASSEMBLERS:
+   243	    EXPECTED_FINAL_OUTPUTS.extend(
+   244	        [
+   245	            (
+   246	                f"results/assemblies/"
+   247	                f"{sample}.{technology}.flye/"
+   248	                f"assembly.fasta"
+   249	            )
+   250	            for sample, technology
+   251	            in SAMPLE_TECH_PAIRS
+   252	        ]
+   253	    )
+   254	
+   255	# GoldRush outputs will be added after its command and installation are validated
+   256	
+   257	# ntLink outputs will be added after selecting which draft assemblies it will
+   258	# scaffold using the corresponding long-read datasets
+   259	
+   260	# Verkko outputs will be added after validating its hybrid ONT and PacBio inputs
+   261	
+   262	
+   263	# -----------------------------------------------------------------------------
+   264	# Wildcard constraints
+   265	# -----------------------------------------------------------------------------
+   266	
+   267	# Restrict wildcards to the samples and technologies listed in samples.tsv
+   268	wildcard_constraints:
+   269	    sample="|".join(SAMPLES),
+   270	    technology="|".join(TECHNOLOGIES)
+
+============================================================
+FILE: rules/validation.smk
+============================================================
+     1	#####################################################################################
+     2	# INPUT AND ENVIRONMENT VALIDATION
+     3	# This module checks the sample table, sequencing files, and Conda environment
+     4	# definitions before any assembler or scaffolding rule is executed.
+     5	#####################################################################################
+     6	
+     7	
+     8	# -----------------------------------------------------------------------------
+     9	# Rule 1: Validate workflow inputs
+    10	# -----------------------------------------------------------------------------
+    11	
+    12	# Check the required sample table, FASTQ files, and environment definitions to
+    13	# prevent the workflow from failing later because of an incomplete setup
+    14	rule validate_inputs:
+    15	    output:
+    16	        VALIDATION_OK
+    17	    run:
+    18	        Path(output[0]).parent.mkdir(
+    19	            parents=True,
+    20	            exist_ok=True
+    21	        )
+    22	
+    23	        errors = []
+    24	
+    25	        # Verify that samples.tsv exists
+    26	        if not Path(SAMPLE_SHEET).exists():
+    27	            errors.append(
+    28	                f"Missing sample sheet: {SAMPLE_SHEET}"
+    29	            )
+    30	
+    31	        # Verify that every FASTQ declared in samples.tsv exists
+    32	        for row in SAMPLE_ROWS:
+    33	            fastq = Path(row["fastq"])
+    34	
+    35	            if not fastq.exists():
+    36	                errors.append(
+    37	                    f"Missing FASTQ file: {fastq}"
+    38	                )
+    39	
+    40	        # Build the list of required environments from active_assemblers
+    41	        required_environments = []
+    42	
+    43	        if "flye" in ACTIVE_ASSEMBLERS:
+    44	            required_environments.append(
+    45	                ENV_FLYE
+    46	            )
+    47	
+    48	        if "goldrush" in ACTIVE_ASSEMBLERS:
+    49	            required_environments.append(
+    50	                ENV_GOLDRUSH
+    51	            )
+    52	
+    53	        if "ntlink" in ACTIVE_ASSEMBLERS:
+    54	            required_environments.append(
+    55	                ENV_NTLINK
+    56	            )
+    57	
+    58	        if "verkko" in ACTIVE_ASSEMBLERS:
+    59	            required_environments.append(
+    60	                ENV_VERKKO
+    61	            )
+    62	
+    63	        # Verify that every required environment YAML file exists
+    64	        for environment_file in required_environments:
+    65	            if not Path(environment_file).exists():
+    66	                errors.append(
+    67	                    f"Missing Conda environment file: "
+    68	                    f"{environment_file}"
+    69	                )
+    70	
+    71	        # Stop the workflow and display all detected problems together
+    72	        if errors:
+    73	            message = "\n".join(errors)
+    74	
+    75	            raise RuntimeError(
+    76	                "\nASSEMBLER WORKFLOW VALIDATION FAILED\n"
+    77	                "Fix these problems before running the workflow:\n\n"
+    78	                f"{message}\n"
+    79	            )
+    80	
+    81	        # Create the marker file after all validations pass
+    82	        Path(output[0]).write_text(
+    83	            "Assembler input validation passed.\n"
+    84	        )
+
+============================================================
+FILE: rules/flye.smk
+============================================================
+     1	#####################################################################################
+     2	# FLYE ASSEMBLY RULES
+     3	# Flye performs de novo assembly independently for ONT and PacBio HiFi reads.
+     4	#####################################################################################
+     5	
+     6	
+     7	# -----------------------------------------------------------------------------
+     8	# Rule 2: Flye de novo assembly
+     9	# -----------------------------------------------------------------------------
+    10	
+    11	# Use the technology-specific Flye input option and generate one assembly
+    12	# directory and one assembly FASTA for every sample and technology combination
+    13	rule flye_assembly:
+    14	    input:
+    15	        validation=VALIDATION_OK,
+    16	        fastq=fastq_for
+    17	    output:
+    18	        assembly=(
+    19	            "results/assemblies/"
+    20	            "{sample}.{technology}.flye/"
+    21	            "assembly.fasta"
+    22	        )
+    23	    conda:
+    24	        ENV_FLYE
+    25	    params:
+    26	        outdir=(
+    27	            "results/assemblies/"
+    28	            "{sample}.{technology}.flye"
+    29	        ),
+    30	        read_option=flye_read_option,
+    31	        genome_size=GENOME_SIZE
+    32	    threads:
+    33	        DEFAULT_THREADS
+    34	    shell:
+    35	        r"""
+    36	        mkdir -p {params.outdir}
+    37	
+    38	        flye \
+    39	            {params.read_option} {input.fastq} \
+    40	            --genome-size {params.genome_size} \
+    41	            --threads {threads} \
+    42	            --out-dir {params.outdir}
+    43	        """
+
+============================================================
+FILE: rules/goldrush.smk
+============================================================
+     1	###############################################################################
+     2	# GOLDRUSH ASSEMBLY RULES
+     3	###############################################################################
+     4	
+     5	rule goldrush_assembly:
+     6	    input:
+     7	        validation="results/logs/validate_inputs.ok",
+     8	        reads=lambda wildcards: fastq_for(wildcards)
+     9	    output:
+    10	        assembly="results/smoke_test/goldrush/{sample}.{technology}/assembly.fasta"
+    11	    params:
+    12	        workdir=lambda wildcards: (
+    13	            f"results/smoke_test/goldrush/"
+    14	            f"{wildcards.sample}.{wildcards.technology}/work"
+    15	        ),
+    16	        prefix=lambda wildcards: (
+    17	            f"{wildcards.sample}_{wildcards.technology}_goldrush"
+    18	        ),
+    19	        reads_basename=lambda wildcards: (
+    20	            f"{wildcards.sample}_{wildcards.technology}"
+    21	        ),
+    22	        min_read_length=lambda wildcards: (
+    23	            5000 if wildcards.technology == "ont" else 10000
+    24	        )
+    25	    threads:
+    26	        lambda wildcards: int(config.get("threads", 4))
+    27	    conda:
+    28	        ENV_GOLDRUSH
+    29	    shell:
+    30	        r"""
+    31	        set -euo pipefail
+    32	
+    33	        mkdir -p "{params.workdir}"
+    34	        mkdir -p "$(dirname "{output.assembly}")"
+    35	
+    36	        # GoldRush expects an uncompressed FASTQ in its working directory.
+    37	        gzip -cd "{input.reads}" \
+    38	            > "{params.workdir}/{params.reads_basename}.fastq"
+    39	
+    40	        cd "{params.workdir}"
+    41	
+    42	        goldrush run \
+    43	            reads="{params.reads_basename}" \
+    44	            G={config[genome_size]} \
+    45	            t={threads} \
+    46	            m={params.min_read_length} \
+    47	            P=0 \
+    48	            p="{params.prefix}" \
+    49	            track_time=1
+    50	
+    51	        FINAL_ASSEMBLY=$(
+    52	            find goldrush_intermediate_files \
+    53	                -type f \
+    54	                -name "*ntLink-5rounds.polished.fa" \
+    55	                -print \
+    56	                | sort \
+    57	                | tail -n 1
+    58	        )
+    59	
+    60	        if [[ -z "$FINAL_ASSEMBLY" || ! -s "$FINAL_ASSEMBLY" ]]; then
+    61	            echo "ERROR: GoldRush final polished assembly was not produced."
+    62	            exit 1
+    63	        fi
+    64	
+    65	        cp "$FINAL_ASSEMBLY" \
+    66	           "$OLDPWD/{output.assembly}"
+    67	
+    68	        test -s "$OLDPWD/{output.assembly}"
+    69	        """
+
+============================================================
+FILE: rules/verkko.smk
+============================================================
+     1	#####################################################################################
+     2	# VERKKO HYBRID ASSEMBLY RULES
+     3	# Verkko combines ONT and PacBio HiFi reads from the same sample.
+     4	#####################################################################################
+     5	
+     6	rule verkko_assembly:
+     7	    input:
+     8	        hifi=pb_fastq_for_sample,
+     9	        ont=ont_fastq_for_sample
+    10	    output:
+    11	        assembly="results/smoke_test/verkko/{sample}/assembly.fasta"
+    12	    threads: 4
+    13	    conda:
+    14	        ENV_VERKKO
+    15	    params:
+    16	        workdir="results/smoke_test/verkko/{sample}/work"
+    17	    shell:
+    18	        r"""
+    19	        set -euo pipefail
+    20	
+    21	        mkdir -p "{params.workdir}"
+    22	        mkdir -p "$(dirname "{output.assembly}")"
+    23	
+    24	        verkko \
+    25	            -d "{params.workdir}" \
+    26	            --hifi "{input.hifi}" \
+    27	            --nano "{input.ont}" \
+    28	            --local \
+    29	            --local-cpus {threads} \
+    30	            --local-memory 9
+    31	
+    32	        cp "{params.workdir}/assembly.fasta" \
+    33	           "{output.assembly}"
+    34	
+    35	        test -s "{output.assembly}"
+    36	        """
+
+============================================================
+FILE: rules/ntlink.smk
+============================================================
+     1	#####################################################################################
+     2	# NTLINK SCAFFOLDING RULES
+     3	# ntLink uses long reads to order, orient, and connect contigs from an existing
+     4	# draft assembly generated by another assembler such as Flye or GoldRush.
+     5	#####################################################################################
+     6	
+     7	
+     8	# -----------------------------------------------------------------------------
+     9	# Future Rule 4: ntLink scaffolding
+    10	# -----------------------------------------------------------------------------
+    11	
+    12	# Planned inputs:
+    13	#   - Input validation marker
+    14	#   - Draft assembly FASTA from Flye or GoldRush
+    15	#   - ONT or PacBio long-read FASTQ file
+    16	#
+    17	# Planned outputs:
+    18	#   - Scaffolded assembly FASTA
+    19	#   - ntLink log and intermediate files
+    20	#
+    21	# ntLink is not treated as an independent de novo assembler because it requires
+    22	# a previously generated draft assembly.
+    23	
+    24	
+    25	
+    26	rule ntlink_scaffold:
+    27	    input:
+    28	        draft="results/smoke_test/goldrush/{sample}.{technology}/assembly.fasta",
+    29	        reads=lambda wildcards: fastq_for(wildcards)
+    30	
+    31	    output:
+    32	        assembly="results/smoke_test/ntlink/{sample}.{technology}/assembly.fasta"
+    33	
+    34	    threads: 4
+    35	
+    36	    conda:
+    37	        ENV_NTLINK
+    38	
+    39	    params:
+    40	        workdir="results/smoke_test/ntlink/{sample}.{technology}/work"
+    41	
+    42	    shell:   #start the bash command for the rule
+    43	        #start a multiline section. Set -euo pipefail makes to stop de script if real error happens. mkdir create the specific nt Link working directory
+    44	        r"""
+    45	        set -euo pipefail
+    46	
+    47	        mkdir -p "{params.workdir}"
+    48	        mkdir -p "$(dirname "{output.assembly}")"
+    49	
+    50	        cp "{input.draft}" "{params.workdir}/draft.fasta"
+    51	        gzip -cd "{input.reads}" \
+    52	            > "{params.workdir}/reads.fastq"
+    53	
+    54	        (
+    55	            cd "{params.workdir}"
+    56	
+    57	            ntLink scaffold \
+    58	                target=draft.fasta \
+    59	                reads='reads.fastq' \
+    60	                t={threads}
+    61	        )
+    62	
+    63	        cp "{params.workdir}/draft.fasta.k32.w100.z1000.ntLink.scaffolds.fa" \
+    64	           "{output.assembly}"
+    65	
+    66	        test -s "{output.assembly}"
+    67	        """
+
+============================================================
+FILE: rules/assessment.smk
+============================================================
+     1	#####################################################################################
+     2	# ASSEMBLY QUALITY ASSESSMENT RULES
+     3	# This module will calculate comparable statistics for Flye, GoldRush, ntLink,
+     4	# and Verkko outputs after their assembly rules are operational.
+     5	#####################################################################################
+     6	
+     7	
+     8	# -----------------------------------------------------------------------------
+     9	# Future Rule 6: Calculate assembly statistics
+    10	# -----------------------------------------------------------------------------
+    11	
+    12	# Planned metrics:
+    13	#   - Number of contigs or scaffolds
+    14	#   - Total assembly length
+    15	#   - N50 and L50
+    16	#   - Longest contig
+    17	#   - Minimum and maximum sequence length
+    18	#   - GC percentage
+    19	
+    20	
+    21	# -----------------------------------------------------------------------------
+    22	# Future Rule 7: Build the assembly benchmark summary
+    23	# -----------------------------------------------------------------------------
+    24	
+    25	# The final summary will combine all assembly statistics into one table with:
+    26	#   - Sample
+    27	#   - Sequencing technology
+    28	#   - Assembler or scaffolder
+    29	#   - Assembly size
+    30	#   - Contig count
+    31	#   - N50
+    32	#   - Longest contig
+
+============================================================
+FILE: config.yaml
+============================================================
+     1	sample_sheet: samples.tsv
+     2	
+     3	active_assemblers:
+     4	  - flye
+     5	
+     6	genome_size: 3.1g
+     7	threads: 4
+
+============================================================
+FILE: config.real.yaml
+============================================================
+     1	sample_sheet: samples.real.tsv
+     2	
+     3	active_assemblers:
+     4	  - flye
+     5	
+     6	genome_size: 3.1g
+     7	threads: 32
+
+============================================================
+FILE: config.chr21.yaml
+============================================================
+     1	sample_sheet: samples.chr21.tsv
+     2	
+     3	active_assemblers:
+     4	  - flye
+     5	
+     6	genome_size: 46709983
+     7	threads: 4
+
+============================================================
+FILE: samples.tsv
+============================================================
+     1	sample	technology	fastq
+     2	HG002	ont	data/reads/HG002.ont.1k.fastq.gz
+     3	HG002	pb	data/reads/HG002.pb.1k.fastq.gz
+     4	HG003	ont	data/reads/HG003.ont.1k.fastq.gz
+     5	HG003	pb	data/reads/HG003.pb.1k.fastq.gz
+     6	HG004	ont	data/reads/HG004.ont.1k.fastq.gz
+     7	HG004	pb	data/reads/HG004.pb.1k.fastq.gz
+
+============================================================
+FILE: smoke_test/config.chr21.yaml
+============================================================
+     1	sample_sheet: smoke_test/samples.chr21.tsv
+     2	active_assemblers:
+     3	- flye
+     4	- goldrush
+     5	genome_size: 1m
+     6	threads: 4
+
+============================================================
+FILE: smoke_test/config.verkko.yaml
+============================================================
+     1	sample_sheet: smoke_test/samples.verkko.tsv
+     2	
+     3	active_assemblers:
+     4	  - verkko
+     5	
+     6	genome_size: 5m
+     7	threads: 4
+
+============================================================
+FILE: smoke_test/samples.chr21.tsv
+============================================================
+     1	sample	technology	fastq
+     2	HG002	ont	smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq
+     3	HG002	pb	smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq
+     4	HG003	ont	smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq
+     5	HG003	pb	smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq
+     6	HG004	ont	smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq
+     7	HG004	pb	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq
+
+============================================================
+FILE: smoke_test/samples.verkko.tsv
+============================================================
+     1	sample	technology	fastq
+     2	ecoli	pb	smoke_test/data/verkko_official/ecoli_hifi_subset24x.fastq.gz
+     3	ecoli	ont	smoke_test/data/verkko_official/ecoli_ont_subset50x.fastq.gz
+
+============================================================
+CHROMOSOME 21 INPUT TABLE
+============================================================
+sample  technology  region  minimum_mapq  target_coverage  seed   extracted_bam                                         normalized_fastq                                                      status
+HG002   hifi        chr21   20            30               21002  inputs/pacbio/HG002/HG002.hifi.chr21.primary.q20.bam  inputs/normalized/HG002/HG002.hifi.chr21.primary.mapq20.30x.fastq.gz  NORMALIZED_PASS
+HG002   ont         chr21   20            30               22002  inputs/ont/HG002/HG002.ont.chr21.primary.q20.bam      inputs/normalized/HG002/HG002.ont.chr21.q20.30x.fastq.gz              PENDING_EXTRACTION
+HG003   hifi        chr21   20            30               21003  inputs/pacbio/HG003/HG003.hifi.chr21.primary.q20.bam  inputs/normalized/HG003/HG003.hifi.chr21.q20.30x.fastq.gz             PENDING_EXTRACTION
+HG003   ont         chr21   20            30               22003  inputs/ont/HG003/HG003.ont.chr21.primary.q20.bam      inputs/normalized/HG003/HG003.ont.chr21.q20.30x.fastq.gz              PENDING_EXTRACTION
+HG004   hifi        chr21   20            30               21004  inputs/pacbio/HG004/HG004.hifi.chr21.primary.q20.bam  inputs/normalized/HG004/HG004.hifi.chr21.q20.30x.fastq.gz             PENDING_EXTRACTION
+HG004   ont         chr21   20            30               22004  inputs/ont/HG004/HG004.ont.chr21.primary.q20.bam      inputs/normalized/HG004/HG004.ont.chr21.q20.30x.fastq.gz              PENDING_EXTRACTION
+
+============================================================
+FINAL NORMALIZED VALIDATION TABLE
+============================================================
+sample  technology  chromosome  minimum_mapq  extracted_reads  extracted_read_bases  extracted_coverage  extracted_read_n50  target_coverage  normalized_reads  normalized_read_bases  normalized_coverage  seed   normalized_fastq                                                                                                                                                                     sha256                                                            validation_status
+HG002   hifi        chr21       20            118123           1971011532            42.196794           17356               30.000000        83885             1401299063             29.999991            21002  /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized/HG002/HG002.hifi.chr21.primary.mapq20.30x.fastq.gz  06fd092bb6885ab390c737c080b589e8862e97fce53d8fd6544c62341b8ea731  PASS
+HG002   ont         chr21       20            112127           2321837038            49.707512           59568               30.000000        67730             1401285584             29.999702            22002  /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized/HG002/HG002.ont.chr21.primary.mapq20.30x.fastq.gz   93a66a3375cb00083446f6b4b582db758b6d5d808542a9cca722d32228827b72  PASS
+HG003   hifi        chr21       20            116307           1892144966            40.508363           16860               30.000000        86103             1401300677             30.000025            21003  /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized/HG003/HG003.hifi.chr21.primary.mapq20.30x.fastq.gz  77ade9e0ea4a2a33ab327d564917d888305c15fcad71b53aba6d1cac4dbfecf1  PASS
+HG003   ont         chr21       20            174424           3539475570            75.775570           47315               30.000000        69004             1401276886             29.999516            22003  /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized/HG003/HG003.ont.chr21.primary.mapq20.30x.fastq.gz   c21585c6c522693b827c16d297f7f76c43541ffa1b93195ac67dd41b5a13bc2e  PASS
+HG004   hifi        chr21       20            88233            1412717196            30.244438           16821               30.000000        87510             1401300267             30.000017            21004  /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized/HG004/HG004.hifi.chr21.primary.mapq20.30x.fastq.gz  4c92d71f413fb15644e18eb8230110157a7fcf3b92843e7bde6d9226c4e8080e  PASS
+HG004   ont         chr21       20            160715           3633362095            77.785558           52350               30.000000        62064             1401250419             29.998949            22004  /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized/HG004/HG004.ont.chr21.primary.mapq20.30x.fastq.gz   0ba1ef7b7d588bec73684c46180a4e7731f3ec94ebf0b61409fa7df35db372a2  PASS
+
+============================================================
+GENOME-SIZE REFERENCES IN WORKFLOW
+============================================================
+rules/common.smk.backup_before_env_path_fix_20260803_091412:19:GENOME_SIZE = config.get("genome_size", "3.1g")
+rules/goldrush.smk:44:            G={config[genome_size]} \
+rules/common.smk.backup_env_paths_20260803_091238:19:GENOME_SIZE = config.get("genome_size", "3.1g")
+rules/goldrush.smk.backup_before_gzip_fix_20260805_090314:44:            G={config[genome_size]} \
+rules/common.smk.backup_env_fix_20260803_091443:19:GENOME_SIZE = config.get("genome_size", "3.1g")
+rules/common.smk:19:GENOME_SIZE = config.get("genome_size", "3.1g")
+rules/flye.smk:31:        genome_size=GENOME_SIZE
+rules/flye.smk:40:            --genome-size {params.genome_size} \
+config.chr21.yaml:1:sample_sheet: samples.chr21.tsv
+config.chr21.yaml:6:genome_size: 46709983
+config.real.yaml:6:genome_size: 3.1g
+config.yaml:6:genome_size: 3.1g
+smoke_test/config.chr21.yaml:1:sample_sheet: smoke_test/samples.chr21.tsv
+smoke_test/config.chr21.yaml:5:genome_size: 1m
+smoke_test/verkko_official_test.log:33:genome_size: 5m
+smoke_test/config.verkko.yaml:6:genome_size: 5m
+smoke_test/run_official_verkko_test.sh:95:genome_size: 5m
+smoke_test/data/reference/chr21_1mb.fasta:1:>chr21_smoke_1mb_13000001_14000000_acgt_1.0000
+smoke_test/scripts/generate_chr21_smoke_data.py:15:    / "chr21_1mb.fasta"
+smoke_test/scripts/generate_chr21_smoke_data.py:22:    / "reads_chr21"
+smoke_test/scripts/generate_chr21_smoke_data.py:32:def find_chr21_reference() -> Path:
+smoke_test/scripts/generate_chr21_smoke_data.py:45:            if "chr21" not in name:
+smoke_test/scripts/generate_chr21_smoke_data.py:54:            "No chromosome 21 FASTA was found under data/ or smoke_test/."
+smoke_test/scripts/generate_chr21_smoke_data.py:121:        raise RuntimeError("Could not select a chromosome 21 region.")
+smoke_test/scripts/generate_chr21_smoke_data.py:141:            f">chr21_smoke_1mb_"
+smoke_test/scripts/generate_chr21_smoke_data.py:159:        / f"{sample}.{technology}.chr21.smoke.fastq"
+smoke_test/scripts/generate_chr21_smoke_data.py:209:    reference = find_chr21_reference()
+smoke_test/scripts/generate_chr21_diploid_smoke.py:13:    / "chr21_1mb.fasta"
+smoke_test/scripts/generate_chr21_diploid_smoke.py:20:    / "reads_chr21"
+smoke_test/scripts/generate_chr21_diploid_smoke.py:110:        / f"{sample}.{technology}.chr21.smoke.fastq"
+smoke_test/config.yaml:5:genome_size: 1m
+smoke_test/samples.chr21.tsv:2:HG002	ont	smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq
+smoke_test/samples.chr21.tsv:3:HG002	pb	smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq
+smoke_test/samples.chr21.tsv:4:HG003	ont	smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq
+smoke_test/samples.chr21.tsv:5:HG003	pb	smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq
+smoke_test/samples.chr21.tsv:6:HG004	ont	smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq
+smoke_test/samples.chr21.tsv:7:HG004	pb	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq
+benchmark_chr21_real/Snakefile.inputs:9:ROOT = "benchmark_chr21_real"
+benchmark_chr21_real/Snakefile.inputs:99:    "chr21.primary.mapq20.bam"
+benchmark_chr21_real/Snakefile.inputs:109:    "chr21.primary.mapq20.tsv"
+benchmark_chr21_real/Snakefile.inputs:115:    "chr21.primary.mapq20.ok"
+benchmark_chr21_real/Snakefile.inputs:122:    "chr21.primary.mapq20.30x.fastq.gz"
+benchmark_chr21_real/Snakefile.inputs:128:    "chr21.primary.mapq20.30x.names.txt"
+benchmark_chr21_real/Snakefile.inputs:134:    "chr21.primary.mapq20.30x.tsv"
+benchmark_chr21_real/Snakefile.inputs:140:    "chr21.primary.mapq20.30x.ok"
+benchmark_chr21_real/Snakefile.inputs:146:    "chr21.primary.mapq20.30x.log"
+benchmark_chr21_real/Snakefile.inputs:182:        f"{sample}.{technology}.chr21.primary.mapq20.ok"
+benchmark_chr21_real/Snakefile.inputs:190:        f"{sample}.{technology}.chr21.primary.mapq20.tsv"
+benchmark_chr21_real/Snakefile.inputs:198:        f"{sample}.{technology}.chr21.primary.mapq20.30x.ok"
+benchmark_chr21_real/Snakefile.inputs:206:        f"{sample}.{technology}.chr21.primary.mapq20.30x.tsv"
+benchmark_chr21_real/Snakefile.inputs:280:            benchmark_chr21_real/scripts/filter_sam_start_window.py \
+benchmark_chr21_real/Snakefile.inputs:408:            benchmark_chr21_real/scripts/validate_extracted_chr21_bam.py \
+benchmark_chr21_real/Snakefile.inputs:457:            benchmark_chr21_real/scripts/normalize_chr21_bam_to_coverage.py \
+benchmark_chr21_real/Snakefile.inputs:688:                    "SIX MATCHED CHROMOSOME-21 INPUTS READY",
+benchmark_chr21_real/config/normalized_inputs.tsv:2:HG002	hifi	chr21	20	30	21002	inputs/pacbio/HG002/HG002.hifi.chr21.primary.q20.bam	inputs/normalized/HG002/HG002.hifi.chr21.primary.mapq20.30x.fastq.gz	NORMALIZED_PASS
+benchmark_chr21_real/config/normalized_inputs.tsv:3:HG002	ont	chr21	20	30	22002	inputs/ont/HG002/HG002.ont.chr21.primary.q20.bam	inputs/normalized/HG002/HG002.ont.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+benchmark_chr21_real/config/normalized_inputs.tsv:4:HG003	hifi	chr21	20	30	21003	inputs/pacbio/HG003/HG003.hifi.chr21.primary.q20.bam	inputs/normalized/HG003/HG003.hifi.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+benchmark_chr21_real/config/normalized_inputs.tsv:5:HG003	ont	chr21	20	30	22003	inputs/ont/HG003/HG003.ont.chr21.primary.q20.bam	inputs/normalized/HG003/HG003.ont.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+benchmark_chr21_real/config/normalized_inputs.tsv:6:HG004	hifi	chr21	20	30	21004	inputs/pacbio/HG004/HG004.hifi.chr21.primary.q20.bam	inputs/normalized/HG004/HG004.hifi.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+benchmark_chr21_real/config/normalized_inputs.tsv:7:HG004	ont	chr21	20	30	22004	inputs/ont/HG004/HG004.ont.chr21.primary.q20.bam	inputs/normalized/HG004/HG004.ont.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+benchmark_chr21_real/config/sources.resolved.tsv:1:sample	technology	source_family	source_bam_url	source_bai_url	chromosome_name	chromosome_length	minimum_mapq	target_coverage	seed	remote_chr21_indexed_records	source_validation
+benchmark_chr21_real/config/sources.resolved.tsv:2:HG002	hifi	PacBio_HiFi_Revio_20231031	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/PacBio_HiFi-Revio_20231031/HG002_PacBio-HiFi-Revio_20231031_48x_GRCh38-GIABv3.bam	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/PacBio_HiFi-Revio_20231031/HG002_PacBio-HiFi-Revio_20231031_48x_GRCh38-GIABv3.bam.bai	chr21	46709983	20	30	21002	133605	PASS
+benchmark_chr21_real/config/sources.resolved.tsv:3:HG002	ont	ONT_ultralong_GRCh38	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/Ultralong_OxfordNanopore/guppy-V3.2.4_2020-01-22/HG002_GRCh38_ONT-UL_GIAB_20200122.phased.bam	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/Ultralong_OxfordNanopore/guppy-V3.2.4_2020-01-22/HG002_GRCh38_ONT-UL_GIAB_20200122.phased.bam.bai	chr21	46709983	20	30	22002	285639	PASS
+benchmark_chr21_real/config/sources.resolved.tsv:4:HG003	hifi	PacBio_HiFi_Revio_20231031	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG003_NA24149_father/PacBio_HiFi-Revio_20231031/HG003_PacBio-HiFi-Revio_20231031_46x_GRCh38-GIABv3.bam	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG003_NA24149_father/PacBio_HiFi-Revio_20231031/HG003_PacBio-HiFi-Revio_20231031_46x_GRCh38-GIABv3.bam.bai	chr21	46709983	20	30	21003	130066	PASS
+benchmark_chr21_real/config/sources.resolved.tsv:5:HG003	ont	ONT_ultralong_GRCh38	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG003_NA24149_father/UCSC_Ultralong_OxfordNanopore_Promethion/HG003_GRCh38_ONT-UL_UCSC_20200508.bam	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG003_NA24149_father/UCSC_Ultralong_OxfordNanopore_Promethion/HG003_GRCh38_ONT-UL_UCSC_20200508.bam.bai	chr21	46709983	20	30	22003	426882	PASS
+benchmark_chr21_real/config/sources.resolved.tsv:6:HG004	hifi	PacBio_HiFi_Revio_20231031	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG004_NA24143_mother/PacBio_HiFi-Revio_20231031/HG004_PacBio-HiFi-Revio_20231031_36x_GRCh38-GIABv3.bam	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG004_NA24143_mother/PacBio_HiFi-Revio_20231031/HG004_PacBio-HiFi-Revio_20231031_36x_GRCh38-GIABv3.bam.bai	chr21	46709983	20	30	21004	99708	PASS
+benchmark_chr21_real/config/sources.resolved.tsv:7:HG004	ont	ONT_ultralong_GRCh38	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG004_NA24143_mother/UCSC_Ultralong_OxfordNanopore_Promethion/HG004_GRCh38_ONT-UL_UCSC_20200508.bam	https://ftp.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG004_NA24143_mother/UCSC_Ultralong_OxfordNanopore_Promethion/HG004_GRCh38_ONT-UL_UCSC_20200508.bam.bai	chr21	46709983	20	30	22004	396604	PASS

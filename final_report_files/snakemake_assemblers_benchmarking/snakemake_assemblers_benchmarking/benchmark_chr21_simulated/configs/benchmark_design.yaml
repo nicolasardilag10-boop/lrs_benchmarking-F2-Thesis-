@@ -1,0 +1,49 @@
+experiment:
+  name: chr21_1mb_synthetic_diploid_benchmark
+  description: >
+    Controlled synthetic diploid assembly benchmark using a
+    1-Mb sequence derived from human chromosome 21.
+
+reference:
+  fasta: benchmark_chr21_simulated/inputs/reference/chr21_region_1mb.fasta
+  length_bp: 1000000
+  target_description: chr21-derived 1-Mb region
+
+samples:
+  - SIM01
+  - SIM02
+  - SIM03
+
+simulation:
+  base_seed: 20260805
+  haplotype_difference_rate: 0.001
+  coverage_per_haplotype:
+    hifi: 30
+    ont: 30
+  approximate_combined_coverage:
+    hifi: 60
+    ont: 60
+
+technologies:
+  hifi:
+    mean_read_length: 15000
+    sequencing_error_rate: 0.002
+  ont:
+    mean_read_length: 20000
+    sequencing_error_rate: 0.03
+
+required_truth_outputs:
+  - SIM01.hap1.fasta
+  - SIM01.hap2.fasta
+  - SIM02.hap1.fasta
+  - SIM02.hap2.fasta
+  - SIM03.hap1.fasta
+  - SIM03.hap2.fasta
+
+reporting:
+  real_biological_samples: false
+  allowed_description: controlled synthetic diploid benchmark
+  forbidden_sample_labels:
+    - HG002
+    - HG003
+    - HG004

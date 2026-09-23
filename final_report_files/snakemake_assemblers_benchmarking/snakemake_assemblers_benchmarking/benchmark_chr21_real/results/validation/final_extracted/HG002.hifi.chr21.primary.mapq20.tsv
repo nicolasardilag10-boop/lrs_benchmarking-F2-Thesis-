@@ -1,0 +1,2 @@
+sample	technology	chromosome	chromosome_length	minimum_mapq	reads	total_read_bases	mean_read_length	median_read_length	read_n50	maximum_read_length	sequence_coverage	mapped_cigar_bases	mapped_cigar_coverage	target_coverage	bam	validation_status
+HG002	hifi	chr21	46709983	20	118123	1971011532	16686.094	16041.000	17356	47203	42.196794	1956001931	41.875458	30.000000	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_extracted/HG002/HG002.hifi.chr21.primary.mapq20.bam	PASS

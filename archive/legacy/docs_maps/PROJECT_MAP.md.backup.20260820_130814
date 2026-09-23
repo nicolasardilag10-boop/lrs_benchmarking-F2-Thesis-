@@ -1,0 +1,922 @@
+# LRS Benchmarking — Project Map & Navigation Guide
+
+> **Goal:** make the repository easy to navigate without memorizing long paths, while keeping working Snakemake workflows stable.
+
+---
+
+## Visual legend
+
+Use these colors as a fast mental code throughout the project:
+
+| Color | Meaning | Examples |
+|---|---|---|
+| 🟦 **Navigation / project root** | High-level locations | `LRS`, `ASM`, `ALIGN` |
+| 🟩 **Active workflow** | Files currently used for real workflow development | `Snakefile.assemblers` |
+| 🟨 **Configuration** | Parameters and workflow configuration | `config.assemblers.yaml`, `containers.yaml` |
+| 🟪 **Software environments** | Containers / Docker / Conda | `containers/`, `envs/` |
+| 🟧 **Scripts / utilities** | Validation, plotting, helper scripts | `scripts/` |
+| 🟥 **Local only** | Data, outputs, logs, caches — normally not GitHub source | `inputs/`, `results/`, `.snakemake/` |
+| ⬛ **Legacy / archive** | Older implementations and backups | older `Snakefile`, `rules/`, `envs/`, `*.before_*` |
+| ⬜ **Documentation** | Maps, README files, notes | `docs/` |
+
+---
+
+# 1. The 30-second mental map
+
+Do **not** memorize `/home/nicolas/...`.
+
+Memorize this hierarchy:
+
+```text
+🟦 LRS  ~/lrs_benchmarking
+│
+├── 🟦 ALIGN
+│   └── final_report_files/snakemake_aligners_benchmarking
+│       └── minimap2 / pbmm2 / VACmap / vg giraffe benchmarking
+│
+├── 🟦 ASM
+│   └── final_report_files/snakemake_assemblers_benchmarking
+│       │
+│       ├── 🟩 CHR21
+│       │   └── benchmark_chr21_real
+│       │       ├── 🟩 Snakefile.assemblers
+│       │       ├── 🟨 config/
+│       │       │   ├── config.assemblers.yaml
+│       │       │   └── containers.yaml
+│       │       ├── 🟥 inputs/
+│       │       └── 🟥 results/
+│       │
+│       ├── 🟪 containers/
+│       │   ├── flye2/
+│       │   ├── goldrush/
+│       │   ├── ntlink/
+│       │   └── verkko2/
+│       │
+│       ├── 🟧 scripts/
+│       │
+│       ├── ⬛ rules/        older / modular workflow
+│       └── ⬛ envs/         older / modular workflow
+│
+├── 🟦 SV
+│   └── SV aligners call/
+│
+├── ⬜ docs/
+│   ├── PROJECT_MAP.md
+│   └── lrs_shortcuts.sh
+│
+└── 🟥 local data / results / caches
+```
+
+---
+
+# 2. The path grammar
+
+Every important location should be readable as:
+
+```text
+PROJECT → DOMAIN → WORKFLOW → PURPOSE → FILE
+```
+
+Examples:
+
+```text
+LRS → ASM → CHR21 → CONFIG → containers.yaml
+LRS → ASM → CONTAINERS → FLYE2 → Dockerfile
+LRS → ALIGN → results → figures
+LRS → SV → configuration
+```
+
+This is the main memory strategy.
+
+## Example
+
+Instead of memorizing:
+
+```text
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/config/containers.yaml
+```
+
+remember:
+
+```text
+ASM → CHR21 → CONFIG → containers.yaml
+```
+
+Then the shell variable gives you:
+
+```bash
+"$ASMCONFIG/containers.yaml"
+```
+
+---
+
+# 3. Core navigation variables
+
+These names are intentionally short and hierarchical.
+
+| Variable | Meaning | Directory |
+|---|---|---|
+| 🟦 `LRS` | Entire Git repository | `~/lrs_benchmarking` |
+| 🟦 `FR` | Final report workspace | `$LRS/final_report_files` |
+| 🟦 `ASM` | Assembler benchmarking project | `$FR/snakemake_assemblers_benchmarking` |
+| 🟩 `CHR21` | Current real chr21 assembler workflow | `$ASM/benchmark_chr21_real` |
+| 🟨 `ASMCONFIG` | Current assembler configuration | `$CHR21/config` |
+| 🟪 `ASMCONT` | Assembler Dockerfiles | `$ASM/containers` |
+| 🟧 `ASMSCRIPTS` | Assembler helper/validation scripts | `$ASM/scripts` |
+| 🟦 `ALIGN` | Aligner benchmarking project | `$FR/snakemake_aligners_benchmarking` |
+| 🟦 `SV` | SV / variant-caller work area | `$LRS/SV aligners call` |
+
+### Memory rule
+
+```text
+ASM + CONFIG  = ASMCONFIG
+ASM + CONT    = ASMCONT
+ASM + SCRIPTS = ASMSCRIPTS
+```
+
+---
+
+# 4. One consistent shortcut language
+
+All **directory navigation** shortcuts begin with:
+
+```text
+go-
+```
+
+All **project information / inspection** shortcuts begin with:
+
+```text
+lrs-
+```
+
+This makes them much easier to remember.
+
+## Directory shortcuts
+
+| Shortcut | Meaning | Destination |
+|---|---|---|
+| `go-lrs` | Go to repository root | `$LRS` |
+| `go-asm` | Go to assembler project | `$ASM` |
+| `go-chr21` | Go to current chr21 assembler workflow | `$CHR21` |
+| `go-config` | Go to assembler config | `$ASMCONFIG` |
+| `go-cont` | Go to assembler containers | `$ASMCONT` |
+| `go-scripts` | Go to assembler scripts | `$ASMSCRIPTS` |
+| `go-flye` | Go directly to Flye2 Docker context | `$ASMCONT/flye2` |
+| `go-goldrush` | Go directly to GoldRush Docker context | `$ASMCONT/goldrush` |
+| `go-ntlink` | Go directly to ntLink Docker context | `$ASMCONT/ntlink` |
+| `go-verkko` | Go directly to Verkko2 Docker context | `$ASMCONT/verkko2` |
+| `go-align` | Go to aligner benchmarking | `$ALIGN` |
+| `go-sv` | Go to SV work | `$SV` |
+
+## Information shortcuts
+
+| Shortcut | Purpose |
+|---|---|
+| `lrs-map` | Open this project map in the terminal |
+| `lrs-map-code` | Open this map in VS Code |
+| `lrs-where` | Print the important project directories |
+| `lrs-status` | Show Git status for the whole repository |
+| `lrs-asm-status` | Show Git status only for assembler project |
+
+### The mnemonic
+
+```text
+go-X      = take me to X
+lrs-X     = show / inspect something about the project
+```
+
+---
+
+# 5. "Where is the file I need?" quick lookup
+
+## Current assembler workflow
+
+🟩 **Main chr21 Snakefile**
+
+```bash
+"$CHR21/Snakefile.assemblers"
+```
+
+Contains the current assembler workflow logic, including the chr21 rules used for:
+
+- Flye
+- GoldRush
+- Verkko
+- ntLink
+- validation/checkpoint logic
+- workflow completion logic
+
+Open:
+
+```bash
+less "$CHR21/Snakefile.assemblers"
+```
+
+---
+
+## Main assembler configuration
+
+🟨 **Workflow parameters**
+
+```bash
+"$ASMCONFIG/config.assemblers.yaml"
+```
+
+Think:
+
+```text
+ASM → CHR21 → CONFIG → main parameters
+```
+
+---
+
+## Container configuration
+
+🟨 **Which container image each assembler rule uses**
+
+```bash
+"$ASMCONFIG/containers.yaml"
+```
+
+Contains container definitions for:
+
+```text
+flye2
+goldrush
+ntlink
+verkko2
+```
+
+Open:
+
+```bash
+cat "$ASMCONFIG/containers.yaml"
+```
+
+---
+
+# 6. Container map
+
+## 🟪 Flye2
+
+```text
+ASM → containers → flye2
+```
+
+Path:
+
+```bash
+"$ASMCONT/flye2/Dockerfile"
+```
+
+Validated local image:
+
+```text
+lrs-flye2:2.9.6
+```
+
+Validated executable:
+
+```text
+flye --version
+→ 2.9.6-b1802
+```
+
+Quick access:
+
+```bash
+go-flye
+```
+
+---
+
+## 🟪 GoldRush
+
+```text
+ASM → containers → goldrush
+```
+
+Path:
+
+```bash
+"$ASMCONT/goldrush/Dockerfile"
+```
+
+Quick access:
+
+```bash
+go-goldrush
+```
+
+---
+
+## 🟪 ntLink
+
+```text
+ASM → containers → ntlink
+```
+
+Path:
+
+```bash
+"$ASMCONT/ntlink/Dockerfile"
+```
+
+Quick access:
+
+```bash
+go-ntlink
+```
+
+---
+
+## 🟪 Verkko2
+
+```text
+ASM → containers → verkko2
+```
+
+Path:
+
+```bash
+"$ASMCONT/verkko2/Dockerfile"
+```
+
+Quick access:
+
+```bash
+go-verkko
+```
+
+---
+
+# 7. Active vs older assembler workflow
+
+This distinction is important.
+
+## 🟩 CURRENT chr21 workflow
+
+```text
+$CHR21/Snakefile.assemblers
+```
+
+Use this for the current chr21 containerized benchmark.
+
+Associated configuration:
+
+```text
+$CHR21/config/
+```
+
+Associated local data/output:
+
+```text
+$CHR21/inputs/
+$CHR21/results/
+```
+
+---
+
+## ⬛ OLDER / MODULAR assembler workflow
+
+You also have:
+
+```text
+$ASM/Snakefile
+$ASM/rules/
+$ASM/envs/
+```
+
+Examples:
+
+```text
+rules/flye.smk
+rules/goldrush.smk
+rules/ntlink.smk
+rules/verkko.smk
+
+envs/flye.yaml
+envs/goldrush.yaml
+envs/ntlink.yaml
+envs/verkko.yaml
+```
+
+### Mental rule
+
+```text
+CURRENT:
+CHR21 → Snakefile.assemblers
+
+OLDER / MODULAR:
+ASM → Snakefile + rules + envs
+```
+
+Do not delete or move the older structure until dependencies have been checked.
+
+---
+
+# 8. Scripts map
+
+🟧 Directory:
+
+```bash
+"$ASMSCRIPTS"
+```
+
+Known helper/validation scripts include:
+
+| Script | Purpose |
+|---|---|
+| `check_assembler_container_definitions.sh` | Static checks for assembler container definitions |
+| `validate_containerized_chr21_workflow.sh` | Validation of the containerized chr21 workflow |
+| `create_human_technical_figures.py` | Figure/report helper |
+| `create_technical_validation_figures.py` | Technical validation figures |
+
+Rule of thumb:
+
+```text
+Snakefile = workflow logic
+config/   = parameters
+containers/ = software environment definitions
+scripts/  = helper logic / validation / reporting
+```
+
+---
+
+# 9. Aligner project
+
+🟦 Variable:
+
+```bash
+"$ALIGN"
+```
+
+Meaning:
+
+```text
+minimap2 / pbmm2 / VACmap / vg giraffe benchmarking
+```
+
+Quick access:
+
+```bash
+go-align
+```
+
+Do not mix aligner files into assembler Git commits.
+
+---
+
+# 10. SV project
+
+🟦 Variable:
+
+```bash
+"$SV"
+```
+
+Quick access:
+
+```bash
+go-sv
+```
+
+Because the real folder name contains spaces, use the shortcut or always quote `$SV`.
+
+---
+
+# 11. GitHub vs local-only policy
+
+## 🟢 GitHub / source-controlled
+
+These are generally reproducibility/source files:
+
+```text
+Snakefiles
+*.smk
+Dockerfiles
+*.yaml / *.yml
+reusable *.py
+reusable *.sh
+README / docs
+small manifests / sample sheets
+container definitions
+workflow configuration
+```
+
+For the current assembler workflow, important GitHub candidates include:
+
+```text
+benchmark_chr21_real/Snakefile.assemblers
+benchmark_chr21_real/config/config.assemblers.yaml
+benchmark_chr21_real/config/containers.yaml
+
+containers/flye2/Dockerfile
+containers/goldrush/Dockerfile
+containers/ntlink/Dockerfile
+containers/verkko2/Dockerfile
+
+scripts/check_assembler_container_definitions.sh
+scripts/validate_containerized_chr21_workflow.sh
+
+docs/PROJECT_MAP.md
+docs/lrs_shortcuts.sh
+```
+
+---
+
+## 🔴 Local / server only
+
+Normally do **not** push:
+
+```text
+real FASTQ
+BAM
+assembly FASTA outputs
+large intermediates
+.snakemake/
+.conda/
+container build logs
+Docker image archives
+temporary outputs
+large workflow results
+```
+
+For chr21:
+
+```text
+$CHR21/inputs/
+$CHR21/results/
+```
+
+Think:
+
+```text
+CODE / CONFIG / DOCS  → GitHub
+DATA / RESULTS        → local or server
+```
+
+---
+
+# 12. Archive category
+
+⬛ Examples:
+
+```text
+*.backup_*
+*.before_*
+*.bak
+old test scripts
+temporary output files
+```
+
+Recommended future local-only archive:
+
+```text
+$LRS/_local_archive/
+├── aligners/
+├── assemblers/
+├── sv/
+└── reports/
+```
+
+Do **not** move working files just for visual tidiness. Check references first.
+
+---
+
+# 13. Safe Git workflow
+
+Because this repository contains several projects at the same time:
+
+## Avoid
+
+```bash
+git add .
+```
+
+## Prefer
+
+```bash
+git add exact/path/to/file
+```
+
+Then always inspect:
+
+```bash
+git diff --cached
+```
+
+For assembler-only status:
+
+```bash
+lrs-asm-status
+```
+
+Mental rule:
+
+```text
+STATUS → STAGE EXACT FILES → REVIEW → COMMIT → PUSH
+```
+
+---
+
+# 14. Flye2 progress tracker
+
+| Stage | Status |
+|---|---|
+| Snakemake rule inspected | ✅ |
+| Dockerfile created | ✅ |
+| Dockerfile statically validated | ✅ |
+| Local Docker image built | ✅ |
+| Container starts | ✅ |
+| `flye --version` validated | ✅ `2.9.6-b1802` |
+| Container configuration checked | ✅ |
+| Flye-only Snakemake dry-run | ✅ 6 jobs |
+| Git final review | ⏳ |
+| Git commit | ⏳ |
+| Git push | ⏳ |
+| Server execution | ⏳ |
+
+---
+
+# 15. The 5-second decision guide
+
+When you ask yourself:
+
+### "I need the assembler Snakefile"
+
+Think:
+
+```text
+ASM → CHR21
+```
+
+Run:
+
+```bash
+go-chr21
+```
+
+---
+
+### "I need container configuration"
+
+Think:
+
+```text
+ASM → CHR21 → CONFIG
+```
+
+Run:
+
+```bash
+go-config
+```
+
+---
+
+### "I need a Dockerfile"
+
+Think:
+
+```text
+ASM → CONTAINERS → ASSEMBLER
+```
+
+Example:
+
+```bash
+go-flye
+```
+
+---
+
+### "I need validation/helper code"
+
+Think:
+
+```text
+ASM → SCRIPTS
+```
+
+Run:
+
+```bash
+go-scripts
+```
+
+---
+
+### "I need minimap2/pbmm2/VACmap/vg"
+
+Think:
+
+```text
+ALIGN
+```
+
+Run:
+
+```bash
+go-align
+```
+
+---
+
+### "I need structural variant work"
+
+Think:
+
+```text
+SV
+```
+
+Run:
+
+```bash
+go-sv
+```
+
+---
+
+# 16. Professional shell setup
+
+The companion file:
+
+```text
+docs/lrs_shortcuts.sh
+```
+
+contains all variables, navigation aliases, and inspection helpers.
+
+Add only this line to your `~/.bashrc`:
+
+```bash
+source "$HOME/lrs_benchmarking/docs/lrs_shortcuts.sh"
+```
+
+Then reload:
+
+```bash
+source ~/.bashrc
+```
+
+Why this is cleaner than putting dozens of project aliases directly into `.bashrc`:
+
+```text
+~/.bashrc
+    → only activates the project navigation file
+
+docs/lrs_shortcuts.sh
+    → stores all LRS-specific navigation logic
+
+docs/PROJECT_MAP.md
+    → explains the architecture
+```
+
+This also means the map and shortcut definitions can be version-controlled together.
+
+---
+
+# 17. Quick diagnostic commands
+
+## Where am I?
+
+```bash
+pwd
+```
+
+## Show all important project roots
+
+```bash
+lrs-where
+```
+
+## Open this map
+
+```bash
+lrs-map
+```
+
+## Open this map in VS Code
+
+```bash
+lrs-map-code
+```
+
+## Repository Git status
+
+```bash
+lrs-status
+```
+
+## Assembler-only Git status
+
+```bash
+lrs-asm-status
+```
+
+---
+
+# 18. Recommended daily routine
+
+Start a work session with:
+
+```bash
+go-lrs
+lrs-status
+```
+
+For assembler work:
+
+```bash
+go-asm
+lrs-asm-status
+```
+
+Then navigate by purpose:
+
+```text
+workflow    → go-chr21
+config      → go-config
+containers  → go-cont
+scripts     → go-scripts
+Flye        → go-flye
+GoldRush    → go-goldrush
+ntLink      → go-ntlink
+Verkko      → go-verkko
+```
+
+At any moment you are lost:
+
+```bash
+lrs-where
+```
+
+or:
+
+```bash
+lrs-map
+```
+
+---
+
+# 19. Design principles behind this organization
+
+This guide follows common workflow-engineering ideas used by mature bioinformatics workflow ecosystems:
+
+1. **Separate workflow logic, configuration, software environments, scripts and documentation.**
+2. **Keep paths predictable and hierarchical.**
+3. **Version-control reproducibility files, not large raw/intermediate data.**
+4. **Use versioned containers/environments for portability.**
+5. **Keep active workflow paths stable; organize navigation around them before physically moving files.**
+6. **Prefer modular workflow components when the project grows.**
+
+Useful official references:
+
+- Snakemake — Best practices  
+  https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html
+
+- Snakemake — Modularization  
+  https://snakemake.readthedocs.io/en/stable/snakefiles/modularization.html
+
+- Snakemake — Configuration  
+  https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html
+
+- nf-core — Pipeline file structure  
+  https://nf-co.re/docs/developing/pipelines/template-files
+
+The goal is not to copy another workflow framework literally. The useful principle is the same: **predictable structure + separation of concerns + reproducibility + documentation**.
+
+---
+
+# 20. The only structure you need to memorize
+
+```text
+🟦 LRS
+│
+├── 🟦 ALIGN
+│
+├── 🟦 ASM
+│   ├── 🟩 CHR21
+│   │   ├── 🟩 workflow
+│   │   ├── 🟨 config
+│   │   ├── 🟥 inputs
+│   │   └── 🟥 results
+│   ├── 🟪 containers
+│   ├── 🟧 scripts
+│   └── ⬛ older rules/envs
+│
+├── 🟦 SV
+└── ⬜ docs
+```
+
+And remember the shortcut grammar:
+
+```text
+go-X  = go to a directory
+lrs-X = inspect / understand the project
+```
+
+That is the navigation system. Everything else can be derived from it.

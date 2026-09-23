@@ -1,0 +1,7 @@
+sample	technology	link_path	resolved_path	link_type	target_size_bytes
+HG002	ont	data/reads/HG002.ont.1k.fastq.gz	/home/nicolas/lrs_benchmarking/samples_try/HG002.ont.1k.fastq.gz	symbolic_link	13419506
+HG002	pb	data/reads/HG002.pb.1k.fastq.gz	/home/nicolas/lrs_benchmarking/samples_try/HG002.pb.1k.fastq.gz	symbolic_link	5228577
+HG003	ont	data/reads/HG003.ont.1k.fastq.gz	/home/nicolas/lrs_benchmarking/samples_try/HG003.ont.1k.fastq.gz	symbolic_link	8876237
+HG003	pb	data/reads/HG003.pb.1k.fastq.gz	/home/nicolas/lrs_benchmarking/samples_try/HG003.pb.1k.fastq.gz	symbolic_link	5537022
+HG004	ont	data/reads/HG004.ont.1k.fastq.gz	/home/nicolas/lrs_benchmarking/samples_try/HG004.ont.1k.fastq.gz	symbolic_link	9451698
+HG004	pb	data/reads/HG004.pb.1k.fastq.gz	/home/nicolas/lrs_benchmarking/samples_try/HG004.pb.1k.fastq.gz	symbolic_link	5898485

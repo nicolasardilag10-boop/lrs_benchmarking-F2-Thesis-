@@ -1,0 +1,380 @@
+from pathlib import Path
+import csv
+import gzip
+
+
+SAMPLE_SHEET = Path(
+    "benchmark_1k/configs/samples.tsv"
+)
+
+OUTPUT_ROOT = Path(
+    "benchmark_1k/results"
+)
+
+GENOME_SIZE = "3.1g"
+THREADS = 4
+
+ENV_FLYE = "../envs/flye.yaml"
+
+
+def read_samples():
+    rows = []
+
+    with SAMPLE_SHEET.open(
+        "r",
+        encoding="utf-8",
+        newline="",
+    ) as handle:
+        reader = csv.DictReader(
+            handle,
+            delimiter="\t",
+        )
+
+        required = {
+            "sample",
+            "technology",
+            "fastq",
+        }
+
+        observed = set(reader.fieldnames or [])
+
+        if not required.issubset(observed):
+            raise ValueError(
+                "Sample sheet must contain: "
+                "sample, technology and fastq"
+            )
+
+        for row in reader:
+            sample = row["sample"].strip()
+            technology = row["technology"].strip()
+            fastq = row["fastq"].strip()
+
+            if technology not in {"ont", "pb"}:
+                raise ValueError(
+                    f"Unsupported technology: {technology}"
+                )
+
+            rows.append(
+                {
+                    "sample": sample,
+                    "technology": technology,
+                    "fastq": fastq,
+                }
+            )
+
+    return rows
+
+
+SAMPLE_ROWS = read_samples()
+
+SAMPLE_TECH_PAIRS = [
+    (
+        row["sample"],
+        row["technology"],
+    )
+    for row in SAMPLE_ROWS
+]
+
+FASTQ_BY_PAIR = {
+    (
+        row["sample"],
+        row["technology"],
+    ): row["fastq"]
+    for row in SAMPLE_ROWS
+}
+
+
+def fastq_for(wildcards):
+    key = (
+        wildcards.sample,
+        wildcards.technology,
+    )
+
+    if key not in FASTQ_BY_PAIR:
+        raise ValueError(
+            f"No FASTQ for {key}"
+        )
+
+    return FASTQ_BY_PAIR[key]
+
+
+def flye_option(wildcards):
+    if wildcards.technology == "ont":
+        return "--nano-raw"
+
+    if wildcards.technology == "pb":
+        return "--pacbio-hifi"
+
+    raise ValueError(
+        f"Unknown technology: "
+        f"{wildcards.technology}"
+    )
+
+
+rule all:
+    input:
+        expand(
+            (
+                "benchmark_1k/results/status/flye/"
+                "{sample}.{technology}.tsv"
+            ),
+            zip,
+            sample=[
+                sample
+                for sample, technology
+                in SAMPLE_TECH_PAIRS
+            ],
+            technology=[
+                technology
+                for sample, technology
+                in SAMPLE_TECH_PAIRS
+            ],
+        )
+
+
+rule validate_1k_inputs:
+    output:
+        marker=(
+            "benchmark_1k/results/validation/"
+            "inputs.validated.ok"
+        ),
+        table=(
+            "benchmark_1k/results/validation/"
+            "snakemake_input_validation.tsv"
+        )
+    run:
+        Path(output.marker).parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        expected_pairs = {
+            ("HG002", "ont"),
+            ("HG002", "pb"),
+            ("HG003", "ont"),
+            ("HG003", "pb"),
+            ("HG004", "ont"),
+            ("HG004", "pb"),
+        }
+
+        observed_pairs = {
+            (
+                row["sample"],
+                row["technology"],
+            )
+            for row in SAMPLE_ROWS
+        }
+
+        if observed_pairs != expected_pairs:
+            raise ValueError(
+                "Unexpected sample/technology matrix.\n"
+                f"Expected: {sorted(expected_pairs)}\n"
+                f"Observed: {sorted(observed_pairs)}"
+            )
+
+        validation_rows = []
+
+        for row in SAMPLE_ROWS:
+            path = Path(row["fastq"])
+
+            if not path.is_file():
+                raise FileNotFoundError(
+                    f"Missing FASTQ: {path}"
+                )
+
+            reads = 0
+            total_bases = 0
+
+            with gzip.open(
+                path,
+                "rt",
+                encoding="utf-8",
+                errors="strict",
+            ) as handle:
+                while True:
+                    header = handle.readline()
+
+                    if not header:
+                        break
+
+                    sequence = handle.readline()
+                    plus = handle.readline()
+                    quality = handle.readline()
+
+                    if (
+                        not sequence
+                        or not plus
+                        or not quality
+                    ):
+                        raise ValueError(
+                            f"Truncated FASTQ: {path}"
+                        )
+
+                    sequence = sequence.rstrip(
+                        "\r\n"
+                    )
+
+                    quality = quality.rstrip(
+                        "\r\n"
+                    )
+
+                    if not header.startswith("@"):
+                        raise ValueError(
+                            f"Invalid header: {path}"
+                        )
+
+                    if not plus.startswith("+"):
+                        raise ValueError(
+                            f"Invalid separator: {path}"
+                        )
+
+                    if len(sequence) != len(quality):
+                        raise ValueError(
+                            "Sequence-quality mismatch: "
+                            f"{path}"
+                        )
+
+                    reads += 1
+                    total_bases += len(sequence)
+
+            if reads != 1000:
+                raise ValueError(
+                    f"{path} contains {reads} reads, "
+                    "expected exactly 1000."
+                )
+
+            validation_rows.append(
+                (
+                    row["sample"],
+                    row["technology"],
+                    str(path),
+                    reads,
+                    total_bases,
+                    "PASS",
+                )
+            )
+
+        with Path(output.table).open(
+            "w",
+            encoding="utf-8",
+        ) as handle:
+            handle.write(
+                "sample\ttechnology\tfastq\t"
+                "reads\ttotal_bases\tstatus\n"
+            )
+
+            for values in validation_rows:
+                handle.write(
+                    "\t".join(
+                        str(value)
+                        for value in values
+                    )
+                    + "\n"
+                )
+
+        Path(output.marker).write_text(
+            "All six local HG 1k FASTQs passed validation.\n",
+            encoding="utf-8",
+        )
+
+
+rule flye_attempt:
+    input:
+        validation=rules.validate_1k_inputs.output.marker,
+        fastq=fastq_for
+    output:
+        status=(
+            "benchmark_1k/results/status/flye/"
+            "{sample}.{technology}.tsv"
+        )
+    log:
+        flye=(
+            "benchmark_1k/results/logs/flye/"
+            "{sample}.{technology}.log"
+        )
+    benchmark:
+        (
+            "benchmark_1k/results/benchmarks/flye/"
+            "{sample}.{technology}.tsv"
+        )
+    conda:
+        ENV_FLYE
+    threads:
+        THREADS
+    params:
+        option=flye_option,
+        genome_size=GENOME_SIZE,
+        outdir=(
+            "benchmark_1k/results/assemblies/"
+            "flye/{sample}.{technology}"
+        )
+    shell:
+        r"""
+        set -u
+
+        mkdir -p \
+            "$(dirname "{output.status}")" \
+            "$(dirname "{log.flye}")" \
+            "benchmark_1k/results/benchmarks/flye" \
+            "{params.outdir}"
+
+        rm -f "{output.status}"
+
+        start_time="$(date --iso-8601=seconds)"
+
+        set +e
+
+        flye \
+            {params.option} "{input.fastq}" \
+            --genome-size "{params.genome_size}" \
+            --threads {threads} \
+            --out-dir "{params.outdir}" \
+            > "{log.flye}" \
+            2>&1
+
+        exit_code=$?
+
+        set -e
+
+        end_time="$(date --iso-8601=seconds)"
+
+        assembly_path="{params.outdir}/assembly.fasta"
+
+        if [[
+            "$exit_code" -eq 0
+            &&
+            -s "$assembly_path"
+        ]]
+        then
+            status="PASS"
+            message="Flye produced a non-empty assembly."
+        else
+            status="FAIL"
+            message="No valid assembly; inspect the Flye log."
+        fi
+
+        printf \
+            "sample\ttechnology\ttool\tinput_fastq\tgenome_size\texit_code\tstatus\tassembly_path\tstart_time\tend_time\tmessage\n" \
+            > "{output.status}"
+
+        printf \
+            "%s\t%s\tFlye\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" \
+            "{wildcards.sample}" \
+            "{wildcards.technology}" \
+            "{input.fastq}" \
+            "{params.genome_size}" \
+            "$exit_code" \
+            "$status" \
+            "$assembly_path" \
+            "$start_time" \
+            "$end_time" \
+            "$message" \
+            >> "{output.status}"
+
+        exit 0
+        """
+
+
+wildcard_constraints:
+    sample="HG002|HG003|HG004",
+    technology="ont|pb"

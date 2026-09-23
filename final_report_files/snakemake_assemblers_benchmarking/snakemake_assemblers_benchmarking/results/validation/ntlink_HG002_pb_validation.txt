@@ -1,0 +1,12 @@
+ntLink technical validation
+Date: 2026-08-05T09:11:16+02:00
+Sample: HG002
+Technology: PacBio
+Input reads: data/reads/HG002.pb.1k.fastq.gz
+Draft: results/smoke_test/goldrush/HG002.pb/assembly.fasta
+Output: results/smoke_test/ntlink/HG002.pb/assembly.fasta
+ntLink version: GNU Make 4.4.1
+Workflow status: PASS
+
+74d82baee7ff3e5a01280cceaa697b1b960f8498b426898f6402700d9c4db34a  results/smoke_test/goldrush/HG002.pb/assembly.fasta
+2da5470020273a33fd107b306fddd480b2209798c8b7044df4c9c9d25257f829  results/smoke_test/ntlink/HG002.pb/assembly.fasta

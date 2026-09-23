@@ -1,0 +1,159 @@
+=== MINIMAP2 ===
+2.27-r1193
+
+=== PBMM2 ===
+pbmm2 26.2.99
+
+Using:
+  pbmm2    : 26.2.99 (commit v26.2.0-13-g7417ff1)
+  pbbam    : 26.2.99 (commit v26.2.0-19-g4c53ed2)
+  pbsamoa  : 26.2.99 (commit v26.2.0-60-g96ded83)
+  pbcopper : 26.2.99 (commit v26.2.0-29-gbff1851)
+  boost    : 1.90
+  htslib   : 1.23
+  minimap2 : 2.26
+  zlib     : 1.3.1
+
+=== VG ===
+vg version v1.73.0 "Ducky"
+Compiled with g++ (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0 on Linux
+Linked against libstd++ 20230528
+Using HTSlib headers 101990, library 1.19.1-29-g3cfe8769
+Built by anovak@courtyard.gi.ucsc.edu
+
+=== VACMAP HELP ===
+usage: vacmap [-h] -ref REF -read READ [READ ...] -mode {H,L,S,R,asm} [-o O]
+              [--force] [--nowriteindex] [-t T] [-k K] [-w W] [-c C]
+              [-maxdivergence MAXDIVERGENCE] [-globalpenalty GLOBALPENALTY]
+              [-localpenalty LOCALPENALTY] [-globalmaxdiff GLOBALMAXDIFF]
+              [-localmaxdiff LOCALMAXDIFF] [--eqx] [--MD] [--cs [CS]] [--L]
+              [--markunbalancetra] [--nodiscard] [--copycomments] [--H]
+              [--fakecigar] [--Q] [--debug] [-workdir WORKDIR]
+              [--rg-id STRING] [--rg-sm STRING] [--rg-lb STRING]
+              [--rg-pl STRING] [--rg-ds STRING] [--rg-dt YYYY-MM-DD]
+              [--rg-pu STRING] [--rg-pi INT] [--rg-pg STRING] [--rg-cn STRING]
+              [--rg-fo STRING] [--rg-ks STRING] [--rg-pm STRING]
+              [--rg-bc STRING]
+
+VACmap - a long-read aligner for structural variation discovery
+
+options:
+  -h, --help            show this help message and exit
+
+Required Arguments:
+  -ref REF              Path to reference FASTA file
+  -read READ [READ ...]
+                        Path to read file(s). Supports wildcards (e.g., *.fastq).
+  -mode {H,L,S,R,asm}   Alignment mode:
+                         H   : High error rate long reads (PacBio CLR, ONT)
+                         L   : Low error rate long reads (PacBio HiFi)
+                         asm : Assembly mode
+                         S   : Sensitive mode
+                         R   : No prefer closer mode
+
+Output Arguments:
+  -o O                  Output path (default: stdout). Must end in .sam, .bam, or .sorted.bam if writing to a file. (Note: Output will be sorted if the path ends in .sorted.bam).
+  --force               Overwrite output file if it exists.
+  --nowriteindex        Do not save the reference index for reuse.
+
+Alignment Parameters:
+  -t T                  Number of threads (default: 8)
+  -k K                  Kmer size (default: 15)
+  -w W                  Minimizer window size (default: 10)
+  -c C                  Top N clusters (default: 100)
+  -maxdivergence MAXDIVERGENCE
+                        Max sequence divergence (default depends on mode)
+
+Penalties:
+  -globalpenalty GLOBALPENALTY
+                        Global variation penalty
+  -localpenalty LOCALPENALTY
+                        Local variation penalty
+  -globalmaxdiff GLOBALMAXDIFF
+                        Global max diff (default: 50)
+  -localmaxdiff LOCALMAXDIFF
+                        Local max diff (default: 30)
+
+Flags:
+  --eqx                 Output =/X CIGAR operators for sequence match/mismatch.
+  --MD                  Output the MD tag.
+  --cs [CS]             Output the cs tag. Usage: --cs or --cs=long
+  --L                   Write CIGAR with >65535 operators at the CG tag (cigar2cg).
+  --markunbalancetra    Set MAPQ of unbalanced translocation subalignment to 1.
+  --nodiscard           Keep subalignments where surrounding indel sizes are similar.
+  --copycomments        Copy FASTA/Q comments to output.
+  --H                   Use hard-clipping instead of soft-clipping.
+  --fakecigar           Use approximate CIGAR in the SA tag.
+  --Q                   Ignore base quality in the input file.
+  --debug               Enable debug mode.
+  -workdir WORKDIR      Working directory (Required if mode is 'asm')
+
+Read-group (RG) metadata:
+  --rg-id STRING        Adds RG:Z:<string> to all alignments (required when using other --rg-* flags).
+  --rg-sm STRING        RG header: Sample (SM).
+  --rg-lb STRING        RG header: Library (LB).
+  --rg-pl STRING        RG header: Platform (PL).
+  --rg-ds STRING        RG header: Description (DS).
+  --rg-dt YYYY-MM-DD    RG header: Date (DT).
+  --rg-pu STRING        RG header: Platform unit (PU).
+  --rg-pi INT           RG header: Median insert size (PI).
+  --rg-pg STRING        RG header: Programs (PG).
+  --rg-cn STRING        RG header: Sequencing center (CN).
+  --rg-fo STRING        RG header: Flow order (FO).
+  --rg-ks STRING        RG header: Key sequence (KS).
+  --rg-pm STRING        RG header: Platform model (PM).
+  --rg-bc STRING        RG header: Barcode sequence (BC).
+
+=== CONFIGURATION ===
+4:active_aligners:
+10:vacmap_bin: "conda run -n vacmap_env vacmap"
+12:vg_gbz: data/graph/graph.gbz
+13:vg_min: data/graph/graph.min
+14:vg_dist: data/graph/graph.dist
+15:vg_zipcodes: data/graph/graph.zipcodes
+
+=== VACMAP BAM FILES ===
+-rw-r--r-- 1 nicolas nicolas 2.6M Jul 31 14:54 results/bam/HG002.ont.vacmap.sorted.bam
+-rw-r--r-- 1 nicolas nicolas 3.5K Jul 31 15:50 results/bam/HG002.pb.vacmap.sorted.bam
+-rw-r--r-- 1 nicolas nicolas 612K Jul 31 15:13 results/bam/HG003.ont.vacmap.sorted.bam
+-rw-r--r-- 1 nicolas nicolas 3.5K Jul 31 14:44 results/bam/HG003.pb.vacmap.sorted.bam
+-rw-r--r-- 1 nicolas nicolas 400K Jul 31 15:30 results/bam/HG004.ont.vacmap.sorted.bam
+-rw-r--r-- 1 nicolas nicolas 3.5K Jul 31 15:44 results/bam/HG004.pb.vacmap.sorted.bam
+
+=== VACMAP RECORD COUNTS ===
+
+--- HG002.ont.vacmap.sorted.bam ---
+quickcheck: PASS
+all records:     65
+primary records: 37
+primary mapped:  37
+
+--- HG002.pb.vacmap.sorted.bam ---
+quickcheck: PASS
+all records:     0
+primary records: 0
+primary mapped:  0
+
+--- HG003.ont.vacmap.sorted.bam ---
+quickcheck: PASS
+all records:     39
+primary records: 27
+primary mapped:  27
+
+--- HG003.pb.vacmap.sorted.bam ---
+quickcheck: PASS
+all records:     0
+primary records: 0
+primary mapped:  0
+
+--- HG004.ont.vacmap.sorted.bam ---
+quickcheck: PASS
+all records:     43
+primary records: 39
+primary mapped:  39
+
+--- HG004.pb.vacmap.sorted.bam ---
+quickcheck: PASS
+all records:     0
+primary records: 0
+primary mapped:  0

@@ -1,0 +1,7 @@
+sample	technology	fastq
+HG002	ont	smoke_test/data/reads/HG002.ont.smoke.fastq
+HG002	pb	smoke_test/data/reads/HG002.pb.smoke.fastq
+HG003	ont	smoke_test/data/reads/HG003.ont.smoke.fastq
+HG003	pb	smoke_test/data/reads/HG003.pb.smoke.fastq
+HG004	ont	smoke_test/data/reads/HG004.ont.smoke.fastq
+HG004	pb	smoke_test/data/reads/HG004.pb.smoke.fastq

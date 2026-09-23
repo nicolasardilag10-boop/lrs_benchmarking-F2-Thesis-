@@ -1,0 +1,7 @@
+sample	technology	fastq	reads	total_bases	mean_length	min_length	max_length
+HG002	ont	benchmark_1k/inputs/reads/HG002.ont.1k.fastq.gz	1000	18663418	18663.42	207	315783
+HG002	pb	benchmark_1k/inputs/reads/HG002.pb.1k.fastq.gz	1000	13469698	13469.70	791	32674
+HG003	ont	benchmark_1k/inputs/reads/HG003.ont.1k.fastq.gz	1000	12808634	12808.63	71	74299
+HG003	pb	benchmark_1k/inputs/reads/HG003.pb.1k.fastq.gz	1000	14032604	14032.60	1663	32907
+HG004	ont	benchmark_1k/inputs/reads/HG004.ont.1k.fastq.gz	1000	13605899	13605.90	51	78490
+HG004	pb	benchmark_1k/inputs/reads/HG004.pb.1k.fastq.gz	1000	14370953	14370.95	1914	32998

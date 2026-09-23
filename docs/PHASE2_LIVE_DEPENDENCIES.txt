@@ -1,0 +1,159 @@
+============================================================
+PHASE 2 — LIVE CODE DEPENDENCY AUDIT
+Repository: /home/nicolas/lrs_benchmarking
+Generated: Fri Aug 21 11:56:00 CEST 2026
+============================================================
+
+### ROOT CONTENT
+README.md
+SV aligners call
+aligmnt_analysis
+alignment_analysis
+analysis
+archive
+assemblers
+assemblies
+config
+container_validation
+containers
+cuteSV.hg38.smk
+data
+docs
+docs_maps
+fastq
+figures
+final_report_files
+happy_results
+header.smk
+header_assembler.smk
+ilmn.snv_calling.clair3.smk
+local_sv_validation
+notes
+ont.read_mapping.minimap2.smk
+ont.read_mapping.pbmm2.smk
+ont.snv_calling.clair3.smk
+ont.snv_calling.deepvariant.smk
+ont.snv_filtering.v3.smk
+pb.read_mapping.minimap2.smk
+pb.read_mapping.pbmm2.smk
+pb.snv_calling.clair3.smk
+pb.snv_calling.deepvariant.smk
+pbsv.hg38.smk
+reference
+reports
+results
+run_happy.smk
+run_metrics
+samples_try
+samtools_stats_30x_Christian
+sawfish
+sawfish.hg38.smk
+scripts
+sniffles2.hg38.smk
+sv_f1_barplots.png
+tests
+truvari
+truvari_anno.smk
+variant_caller_validation
+vcf_called
+wgs.snv_calling.deepvariant.smk
+workflow
+workflows
+
+
+============================================================
+ROOT SNAKEMAKE FILES
+============================================================
+cuteSV.hg38.smk
+header.smk
+header_assembler.smk
+ilmn.snv_calling.clair3.smk
+ont.read_mapping.minimap2.smk
+ont.read_mapping.pbmm2.smk
+ont.snv_calling.clair3.smk
+ont.snv_calling.deepvariant.smk
+ont.snv_filtering.v3.smk
+pb.read_mapping.minimap2.smk
+pb.read_mapping.pbmm2.smk
+pb.snv_calling.clair3.smk
+pb.snv_calling.deepvariant.smk
+pbsv.hg38.smk
+run_happy.smk
+sawfish.hg38.smk
+sniffles2.hg38.smk
+truvari_anno.smk
+wgs.snv_calling.deepvariant.smk
+
+
+============================================================
+EXTERNAL REFERENCES TO ROOT .smk FILES
+============================================================
+
+------------------------------------------------------------
+cuteSV.hg38.smk
+------------------------------------------------------------
+./variant_caller_validation/docs/variant_caller_inventory.tsv:7:cuteSV	SV	ONT/PacBio	cuteSV.hg38.smk	dry-run
+./SV aligners call/CONSTITUTION_NICOLAS.backup_before_sv_rules_20260730_143948.md:23:**I.4.** SV calling workflow files follow the pattern `<tool>.<reference>.smk` (e.g., `sniffles2.hg38.smk`, `cuteSV.hg38.smk`).
+./SV aligners call/CONSTITUTION_NICOLAS.md:23:**I.4.** SV calling workflow files follow the pattern `<tool>.<reference>.smk` (e.g., `sniffles2.hg38.smk`, `cuteSV.hg38.smk`).
+./SV aligners call/CONSTITUTION_NICOLAS.backup_before_aligner_rules_20260730_151529.md:23:**I.4.** SV calling workflow files follow the pattern `<tool>.<reference>.smk` (e.g., `sniffles2.hg38.smk`, `cuteSV.hg38.smk`).
+./SV aligners call/docs/workflow_tool_inventory.tsv:9:cuteSV	SV_calling	structural variant caller	ONT/PacBio	cuteSV.hg38.smk	container references detected	static_scan_done	SV caller workflow already present in project
+./SV aligners call/CONSTITUTION_NICOLAS.before_sv_caller_rules.md:23:**I.4.** SV calling workflow files follow the pattern `<tool>.<reference>.smk` (e.g., `sniffles2.hg38.smk`, `cuteSV.hg38.smk`).
+./docs/governance/CONSTITUTION.md:23:**I.4.** SV calling workflow files follow the pattern `<tool>.<reference>.smk` (e.g., `sniffles2.hg38.smk`, `cuteSV.hg38.smk`).
+./docs/variant_caller_inventory.tsv:7:cuteSV	SV	ONT/PacBio	cuteSV.hg38.smk	to_check
+./README.md:56:- `cuteSV.hg38.smk`
+
+------------------------------------------------------------
+header.smk
+------------------------------------------------------------
+./pb.read_mapping.minimap2.smk:8:include: "header.smk"
+./pb.read_mapping.pbmm2.smk:8:include: "header.smk"
+./SV aligners call/CONSTITUTION_NICOLAS.backup_before_sv_rules_20260730_143948.md:27:**I.6.** Non-mapping workflow files must include `header.smk` as their first executable line. Mapping workflow files (`<platform>.read_mapping.<tool>.smk`) must include `header_mapper.smk` as their first executable line. `header_mapper.smk` provides `CWD` only, with no VarCAD dependency.
+./SV aligners call/CONSTITUTION_NICOLAS.backup_before_sv_rules_20260730_143948.md:149:**V.1.** Workflows are independent, composable units. No workflow may `include` another workflow file (except `header.smk`).
+./SV aligners call/CONSTITUTION_NICOLAS.md:27:**I.6.** Non-mapping workflow files must include `header.smk` as their first executable line. Mapping workflow files (`<platform>.read_mapping.<tool>.smk`) must include `header_mapper.smk` as their first executable line. `header_mapper.smk` provides `CWD` only, with no VarCAD dependency.
+./SV aligners call/CONSTITUTION_NICOLAS.md:149:**V.1.** Workflows are independent, composable units. No workflow may `include` another workflow file (except `header.smk`).
+./SV aligners call/CONSTITUTION_NICOLAS.backup_before_aligner_rules_20260730_151529.md:27:**I.6.** Non-mapping workflow files must include `header.smk` as their first executable line. Mapping workflow files (`<platform>.read_mapping.<tool>.smk`) must include `header_mapper.smk` as their first executable line. `header_mapper.smk` provides `CWD` only, with no VarCAD dependency.
+./SV aligners call/CONSTITUTION_NICOLAS.backup_before_aligner_rules_20260730_151529.md:149:**V.1.** Workflows are independent, composable units. No workflow may `include` another workflow file (except `header.smk`).
+./SV aligners call/scripts/check_variant_caller_images.sh:28:    *.smk header.smk config*.yaml 2>/dev/null || true
+./SV aligners call/CONSTITUTION_NICOLAS.before_sv_caller_rules.md:27:**I.6.** Non-mapping workflow files must include `header.smk` as their first executable line. Mapping workflow files (`<platform>.read_mapping.<tool>.smk`) must include `header_mapper.smk` as their first executable line. `header_mapper.smk` provides `CWD` only, with no VarCAD dependency.
+./SV aligners call/CONSTITUTION_NICOLAS.before_sv_caller_rules.md:149:**V.1.** Workflows are independent, composable units. No workflow may `include` another workflow file (except `header.smk`).
+./docs/governance/CONSTITUTION.md:27:**I.6.** Non-mapping workflow files must include `header.smk` as their first executable line. Mapping workflow files (`<platform>.read_mapping.<tool>.smk`) must include `header_mapper.smk` as their first executable line. `header_mapper.smk` provides `CWD` only, with no VarCAD dependency.
+./docs/governance/CONSTITUTION.md:149:**V.1.** Workflows are independent, composable units. No workflow may `include` another workflow file (except `header.smk`).
+./ont.read_mapping.minimap2.smk:8:include: "header.smk"
+./README.md:64:- `header.smk`
+./README.md:85:Some configuration logic in `header.smk` also supports `hs1`, but the main benchmarking workflows in this repository currently appear to be centered on **hg38**.
+./ont.read_mapping.pbmm2.smk:8:include: "header.smk"
+
+------------------------------------------------------------
+header_assembler.smk
+------------------------------------------------------------
+./assemblers/whole_genome_asm/ont.assembly.verkko.smk:7:include: "../../header_assembler.smk"
+./assemblers/whole_genome_asm/pb.assembly.ntlink.smk:7:include: "../../header_assembler.smk"
+./assemblers/whole_genome_asm/pb.assembly.flye2.smk:7:include: "../../header_assembler.smk"
+./assemblers/whole_genome_asm/ont.assembly.ntlink.smk:7:include: "../../header_assembler.smk"
+./assemblers/whole_genome_asm/ont.assembly.flye2.smk:7:include: "../../header_assembler.smk"
+./assemblers/whole_genome_asm/pb.assembly.Goldrush.smk:7:include: "../../header_assembler.smk"
+./assemblers/whole_genome_asm/ont.assembly.Goldrush.smk:7:include: "../../header_assembler.smk"
+./docs_maps/lrs_shortcuts.sh:211:alias edit-header='code "$LRSACTIVE/header_assembler.smk"'
+
+------------------------------------------------------------
+ilmn.snv_calling.clair3.smk
+------------------------------------------------------------
+./SV aligners call/docs/workflow_tool_inventory.tsv:6:Clair3	SNV_indel_calling	small variant caller	ONT/PacBio/Illumina where available	ont.snv_calling.clair3.smk; pb.snv_calling.clair3.smk; ilmn.snv_calling.clair3.smk	hkubal/clair3 plus private genetic_data_analysis image	static_scan_done	Caller workflow already present in project
+./README.md:50:- `ilmn.snv_calling.clair3.smk`
+
+------------------------------------------------------------
+ont.read_mapping.minimap2.smk
+------------------------------------------------------------
+./SV aligners call/docs/workflow_tool_inventory.tsv:2:minimap2	alignment	upstream read alignment for variant calling	ONT/PacBio	ont.read_mapping.minimap2.smk; pb.read_mapping.minimap2.smk	Docker/VarCAD references detected in mapping rules	to_validate	Linear-reference long-read aligner used before variant calling
+./README.md:40:- `ont.read_mapping.minimap2.smk`
+./README.md:165:snakemake -s ont.read_mapping.minimap2.smk
+
+------------------------------------------------------------
+ont.read_mapping.pbmm2.smk
+------------------------------------------------------------
+./SV aligners call/docs/workflow_tool_inventory.tsv:3:pbmm2	alignment	upstream read alignment for variant calling	ONT/PacBio	ont.read_mapping.pbmm2.smk; pb.read_mapping.pbmm2.smk	Docker/VarCAD references detected in mapping rules	to_validate	PacBio-oriented wrapper around minimap2; used before variant calling
+./README.md:41:- `ont.read_mapping.pbmm2.smk`
+
+------------------------------------------------------------
+ont.snv_calling.clair3.smk
+------------------------------------------------------------

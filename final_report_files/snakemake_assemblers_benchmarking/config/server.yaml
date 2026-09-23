@@ -1,0 +1,52 @@
+# =============================================================================
+# SERVER CONFIGURATION
+# =============================================================================
+#
+# Normally the user/supervisor only needs to modify:
+#
+#   input_root
+#   reference
+#
+# samples.tsv must NEVER contain server-specific directories.
+# =============================================================================
+
+input_mode: "chr21_fastq"
+
+# ---------------------------------------------------------------------------
+# CHANGE THESE FOR THE SERVER
+# ---------------------------------------------------------------------------
+
+#Change here the directory with the server input_root using the chr21.30x extracted data
+#            ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+input_root: "/server/path/to/benchmark_chr21_real/inputs/final_normalized" 
+
+
+# ---------------------------------------------------------------------------
+# Server resources
+# ---------------------------------------------------------------------------
+#
+# The server may provide approximately:
+#
+#   128 CPU threads
+#   256 GB RAM
+#
+# Those are TOTAL server resources and should not be assigned independently
+# to every rule.
+# ---------------------------------------------------------------------------
+
+threads: 32
+
+resources:
+  mapping_threads: 32
+  flye_threads: 32
+  goldrush_threads: 32
+  ntlink_threads: 16
+  verkko_threads: 32
+
+  mapping_mem_mb: 64000
+  flye_mem_mb: 64000
+  goldrush_mem_mb: 64000
+  goldrush_shm_size: "8g"
+  ntlink_mem_mb: 32000
+  verkko_mem_mb: 64000
+  verkko_local_memory_gb: 64

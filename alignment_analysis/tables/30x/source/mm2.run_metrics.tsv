@@ -1,0 +1,10 @@
+HG002	ont	30x	mm2-ont	Real time: 8996.708 sec; CPU: 507928.011 sec; Peak RSS: 37.653 GB
+HG002	pb	30x	mm2-ont	Real time: 6906.622 sec; CPU: 394442.841 sec; Peak RSS: 36.830 GB
+HG003	ont	30x	mm2-ont	Real time: 9139.646 sec; CPU: 521136.819 sec; Peak RSS: 36.486 GB
+HG003	pb	30x	mm2-ont	Real time: 6456.592 sec; CPU: 377183.699 sec; Peak RSS: 36.334 GB
+HG004	ont	30x	mm2-ont	Real time: 8551.642 sec; CPU: 487589.139 sec; Peak RSS: 38.123 GB
+HG004	pb	30x	mm2-ont	Real time: 6304.022 sec; CPU: 366470.248 sec; Peak RSS: 36.517 GB
+HG002	ont	30x	mm2-pb	Real time: 4597.056 sec; CPU: 202313.624 sec; Peak RSS: 41.291 GB
+HG002	pb	30x	mm2-pb	Real time: 4029.433 sec; CPU: 185504.353 sec; Peak RSS: 41.785 GB
+HG003	ont	30x	mm2-pb	Real time: 4875.328 sec; CPU: 214544.075 sec; Peak RSS: 41.388 GB
+HG004	ont	30x	mm2-pb	Real time: 4806.256 sec; CPU: 198563.736 sec; Peak RSS: 40.228 GB

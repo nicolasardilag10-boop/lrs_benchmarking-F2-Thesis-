@@ -1,0 +1,6 @@
+sample_sheet: smoke_test/samples.tsv
+active_assemblers:
+- flye
+- goldrush
+genome_size: 1m
+threads: 4

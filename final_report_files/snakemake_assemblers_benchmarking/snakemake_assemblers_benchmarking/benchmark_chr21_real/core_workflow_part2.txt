@@ -1,0 +1,267 @@
+
+============================================================
+FILE: rules/flye.smk
+============================================================
+     1	#####################################################################################
+     2	# FLYE ASSEMBLY RULES
+     3	# Flye performs de novo assembly independently for ONT and PacBio HiFi reads.
+     4	#####################################################################################
+     5	
+     6	
+     7	# -----------------------------------------------------------------------------
+     8	# Rule 2: Flye de novo assembly
+     9	# -----------------------------------------------------------------------------
+    10	
+    11	# Use the technology-specific Flye input option and generate one assembly
+    12	# directory and one assembly FASTA for every sample and technology combination
+    13	rule flye_assembly:
+    14	    input:
+    15	        validation=VALIDATION_OK,
+    16	        fastq=fastq_for
+    17	    output:
+    18	        assembly=(
+    19	            "results/assemblies/"
+    20	            "{sample}.{technology}.flye/"
+    21	            "assembly.fasta"
+    22	        )
+    23	    conda:
+    24	        ENV_FLYE
+    25	    params:
+    26	        outdir=(
+    27	            "results/assemblies/"
+    28	            "{sample}.{technology}.flye"
+    29	        ),
+    30	        read_option=flye_read_option,
+    31	        genome_size=GENOME_SIZE
+    32	    threads:
+    33	        DEFAULT_THREADS
+    34	    shell:
+    35	        r"""
+    36	        mkdir -p {params.outdir}
+    37	
+    38	        flye \
+    39	            {params.read_option} {input.fastq} \
+    40	            --genome-size {params.genome_size} \
+    41	            --threads {threads} \
+    42	            --out-dir {params.outdir}
+    43	        """
+
+============================================================
+FILE: rules/goldrush.smk
+============================================================
+     1	###############################################################################
+     2	# GOLDRUSH ASSEMBLY RULES
+     3	###############################################################################
+     4	
+     5	rule goldrush_assembly:
+     6	    input:
+     7	        validation="results/logs/validate_inputs.ok",
+     8	        reads=lambda wildcards: fastq_for(wildcards)
+     9	    output:
+    10	        assembly="results/smoke_test/goldrush/{sample}.{technology}/assembly.fasta"
+    11	    params:
+    12	        workdir=lambda wildcards: (
+    13	            f"results/smoke_test/goldrush/"
+    14	            f"{wildcards.sample}.{wildcards.technology}/work"
+    15	        ),
+    16	        prefix=lambda wildcards: (
+    17	            f"{wildcards.sample}_{wildcards.technology}_goldrush"
+    18	        ),
+    19	        reads_basename=lambda wildcards: (
+    20	            f"{wildcards.sample}_{wildcards.technology}"
+    21	        ),
+    22	        min_read_length=lambda wildcards: (
+    23	            5000 if wildcards.technology == "ont" else 10000
+    24	        )
+    25	    threads:
+    26	        lambda wildcards: int(config.get("threads", 4))
+    27	    conda:
+    28	        ENV_GOLDRUSH
+    29	    shell:
+    30	        r"""
+    31	        set -euo pipefail
+    32	
+    33	        mkdir -p "{params.workdir}"
+    34	        mkdir -p "$(dirname "{output.assembly}")"
+    35	
+    36	        # GoldRush expects an uncompressed FASTQ in its working directory.
+    37	        gzip -cd "{input.reads}" \
+    38	            > "{params.workdir}/{params.reads_basename}.fastq"
+    39	
+    40	        cd "{params.workdir}"
+    41	
+    42	        goldrush run \
+    43	            reads="{params.reads_basename}" \
+    44	            G={config[genome_size]} \
+    45	            t={threads} \
+    46	            m={params.min_read_length} \
+    47	            P=0 \
+    48	            p="{params.prefix}" \
+    49	            track_time=1
+    50	
+    51	        FINAL_ASSEMBLY=$(
+    52	            find goldrush_intermediate_files \
+    53	                -type f \
+    54	                -name "*ntLink-5rounds.polished.fa" \
+    55	                -print \
+    56	                | sort \
+    57	                | tail -n 1
+    58	        )
+    59	
+    60	        if [[ -z "$FINAL_ASSEMBLY" || ! -s "$FINAL_ASSEMBLY" ]]; then
+    61	            echo "ERROR: GoldRush final polished assembly was not produced."
+    62	            exit 1
+    63	        fi
+    64	
+    65	        cp "$FINAL_ASSEMBLY" \
+    66	           "$OLDPWD/{output.assembly}"
+    67	
+    68	        test -s "$OLDPWD/{output.assembly}"
+    69	        """
+
+============================================================
+FILE: rules/verkko.smk
+============================================================
+     1	#####################################################################################
+     2	# VERKKO HYBRID ASSEMBLY RULES
+     3	# Verkko combines ONT and PacBio HiFi reads from the same sample.
+     4	#####################################################################################
+     5	
+     6	rule verkko_assembly:
+     7	    input:
+     8	        hifi=pb_fastq_for_sample,
+     9	        ont=ont_fastq_for_sample
+    10	    output:
+    11	        assembly="results/smoke_test/verkko/{sample}/assembly.fasta"
+    12	    threads: 4
+    13	    conda:
+    14	        ENV_VERKKO
+    15	    params:
+    16	        workdir="results/smoke_test/verkko/{sample}/work"
+    17	    shell:
+    18	        r"""
+    19	        set -euo pipefail
+    20	
+    21	        mkdir -p "{params.workdir}"
+    22	        mkdir -p "$(dirname "{output.assembly}")"
+    23	
+    24	        verkko \
+    25	            -d "{params.workdir}" \
+    26	            --hifi "{input.hifi}" \
+    27	            --nano "{input.ont}" \
+    28	            --local \
+    29	            --local-cpus {threads} \
+    30	            --local-memory 9
+    31	
+    32	        cp "{params.workdir}/assembly.fasta" \
+    33	           "{output.assembly}"
+    34	
+    35	        test -s "{output.assembly}"
+    36	        """
+
+============================================================
+FILE: rules/ntlink.smk
+============================================================
+     1	#####################################################################################
+     2	# NTLINK SCAFFOLDING RULES
+     3	# ntLink uses long reads to order, orient, and connect contigs from an existing
+     4	# draft assembly generated by another assembler such as Flye or GoldRush.
+     5	#####################################################################################
+     6	
+     7	
+     8	# -----------------------------------------------------------------------------
+     9	# Future Rule 4: ntLink scaffolding
+    10	# -----------------------------------------------------------------------------
+    11	
+    12	# Planned inputs:
+    13	#   - Input validation marker
+    14	#   - Draft assembly FASTA from Flye or GoldRush
+    15	#   - ONT or PacBio long-read FASTQ file
+    16	#
+    17	# Planned outputs:
+    18	#   - Scaffolded assembly FASTA
+    19	#   - ntLink log and intermediate files
+    20	#
+    21	# ntLink is not treated as an independent de novo assembler because it requires
+    22	# a previously generated draft assembly.
+    23	
+    24	
+    25	
+    26	rule ntlink_scaffold:
+    27	    input:
+    28	        draft="results/smoke_test/goldrush/{sample}.{technology}/assembly.fasta",
+    29	        reads=lambda wildcards: fastq_for(wildcards)
+    30	
+    31	    output:
+    32	        assembly="results/smoke_test/ntlink/{sample}.{technology}/assembly.fasta"
+    33	
+    34	    threads: 4
+    35	
+    36	    conda:
+    37	        ENV_NTLINK
+    38	
+    39	    params:
+    40	        workdir="results/smoke_test/ntlink/{sample}.{technology}/work"
+    41	
+    42	    shell:   #start the bash command for the rule
+    43	        #start a multiline section. Set -euo pipefail makes to stop de script if real error happens. mkdir create the specific nt Link working directory
+    44	        r"""
+    45	        set -euo pipefail
+    46	
+    47	        mkdir -p "{params.workdir}"
+    48	        mkdir -p "$(dirname "{output.assembly}")"
+    49	
+    50	        cp "{input.draft}" "{params.workdir}/draft.fasta"
+    51	        gzip -cd "{input.reads}" \
+    52	            > "{params.workdir}/reads.fastq"
+    53	
+    54	        (
+    55	            cd "{params.workdir}"
+    56	
+    57	            ntLink scaffold \
+    58	                target=draft.fasta \
+    59	                reads='reads.fastq' \
+    60	                t={threads}
+    61	        )
+    62	
+    63	        cp "{params.workdir}/draft.fasta.k32.w100.z1000.ntLink.scaffolds.fa" \
+    64	           "{output.assembly}"
+    65	
+    66	        test -s "{output.assembly}"
+    67	        """
+
+============================================================
+FILE: rules/assessment.smk
+============================================================
+     1	#####################################################################################
+     2	# ASSEMBLY QUALITY ASSESSMENT RULES
+     3	# This module will calculate comparable statistics for Flye, GoldRush, ntLink,
+     4	# and Verkko outputs after their assembly rules are operational.
+     5	#####################################################################################
+     6	
+     7	
+     8	# -----------------------------------------------------------------------------
+     9	# Future Rule 6: Calculate assembly statistics
+    10	# -----------------------------------------------------------------------------
+    11	
+    12	# Planned metrics:
+    13	#   - Number of contigs or scaffolds
+    14	#   - Total assembly length
+    15	#   - N50 and L50
+    16	#   - Longest contig
+    17	#   - Minimum and maximum sequence length
+    18	#   - GC percentage
+    19	
+    20	
+    21	# -----------------------------------------------------------------------------
+    22	# Future Rule 7: Build the assembly benchmark summary
+    23	# -----------------------------------------------------------------------------
+    24	
+    25	# The final summary will combine all assembly statistics into one table with:
+    26	#   - Sample
+    27	#   - Sequencing technology
+    28	#   - Assembler or scaffolder
+    29	#   - Assembly size
+    30	#   - Contig count
+    31	#   - N50
+    32	#   - Longest contig

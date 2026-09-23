@@ -59,6 +59,8 @@ This separation prevents plot and metric scripts from becoming mixed with Snakem
 
 ```text
 README.md
+├── docs/FILE_INDEX.md
+├── docs/REPOSITORY_TREE.md
 ├── alignment_analysis/README.md
 ├── assemblers/README.md
 │   └── assemblers/whole_genome_asm/README.md
@@ -67,4 +69,16 @@ README.md
 └── variant_calling_analysis/README.md
 ```
 
-The root README is navigation and scope. Detailed run commands belong only in the most specific relevant README, reducing duplicated documentation that can become inconsistent.
+The root README is navigation and scope. `FILE_INDEX.md` locates canonical files, while `REPOSITORY_TREE.md` defines directory responsibilities. Detailed run commands belong only in the most specific relevant README, reducing duplicated documentation that can become inconsistent.
+
+## Final, exploratory, and archived outputs
+
+Selected tables and figures use predictable status directories:
+
+```text
+final/         canonical input to reporting
+derived/       reproducible intermediate tables
+source/        imported source material
+exploratory/   diagnostics and alternative visualizations
+archive/       superseded versions retained for provenance
+```

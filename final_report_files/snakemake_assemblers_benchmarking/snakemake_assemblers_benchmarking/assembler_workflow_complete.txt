@@ -1,0 +1,552 @@
+################################################################################
+### CONFIG.YAML
+################################################################################
+sample_sheet: samples.tsv
+
+active_assemblers:
+  - flye
+
+genome_size: 3.1g
+threads: 4
+
+################################################################################
+### SAMPLES.TSV
+################################################################################
+sample	technology	fastq
+HG002	ont	data/reads/HG002.ont.1k.fastq.gz
+HG002	pb	data/reads/HG002.pb.1k.fastq.gz
+HG003	ont	data/reads/HG003.ont.1k.fastq.gz
+HG003	pb	data/reads/HG003.pb.1k.fastq.gz
+HG004	ont	data/reads/HG004.ont.1k.fastq.gz
+HG004	pb	data/reads/HG004.pb.1k.fastq.gz
+
+################################################################################
+### FILE: rules/common.smk
+################################################################################
+#####################################################################################
+# SHARED ASSEMBLER WORKFLOW CONFIGURATION
+# This module reads the sample table, validates configuration values, defines
+# helper functions, and generates the expected outputs used by the workflow.
+#####################################################################################
+
+# Import packages used to verify paths and read tab-separated sample information
+from pathlib import Path
+import csv
+
+
+# -----------------------------------------------------------------------------
+# General workflow configuration
+# -----------------------------------------------------------------------------
+
+# Define the sample table and general assembler settings
+SAMPLE_SHEET = config.get("sample_sheet", "samples.tsv")
+ACTIVE_ASSEMBLERS = config.get("active_assemblers", ["flye"])
+GENOME_SIZE = config.get("genome_size", "3.1g")
+DEFAULT_THREADS = int(config.get("threads", 4))
+
+# Marker file created after all required inputs have been validated
+VALIDATION_OK = "results/logs/validate_inputs.ok"
+
+# Conda environments used by the individual assembler and assessment modules
+ENV_FLYE = "envs/flye.yaml"
+ENV_GOLDRUSH = "envs/goldrush.yaml"
+ENV_NTLINK = "envs/ntlink.yaml"
+ENV_VERKKO = "envs/verkko.yaml"
+ENV_ASSESSMENT = "envs/assessment.yaml"
+
+# Define all assembler and scaffolding names accepted by this workflow
+SUPPORTED_ASSEMBLERS = {
+    "flye",
+    "goldrush",
+    "ntlink",
+    "verkko",
+}
+
+# Stop immediately if config.yaml contains an unknown tool name
+UNKNOWN_ASSEMBLERS = set(ACTIVE_ASSEMBLERS) - SUPPORTED_ASSEMBLERS
+
+if UNKNOWN_ASSEMBLERS:
+    raise ValueError(
+        f"Unsupported assembler names in config.yaml: "
+        f"{sorted(UNKNOWN_ASSEMBLERS)}"
+    )
+
+
+# -----------------------------------------------------------------------------
+# Read the sample table
+# -----------------------------------------------------------------------------
+
+# Read samples.tsv, verify its required columns, reject missing values, and
+# return the sample name, sequencing technology, and FASTQ path for each row
+def read_sample_sheet(path):
+    path = Path(path)
+
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Missing sample sheet: {path}"
+        )
+
+    rows = []
+
+    with path.open(newline="") as handle:
+        reader = csv.DictReader(
+            handle,
+            delimiter="\t"
+        )
+
+        required_columns = {
+            "sample",
+            "technology",
+            "fastq",
+        }
+
+        observed_columns = set(
+            reader.fieldnames or []
+        )
+
+        missing_columns = (
+            required_columns - observed_columns
+        )
+
+        if missing_columns:
+            raise ValueError(
+                f"Sample sheet is missing columns: "
+                f"{sorted(missing_columns)}"
+            )
+
+        for row in reader:
+            sample = row["sample"].strip()
+            technology = row["technology"].strip()
+            fastq = row["fastq"].strip()
+
+            if not sample or not technology or not fastq:
+                raise ValueError(
+                    f"Invalid empty value in sample sheet row: {row}"
+                )
+
+            if technology not in {"ont", "pb"}:
+                raise ValueError(
+                    f"Unsupported sequencing technology: {technology}"
+                )
+
+            rows.append(
+                {
+                    "sample": sample,
+                    "technology": technology,
+                    "fastq": fastq,
+                }
+            )
+
+    if not rows:
+        raise ValueError(
+            f"Sample sheet is empty: {path}"
+        )
+
+    return rows
+
+
+# Transform samples.tsv into structures used to generate Snakemake jobs
+SAMPLE_ROWS = read_sample_sheet(SAMPLE_SHEET)
+
+SAMPLES = list(
+    dict.fromkeys(
+        row["sample"]
+        for row in SAMPLE_ROWS
+    )
+)
+
+TECHNOLOGIES = list(
+    dict.fromkeys(
+        row["technology"]
+        for row in SAMPLE_ROWS
+    )
+)
+
+SAMPLE_TECH_PAIRS = list(
+    dict.fromkeys(
+        (
+            row["sample"],
+            row["technology"],
+        )
+        for row in SAMPLE_ROWS
+    )
+)
+
+FASTQ_BY_SAMPLE_TECH = {
+    (
+        row["sample"],
+        row["technology"],
+    ): row["fastq"]
+    for row in SAMPLE_ROWS
+}
+
+
+# -----------------------------------------------------------------------------
+# Shared input helper functions
+# -----------------------------------------------------------------------------
+
+# Return the FASTQ associated with one sample and sequencing technology
+def fastq_for(wildcards):
+    key = (
+        wildcards.sample,
+        wildcards.technology,
+    )
+
+    if key not in FASTQ_BY_SAMPLE_TECH:
+        raise ValueError(
+            f"No FASTQ defined for "
+            f"sample={wildcards.sample}, "
+            f"technology={wildcards.technology}"
+        )
+
+    return FASTQ_BY_SAMPLE_TECH[key]
+
+
+# Return the ONT FASTQ associated with one sample
+def ont_fastq_for_sample(wildcards):
+    key = (
+        wildcards.sample,
+        "ont",
+    )
+
+    if key not in FASTQ_BY_SAMPLE_TECH:
+        raise ValueError(
+            f"No ONT FASTQ defined for "
+            f"sample={wildcards.sample}"
+        )
+
+    return FASTQ_BY_SAMPLE_TECH[key]
+
+
+# Return the PacBio HiFi FASTQ associated with one sample
+def pb_fastq_for_sample(wildcards):
+    key = (
+        wildcards.sample,
+        "pb",
+    )
+
+    if key not in FASTQ_BY_SAMPLE_TECH:
+        raise ValueError(
+            f"No PacBio HiFi FASTQ defined for "
+            f"sample={wildcards.sample}"
+        )
+
+    return FASTQ_BY_SAMPLE_TECH[key]
+
+
+# -----------------------------------------------------------------------------
+# Technology-specific parameter functions
+# -----------------------------------------------------------------------------
+
+# Select the correct Flye input option for ONT or PacBio HiFi reads
+def flye_read_option(wildcards):
+    if wildcards.technology == "ont":
+        return "--nano-raw"
+
+    if wildcards.technology == "pb":
+        return "--pacbio-hifi"
+
+    raise ValueError(
+        f"Unsupported sequencing technology: "
+        f"{wildcards.technology}"
+    )
+
+
+# -----------------------------------------------------------------------------
+# Expected workflow outputs
+# -----------------------------------------------------------------------------
+
+# Build the final output collection according to the tools enabled in config.yaml
+EXPECTED_FINAL_OUTPUTS = []
+
+# Flye generates one independent assembly for each sample and technology
+if "flye" in ACTIVE_ASSEMBLERS:
+    EXPECTED_FINAL_OUTPUTS.extend(
+        [
+            (
+                f"results/assemblies/"
+                f"{sample}.{technology}.flye/"
+                f"assembly.fasta"
+            )
+            for sample, technology
+            in SAMPLE_TECH_PAIRS
+        ]
+    )
+
+# GoldRush outputs will be added after its command and installation are validated
+
+# ntLink outputs will be added after selecting which draft assemblies it will
+# scaffold using the corresponding long-read datasets
+
+# Verkko outputs will be added after validating its hybrid ONT and PacBio inputs
+
+
+# -----------------------------------------------------------------------------
+# Wildcard constraints
+# -----------------------------------------------------------------------------
+
+# Restrict wildcards to the samples and technologies listed in samples.tsv
+wildcard_constraints:
+    sample="|".join(SAMPLES),
+    technology="|".join(TECHNOLOGIES)
+
+################################################################################
+### FILE: rules/validation.smk
+################################################################################
+#####################################################################################
+# INPUT AND ENVIRONMENT VALIDATION
+# This module checks the sample table, sequencing files, and Conda environment
+# definitions before any assembler or scaffolding rule is executed.
+#####################################################################################
+
+
+# -----------------------------------------------------------------------------
+# Rule 1: Validate workflow inputs
+# -----------------------------------------------------------------------------
+
+# Check the required sample table, FASTQ files, and environment definitions to
+# prevent the workflow from failing later because of an incomplete setup
+rule validate_inputs:
+    output:
+        VALIDATION_OK
+    run:
+        Path(output[0]).parent.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+        errors = []
+
+        # Verify that samples.tsv exists
+        if not Path(SAMPLE_SHEET).exists():
+            errors.append(
+                f"Missing sample sheet: {SAMPLE_SHEET}"
+            )
+
+        # Verify that every FASTQ declared in samples.tsv exists
+        for row in SAMPLE_ROWS:
+            fastq = Path(row["fastq"])
+
+            if not fastq.exists():
+                errors.append(
+                    f"Missing FASTQ file: {fastq}"
+                )
+
+        # Build the list of required environments from active_assemblers
+        required_environments = []
+
+        if "flye" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_FLYE
+            )
+
+        if "goldrush" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_GOLDRUSH
+            )
+
+        if "ntlink" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_NTLINK
+            )
+
+        if "verkko" in ACTIVE_ASSEMBLERS:
+            required_environments.append(
+                ENV_VERKKO
+            )
+
+        # Verify that every required environment YAML file exists
+        for environment_file in required_environments:
+            if not Path(environment_file).exists():
+                errors.append(
+                    f"Missing Conda environment file: "
+                    f"{environment_file}"
+                )
+
+        # Stop the workflow and display all detected problems together
+        if errors:
+            message = "\n".join(errors)
+
+            raise RuntimeError(
+                "\nASSEMBLER WORKFLOW VALIDATION FAILED\n"
+                "Fix these problems before running the workflow:\n\n"
+                f"{message}\n"
+            )
+
+        # Create the marker file after all validations pass
+        Path(output[0]).write_text(
+            "Assembler input validation passed.\n"
+        )
+
+################################################################################
+### FILE: rules/flye.smk
+################################################################################
+#####################################################################################
+# FLYE ASSEMBLY RULES
+# Flye performs de novo assembly independently for ONT and PacBio HiFi reads.
+#####################################################################################
+
+
+# -----------------------------------------------------------------------------
+# Rule 2: Flye de novo assembly
+# -----------------------------------------------------------------------------
+
+# Use the technology-specific Flye input option and generate one assembly
+# directory and one assembly FASTA for every sample and technology combination
+rule flye_assembly:
+    input:
+        validation=VALIDATION_OK,
+        fastq=fastq_for
+    output:
+        assembly=(
+            "results/assemblies/"
+            "{sample}.{technology}.flye/"
+            "assembly.fasta"
+        )
+    conda:
+        ENV_FLYE
+    params:
+        outdir=(
+            "results/assemblies/"
+            "{sample}.{technology}.flye"
+        ),
+        read_option=flye_read_option,
+        genome_size=GENOME_SIZE
+    threads:
+        DEFAULT_THREADS
+    shell:
+        r"""
+        mkdir -p {params.outdir}
+
+        flye \
+            {params.read_option} {input.fastq} \
+            --genome-size {params.genome_size} \
+            --threads {threads} \
+            --out-dir {params.outdir}
+        """
+
+################################################################################
+### FILE: rules/goldrush.smk
+################################################################################
+#####################################################################################
+# GOLDRUSH ASSEMBLY RULES
+# GoldRush will perform memory-efficient de novo assembly of the long-read
+# datasets after its installation and command-line interface are validated.
+#####################################################################################
+
+
+# -----------------------------------------------------------------------------
+# Future Rule 3: GoldRush de novo assembly
+# -----------------------------------------------------------------------------
+
+# Planned inputs:
+#   - Input validation marker
+#   - One ONT or PacBio long-read FASTQ file
+#
+# Planned outputs:
+#   - One assembly FASTA for each sample and sequencing technology
+#
+# This rule is intentionally inactive until the local GoldRush executable,
+# required parameters, and output names have been confirmed.
+
+################################################################################
+### FILE: rules/ntlink.smk
+################################################################################
+#####################################################################################
+# NTLINK SCAFFOLDING RULES
+# ntLink uses long reads to order, orient, and connect contigs from an existing
+# draft assembly generated by another assembler such as Flye or GoldRush.
+#####################################################################################
+
+
+# -----------------------------------------------------------------------------
+# Future Rule 4: ntLink scaffolding
+# -----------------------------------------------------------------------------
+
+# Planned inputs:
+#   - Input validation marker
+#   - Draft assembly FASTA from Flye or GoldRush
+#   - ONT or PacBio long-read FASTQ file
+#
+# Planned outputs:
+#   - Scaffolded assembly FASTA
+#   - ntLink log and intermediate files
+#
+# ntLink is not treated as an independent de novo assembler because it requires
+# a previously generated draft assembly.
+
+################################################################################
+### FILE: rules/verkko.smk
+################################################################################
+#####################################################################################
+# VERKKO HYBRID ASSEMBLY RULES
+# Verkko combines the ONT and PacBio HiFi datasets belonging to the same sample
+# to perform hybrid diploid genome assembly.
+#####################################################################################
+
+
+# -----------------------------------------------------------------------------
+# Future Rule 5: Verkko hybrid assembly
+# -----------------------------------------------------------------------------
+
+# Planned inputs:
+#   - Input validation marker
+#   - PacBio HiFi FASTQ belonging to one sample
+#   - ONT FASTQ belonging to the same sample
+#
+# Planned outputs:
+#   - Final Verkko assembly graph
+#   - Primary or haplotype assembly FASTA files
+#   - Assembly logs and intermediate workflow files
+#
+# This rule is intentionally inactive until the installation, supported ONT
+# input type, output structure, and required computing resources are validated.
+
+################################################################################
+### FILE: rules/assessment.smk
+################################################################################
+#####################################################################################
+# ASSEMBLY QUALITY ASSESSMENT RULES
+# This module will calculate comparable statistics for Flye, GoldRush, ntLink,
+# and Verkko outputs after their assembly rules are operational.
+#####################################################################################
+
+
+# -----------------------------------------------------------------------------
+# Future Rule 6: Calculate assembly statistics
+# -----------------------------------------------------------------------------
+
+# Planned metrics:
+#   - Number of contigs or scaffolds
+#   - Total assembly length
+#   - N50 and L50
+#   - Longest contig
+#   - Minimum and maximum sequence length
+#   - GC percentage
+
+
+# -----------------------------------------------------------------------------
+# Future Rule 7: Build the assembly benchmark summary
+# -----------------------------------------------------------------------------
+
+# The final summary will combine all assembly statistics into one table with:
+#   - Sample
+#   - Sequencing technology
+#   - Assembler or scaffolder
+#   - Assembly size
+#   - Contig count
+#   - N50
+#   - Longest contig
+
+################################################################################
+### FILE: envs/flye.yaml
+################################################################################
+name: flye-assembly
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - flye
+  - seqkit

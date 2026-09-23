@@ -1,0 +1,4 @@
+12:vg_gbz: data/graph/graph.gbz
+13:vg_min: data/graph/graph.min
+14:vg_dist: data/graph/graph.dist
+15:vg_zipcodes: data/graph/graph.zipcodes

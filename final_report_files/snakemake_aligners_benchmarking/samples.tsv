@@ -1,0 +1,7 @@
+sample	technology	fastq
+HG002	ont	data/samples/HG002.ont.1k.fastq.gz
+HG002	pb	data/samples/HG002.pb.1k.fastq.gz
+HG003	ont	data/samples/HG003.ont.1k.fastq.gz
+HG003	pb	data/samples/HG003.pb.1k.fastq.gz
+HG004	ont	data/samples/HG004.ont.1k.fastq.gz
+HG004	pb	data/samples/HG004.pb.1k.fastq.gz

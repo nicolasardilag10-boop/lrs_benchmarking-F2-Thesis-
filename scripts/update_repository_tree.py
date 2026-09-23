@@ -19,6 +19,20 @@ MODULE_READMES = {
     "variant_calling_analysis/README.md": "variant_calling_analysis",
 }
 
+ROOT_AREAS = [
+    ("Alignment benchmark", "alignment_analysis", "metrics, canonical tables, and final figures"),
+    ("Assembly workflows", "assemblers", "whole-genome and chromosome-21 assembly workflows"),
+    ("Assembly analysis", "assembly_analysis", "assembly metric aggregation and figures"),
+    ("Variant analysis", "variant_calling_analysis", "variant-calling analysis layer"),
+    ("SV workspace", "SV aligners call", "SV and aligner validation workflows"),
+    ("Final report", "final_report_files", "LaTeX report and integrated aligner workflow"),
+    ("Documentation", "docs", "maps, methods, inventories, and troubleshooting"),
+    ("Project figures", "figures", "cross-project and variant figures"),
+    ("Results", "results", "organized links to generated outputs"),
+    ("Tests", "tests", "fixtures, smoke tests, and validation"),
+    ("Archive", "archive", "historical code, snapshots, and retired material"),
+]
+
 # Direct files in a top-level directory are listed only when there are few of them.
 # Large result-heavy folders stay compact in the root README.
 ROOT_DIRECT_FILE_LIMIT = 8
@@ -50,19 +64,44 @@ def repo_root() -> Path:
         ).strip()
     )
 
-def tracked_files(root: Path) -> list[str]:
+def repository_files(root: Path) -> list[str]:
+    """Return visible version-control candidates that still exist on disk."""
     out = subprocess.check_output(
-        ["git", "-C", str(root), "ls-files"],
+        [
+            "git",
+            "-C",
+            str(root),
+            "ls-files",
+            "--cached",
+            "--others",
+            "--exclude-standard",
+        ],
         text=True,
     )
-    return sorted(p.strip() for p in out.splitlines() if p.strip())
+    excluded_parts = {".git", ".snakemake", "__pycache__", "node_modules"}
+    excluded_roots = {"overleaf-toolkit"}
+    files = []
+
+    for raw_path in out.splitlines():
+        path = raw_path.strip()
+        if not path:
+            continue
+        parts = PurePosixPath(path).parts
+        if parts[0] in excluded_roots or excluded_parts.intersection(parts):
+            continue
+        if not (root / path).is_file():
+            continue
+        files.append(path)
+
+    return sorted(set(files))
 
 def esc(value: str) -> str:
     return html.escape(value, quote=False)
 
 def md_file_link(target: str, label: str | None = None) -> str:
     label = label or PurePosixPath(target).name
-    return f"[`{esc(label)}`]({target})"
+    href = f"<{target}>" if " " in target else target
+    return f"[`{esc(label)}`]({href})"
 
 def immediate_children(files: list[str], prefix: str = ""):
     prefix = prefix.strip("/")
@@ -91,64 +130,53 @@ def count_under(files: list[str], prefix: str) -> int:
     return sum(1 for path in files if path.startswith(needle))
 
 def render_root(files: list[str]) -> str:
-    dirs, root_files = immediate_children(files)
-
     lines = [
         "## Repository explorer",
         "",
         START,
-        "Generated from Git-tracked files. Expand only the area you need. "
-        "On GitHub, press **`t`** to search tracked files by name.",
+        "Generated from version-control candidates. This view highlights "
+        "scientific entry points instead of listing every result file. See "
+        "[`docs/REPOSITORY_TREE.md`](docs/REPOSITORY_TREE.md) for the expanded map.",
         "",
-        "<details>",
-        "<summary><b>Top-level files</b></summary>",
-        "",
+        "| Area | Location | Purpose |",
+        "|---|---|---|",
     ]
 
-    for filename in root_files:
-        lines.append(f"- {md_file_link(filename)}")
-
-    lines += ["", "</details>", ""]
-
-    for dirname in dirs:
-        subdirs, direct_files = immediate_children(files, dirname)
-        total = count_under(files, dirname)
-        plural = "file" if total == 1 else "files"
-
-        lines += [
-            "<details>",
-            f"<summary><b>{esc(dirname)}/</b> — {total} tracked {plural}</summary>",
-            "",
-        ]
-
+    for label, dirname, purpose in ROOT_AREAS:
         readme = f"{dirname}/README.md"
-        if readme in files:
-            lines.append(f"- Documentation: {md_file_link(readme, 'README.md')}")
+        lines.append(
+            f"| {esc(label)} | {md_file_link(readme, dirname + '/')} | {esc(purpose)} |"
+        )
 
-        for subdir in subdirs:
-            n = count_under(files, f"{dirname}/{subdir}")
-            p = "file" if n == 1 else "files"
-            lines.append(f"- `{esc(subdir)}/` — {n} {p}")
-
-        visible_direct = [
-            filename
-            for filename in direct_files
-            if f"{dirname}/{filename}" != readme
-        ]
-
-        if visible_direct:
-            if len(visible_direct) <= ROOT_DIRECT_FILE_LIMIT:
-                for filename in visible_direct:
-                    lines.append(
-                        f"- {md_file_link(f'{dirname}/{filename}')}"
-                    )
-            else:
-                lines.append(
-                    f"- `{len(visible_direct)} direct files` — "
-                    "use GitHub's **`t`** file finder or the module README to locate a specific file"
-                )
-
-        lines += ["", "</details>", ""]
+    root_files = {path for path in files if "/" not in path}
+    workflow_groups = [
+        ("Alignment", sorted(path for path in root_files if ".read_mapping." in path)),
+        (
+            "Small variants",
+            sorted(path for path in root_files if ".snv_" in path or path == "run_happy.smk"),
+        ),
+        (
+            "Structural variants",
+            sorted(
+                path
+                for path in root_files
+                if path
+                in {
+                    "cuteSV.hg38.smk",
+                    "pbsv.hg38.smk",
+                    "sawfish.hg38.smk",
+                    "sniffles2.hg38.smk",
+                    "truvari_anno.smk",
+                }
+            ),
+        ),
+    ]
+    lines += ["", "<details>", "<summary><b>Constitution-required root workflows</b></summary>", ""]
+    for label, paths in workflow_groups:
+        if paths:
+            links = ", ".join(md_file_link(path) for path in paths)
+            lines.append(f"- **{label}:** {links}")
+    lines += ["", "</details>", ""]
 
     lines.append(END)
     return "\n".join(lines)
@@ -211,18 +239,32 @@ def render_node(node, rel_dir: str = "") -> list[str]:
     return lines
 
 def render_module(files: list[str], module_root: str) -> str:
-    tree = build_tree(files, module_root)
+    dirs, direct_files = immediate_children(files, module_root)
 
     lines = [
         "## Repository explorer",
         "",
         START,
-        "Generated from Git-tracked files. Expand only the directory you need. "
-        "On GitHub, press **`t`** for fast filename search.",
+        "Generated from version-control candidates. Directories remain compact; "
+        "use this module's curated sections for canonical files.",
         "",
     ]
 
-    lines.extend(render_node(tree))
+    for filename in direct_files:
+        lines.append(f"- {md_file_link(filename)}")
+    if direct_files and dirs:
+        lines.append("")
+    for dirname in dirs:
+        n = count_under(files, f"{module_root}/{dirname}")
+        plural = "file" if n == 1 else "files"
+        readme = f"{module_root}/{dirname}/README.md"
+        if readme in files:
+            lines.append(
+                f"- **{esc(dirname)}/** — {n} {plural}; "
+                f"{md_file_link(f'{dirname}/README.md', 'guide')}"
+            )
+        else:
+            lines.append(f"- **{esc(dirname)}/** — {n} {plural}")
     lines += ["", END]
 
     return "\n".join(lines)
@@ -275,7 +317,7 @@ def main() -> int:
     args = parser.parse_args()
 
     root = repo_root()
-    files = tracked_files(root)
+    files = repository_files(root)
     changed = False
 
     changed |= update_file(

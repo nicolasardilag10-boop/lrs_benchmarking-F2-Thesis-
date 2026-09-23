@@ -918,8 +918,6 @@ sample_legend_handles = [
 
 figure.legend(
     handles=sample_legend_handles,
-    title="GIAB sample",
-    title_fontsize=14,
     frameon=False,
     ncols=3,
     loc="upper center",
@@ -991,8 +989,8 @@ figure, axes = plt.subplots(
     nrows=1,
     ncols=2,
     figsize=(
-        13.0,
-        6.8,
+        9.1,
+        4.76,
     ),
     sharey=True,
 )
@@ -1155,14 +1153,10 @@ for panel_index, technology in enumerate(
         1.03,
         panel_letter,
         transform=axis.transAxes,
+        ha="left",
+        va="bottom",
         fontsize=17,
         fontweight="bold",
-    )
-
-
-    axis.set_xlabel(
-        "Input-normalized CIGAR-aligned yield (%)",
-        fontsize=12,
     )
 
 
@@ -1184,6 +1178,13 @@ axes[0].set_ylabel(
 )
 
 
+figure.supxlabel(
+    "Input-normalized CIGAR-aligned yield (%)",
+    fontsize=12,
+    y=0.10,
+)
+
+
 # ============================================================
 # STEP 19: SCATTER LEGENDS
 # ============================================================
@@ -1196,7 +1197,7 @@ sample_handles = [
         linestyle="None",
         markerfacecolor=sample_colors[sample],
         markeredgecolor="black",
-        markersize=8,
+        markersize=6,
         label=sample,
     )
     for sample in sample_order
@@ -1211,23 +1212,34 @@ aligner_handles = [
         linestyle="None",
         markerfacecolor="white",
         markeredgecolor="black",
-        markersize=8,
+        markersize=6,
         label=aligner,
     )
     for aligner in aligner_order
 ]
 
 
+legend_style = dict(
+    frameon=False,
+    fontsize=9,
+    title_fontsize=9,
+    columnspacing=0.9,
+    handletextpad=0.35,
+    borderaxespad=0.0,
+    handlelength=1.2,
+)
+
+
 legend_samples = figure.legend(
     handles=sample_handles,
     title="GIAB sample",
-    frameon=False,
     ncols=3,
     loc="upper right",
     bbox_to_anchor=(
-        0.49,
-        1.02,
+        0.44,
+        1.01,
     ),
+    **legend_style,
 )
 
 
@@ -1239,21 +1251,21 @@ figure.add_artist(
 figure.legend(
     handles=aligner_handles,
     title="Aligner",
-    frameon=False,
     ncols=4,
     loc="upper left",
     bbox_to_anchor=(
-        0.51,
-        1.02,
+        0.46,
+        1.01,
     ),
+    **legend_style,
 )
 
 
 figure.subplots_adjust(
     left=0.08,
     right=0.98,
-    bottom=0.15,
-    top=0.83,
+    bottom=0.214,
+    top=0.757,
     wspace=0.12,
 )
 

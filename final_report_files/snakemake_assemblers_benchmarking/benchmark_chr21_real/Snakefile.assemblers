@@ -1,0 +1,631 @@
+################################################################################
+# REAL CHROMOSOME 21 ASSEMBLER BENCHMARK
+#
+# Samples:
+#   HG002, HG003, HG004
+#
+# Inputs:
+#   PacBio HiFi 30x
+#   Oxford Nanopore 30x
+#
+# Assemblers:
+#   Flye
+#   GoldRush
+#   Verkko
+#   ntLink using the corresponding GoldRush draft
+#
+# Execution:
+#   Version-pinned Docker Hub images executed explicitly with docker run.
+#
+# Server deployment:
+#   Change input_root in config/config.assemblers.yaml, or override it with
+#   --config input_root=/server/path/to/final_normalized
+################################################################################
+
+configfile: workflow.source_path("config/config.assemblers.yaml")
+
+from pathlib import Path
+import csv
+import shlex
+import shutil
+import yaml
+
+
+# ------------------------------------------------------------------------------
+# Paths and configuration
+# ------------------------------------------------------------------------------
+
+BASE_DIR = Path(workflow.basedir).resolve()
+
+SAMPLE_SHEET = Path(config["sample_sheet"])
+SAMPLE_SHEET = SAMPLE_SHEET.resolve() if SAMPLE_SHEET.is_absolute() else (BASE_DIR / SAMPLE_SHEET).resolve()
+
+# Change only input_root when the normalized chr21 FASTQs are stored elsewhere.
+INPUT_ROOT = Path(config.get("input_root", "inputs/final_normalized"))
+INPUT_ROOT = INPUT_ROOT.resolve() if INPUT_ROOT.is_absolute() else (BASE_DIR / INPUT_ROOT).resolve()
+
+RESULTS_ROOT = Path(config.get("results_root", "results/assembler_benchmark"))
+RESULTS_ROOT = RESULTS_ROOT.resolve() if RESULTS_ROOT.is_absolute() else (BASE_DIR / RESULTS_ROOT).resolve()
+
+GENOME_SIZE = str(config.get("genome_size", "46709983"))
+THREADS = int(config.get("threads", 4))
+LOCAL_MEMORY_GB = int(config.get("local_memory_gb", 9))
+
+ACTIVE_ASSEMBLERS = set(config.get("active_assemblers", ["flye", "goldrush", "verkko", "ntlink"]))
+SUPPORTED_ASSEMBLERS = {"flye", "goldrush", "verkko", "ntlink"}
+
+UNKNOWN_ASSEMBLERS = ACTIVE_ASSEMBLERS - SUPPORTED_ASSEMBLERS
+if UNKNOWN_ASSEMBLERS:
+    raise ValueError(f"Unsupported assemblers: {sorted(UNKNOWN_ASSEMBLERS)}")
+
+VALIDATION_OK = str(RESULTS_ROOT / "checkpoints" / "inputs_validated.ok")
+WORKFLOW_OK = str(RESULTS_ROOT / "checkpoints" / "workflow_complete.ok")
+
+
+# ------------------------------------------------------------------------------
+# Docker Hub images
+# ------------------------------------------------------------------------------
+
+CONTAINER_CONFIG = BASE_DIR / "config" / "containers.yaml"
+
+if not CONTAINER_CONFIG.is_file():
+    raise FileNotFoundError(f"Container configuration not found: {CONTAINER_CONFIG}")
+
+with CONTAINER_CONFIG.open("r", encoding="utf-8") as handle:
+    CONTAINER_CONFIG_DATA = yaml.safe_load(handle) or {}
+
+CONTAINERS = CONTAINER_CONFIG_DATA.get("containers", {})
+REQUIRED_CONTAINER_KEYS = {"flye2", "goldrush", "ntlink", "verkko2"}
+
+MISSING_CONTAINER_KEYS = REQUIRED_CONTAINER_KEYS - set(CONTAINERS)
+if MISSING_CONTAINER_KEYS:
+    raise ValueError("Missing container definitions: " + ", ".join(sorted(MISSING_CONTAINER_KEYS)))
+
+# containers.yaml keeps OCI-style docker:// references. docker run needs the
+# normal repository/image:tag form.
+DOCKER_IMAGES = {}
+
+for key in REQUIRED_CONTAINER_KEYS:
+    image = str(CONTAINERS[key]).strip()
+
+    if image.startswith("docker://"):
+        image = image[len("docker://"):]
+
+    if not image:
+        raise ValueError(f"Empty Docker image definition: {key}")
+
+    DOCKER_IMAGES[key] = image
+
+
+# ------------------------------------------------------------------------------
+# Docker mounts
+# ------------------------------------------------------------------------------
+
+def is_within(path, parent):
+    """Return True when path is located inside parent."""
+    try:
+        path.relative_to(parent)
+        return True
+    except ValueError:
+        return False
+
+
+def docker_mount_args():
+    """
+    Keep host paths identical inside the container.
+
+    BASE_DIR is writable because workflow results are generated there.
+    External input data are mounted read-only.
+    """
+    mounts = ["-v " + shlex.quote(f"{BASE_DIR}:{BASE_DIR}")]
+
+    if not is_within(INPUT_ROOT, BASE_DIR):
+        mounts.append("-v " + shlex.quote(f"{INPUT_ROOT}:{INPUT_ROOT}:ro"))
+
+    if not is_within(RESULTS_ROOT, BASE_DIR):
+        mounts.append("-v " + shlex.quote(f"{RESULTS_ROOT}:{RESULTS_ROOT}"))
+
+    return " ".join(mounts)
+
+
+DOCKER_MOUNTS = docker_mount_args()
+BASE_DIR_STR = str(BASE_DIR)
+
+
+# ------------------------------------------------------------------------------
+# Read and validate the sample sheet
+# ------------------------------------------------------------------------------
+
+def read_sample_sheet(path):
+    rows = []
+
+    if not path.exists():
+        raise FileNotFoundError(f"Sample sheet not found: {path}")
+
+    with path.open(newline="") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+
+        expected_columns = {"sample", "technology", "fastq"}
+        observed_columns = set(reader.fieldnames or [])
+        missing_columns = expected_columns - observed_columns
+
+        if missing_columns:
+            raise ValueError(f"Missing sample-sheet columns: {sorted(missing_columns)}")
+
+        for row in reader:
+            sample = row["sample"].strip()
+            technology = row["technology"].strip()
+            relative_fastq = Path(row["fastq"].strip())
+
+            if technology not in {"pb", "ont"}:
+                raise ValueError(f"Unsupported technology: {technology}")
+
+            # Sample-specific paths remain relative so one input_root works on any server.
+            if relative_fastq.is_absolute():
+                raise ValueError(
+                    f"FASTQ path for {sample} {technology} must be relative to input_root: {relative_fastq}"
+                )
+
+            fastq = (INPUT_ROOT / relative_fastq).resolve()
+
+            if not is_within(fastq, INPUT_ROOT):
+                raise ValueError(f"FASTQ path escapes input_root: {fastq}")
+
+            rows.append({"sample": sample, "technology": technology, "fastq": str(fastq)})
+
+    if not rows:
+        raise ValueError(f"Sample sheet is empty: {path}")
+
+    return rows
+
+
+SAMPLE_ROWS = read_sample_sheet(SAMPLE_SHEET)
+
+SAMPLES = list(dict.fromkeys(row["sample"] for row in SAMPLE_ROWS))
+SAMPLE_TECH_PAIRS = [(row["sample"], row["technology"]) for row in SAMPLE_ROWS]
+
+FASTQ_BY_SAMPLE_TECH = {
+    (row["sample"], row["technology"]): row["fastq"]
+    for row in SAMPLE_ROWS
+}
+
+
+def fastq_for(wc):
+    return FASTQ_BY_SAMPLE_TECH[(wc.sample, wc.technology)]
+
+
+def pb_fastq_for_sample(wc):
+    return FASTQ_BY_SAMPLE_TECH[(wc.sample, "pb")]
+
+
+def ont_fastq_for_sample(wc):
+    return FASTQ_BY_SAMPLE_TECH[(wc.sample, "ont")]
+
+
+def flye_read_option(wc):
+    return "--nano-raw" if wc.technology == "ont" else "--pacbio-hifi"
+
+
+# ------------------------------------------------------------------------------
+# Expected output files
+# ------------------------------------------------------------------------------
+
+EXPECTED_OUTPUTS = []
+
+if "flye" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        str(RESULTS_ROOT / "assemblies" / "flye" / f"{sample}.{technology}" / "assembly.fasta")
+        for sample, technology in SAMPLE_TECH_PAIRS
+    )
+
+if "goldrush" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        str(RESULTS_ROOT / "assemblies" / "goldrush" / f"{sample}.{technology}" / "assembly.fasta")
+        for sample, technology in SAMPLE_TECH_PAIRS
+    )
+
+if "verkko" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        str(RESULTS_ROOT / "assemblies" / "verkko" / sample / "assembly.fasta")
+        for sample in SAMPLES
+    )
+
+if "ntlink" in ACTIVE_ASSEMBLERS:
+    EXPECTED_OUTPUTS.extend(
+        str(RESULTS_ROOT / "assemblies" / "ntlink_goldrush" / f"{sample}.{technology}" / "assembly.fasta")
+        for sample, technology in SAMPLE_TECH_PAIRS
+    )
+
+
+wildcard_constraints:
+    sample="HG002|HG003|HG004",
+    technology="pb|ont"
+
+
+# ------------------------------------------------------------------------------
+# Final targets
+# ------------------------------------------------------------------------------
+
+rule all:
+    input:
+        WORKFLOW_OK
+
+
+# ------------------------------------------------------------------------------
+# Input and runtime validation
+# ------------------------------------------------------------------------------
+
+rule validate_inputs:
+    output:
+        VALIDATION_OK
+    run:
+        errors = []
+
+        for row in SAMPLE_ROWS:
+            fastq = Path(row["fastq"])
+
+            if not fastq.exists():
+                errors.append(f"Missing FASTQ: {fastq}")
+            elif fastq.stat().st_size == 0:
+                errors.append(f"Empty FASTQ: {fastq}")
+
+        for sample in SAMPLES:
+            for technology in ("pb", "ont"):
+                if (sample, technology) not in FASTQ_BY_SAMPLE_TECH:
+                    errors.append(f"Missing input pair: {sample} {technology}")
+
+        if shutil.which("docker") is None:
+            errors.append("Docker executable not found in PATH")
+
+        if errors:
+            raise RuntimeError("\n".join(errors))
+
+        Path(output[0]).parent.mkdir(parents=True, exist_ok=True)
+        Path(output[0]).write_text("Chromosome 21 assembler inputs and Docker runtime validated.\n")
+
+
+# ==============================================================================
+# ASSEMBLER RULES
+#
+# Each assembler uses a version-pinned Docker Hub image from containers.yaml.
+# Start/end information is written to each tool log to simplify server debugging.
+# ==============================================================================
+
+
+# ------------------------------------------------------------------------------
+# Flye assembly
+# One independent assembly per sample/technology pair.
+# ------------------------------------------------------------------------------
+
+rule flye_assembly:
+    input:
+        validation=VALIDATION_OK,
+        fastq=fastq_for
+    output:
+        assembly=str(RESULTS_ROOT / "assemblies" / "flye" / "{sample}.{technology}" / "assembly.fasta")
+    log:
+        str(RESULTS_ROOT / "logs" / "flye" / "{sample}.{technology}.log")
+    message:
+        "Flye assembly: {wildcards.sample} {wildcards.technology}"
+    threads:
+        THREADS
+    resources:
+        mem_mb=8500
+    params:
+        image=DOCKER_IMAGES["flye2"],
+        outdir=lambda wc: str(RESULTS_ROOT / "assemblies" / "flye" / f"{wc.sample}.{wc.technology}"),
+        read_option=flye_read_option,
+        genome_size=GENOME_SIZE
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.outdir:q} "$(dirname {log:q})"
+
+        (
+            echo "============================================================"
+            echo "FLYE START"
+            echo "============================================================"
+            echo "Sample:     {wildcards.sample}"
+            echo "Technology: {wildcards.technology}"
+            echo "Image:      {params.image}"
+            echo "Threads:    {threads}"
+            echo "Input:      {input.fastq}"
+            echo "Output:     {output.assembly}"
+            printf "Start time: "
+            date
+        ) | tee {log:q}
+
+        RESUME_ARG=""
+        [[ -s "{params.outdir}/flye.log" ]] && RESUME_ARG="--resume"
+
+        docker run --rm \
+            --cpus {threads} \
+            --memory {resources.mem_mb}m \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -e TMPDIR=/tmp \
+            --workdir {BASE_DIR_STR:q} \
+            {DOCKER_MOUNTS} \
+            {params.image:q} \
+            flye \
+                {params.read_option} {input.fastq:q} \
+                --genome-size {params.genome_size} \
+                --threads {threads} \
+                --out-dir {params.outdir:q} \
+                $RESUME_ARG \
+            2>&1 | tee -a {log:q}
+
+        test -s {output.assembly:q}
+
+        (
+            echo "FLYE COMPLETE"
+            printf "End time: "
+            date
+        ) | tee -a {log:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# GoldRush assembly
+# GoldRush receives one normalized FASTQ and generates the draft used by ntLink.
+# ------------------------------------------------------------------------------
+
+rule goldrush_assembly:
+    input:
+        validation=VALIDATION_OK,
+        reads=fastq_for
+    output:
+        assembly=str(RESULTS_ROOT / "assemblies" / "goldrush" / "{sample}.{technology}" / "assembly.fasta")
+    log:
+        str(RESULTS_ROOT / "logs" / "goldrush" / "{sample}.{technology}.log")
+    message:
+        "GoldRush assembly: {wildcards.sample} {wildcards.technology}"
+    threads:
+        THREADS
+    resources:
+        mem_mb=9000
+    params:
+        image=DOCKER_IMAGES["goldrush"],
+        workdir=lambda wc: str(RESULTS_ROOT / "work" / "goldrush" / f"{wc.sample}.{wc.technology}"),
+        prefix=lambda wc: f"{wc.sample}_{wc.technology}_goldrush",
+        reads_basename=lambda wc: f"{wc.sample}_{wc.technology}",
+        min_read_length=lambda wc: 5000 if wc.technology == "ont" else 10000,
+        genome_size=GENOME_SIZE
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.workdir:q} "$(dirname {output.assembly:q})" "$(dirname {log:q})"
+
+        (
+            echo "============================================================"
+            echo "GOLDRUSH START"
+            echo "============================================================"
+            echo "Sample:     {wildcards.sample}"
+            echo "Technology: {wildcards.technology}"
+            echo "Image:      {params.image}"
+            echo "Threads:    {threads}"
+            echo "Input:      {input.reads}"
+            echo "Output:     {output.assembly}"
+            printf "Start time: "
+            date
+        ) | tee {log:q}
+
+        READS_FASTQ="{params.workdir}/{params.reads_basename}.fastq"
+
+        if [[ ! -s "$READS_FASTQ" ]]; then
+            echo "Preparing uncompressed GoldRush input FASTQ..." | tee -a {log:q}
+            gzip -cd {input.reads:q} > "$READS_FASTQ.tmp"
+            mv "$READS_FASTQ.tmp" "$READS_FASTQ"
+        fi
+
+        docker run --rm \
+            --cpus {threads} \
+            --memory {resources.mem_mb}m \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -e TMPDIR=/tmp \
+            --workdir {params.workdir:q} \
+            {DOCKER_MOUNTS} \
+            {params.image:q} \
+            goldrush run \
+                reads="{params.reads_basename}" \
+                G={params.genome_size} \
+                t={threads} \
+                m={params.min_read_length} \
+                P=0 \
+                p="{params.prefix}" \
+                track_time=1 \
+            2>&1 | tee -a {log:q}
+
+        FINAL_ASSEMBLY=$(
+            find "{params.workdir}/goldrush_intermediate_files" \
+                -type f \
+                -name "*ntLink-5rounds.polished.fa" \
+                -print \
+            | sort \
+            | tail -n 1
+        )
+
+        if [[ -z "$FINAL_ASSEMBLY" || ! -s "$FINAL_ASSEMBLY" ]]; then
+            echo "ERROR: GoldRush final assembly missing." | tee -a {log:q}
+            exit 1
+        fi
+
+        cp "$FINAL_ASSEMBLY" {output.assembly:q}
+        test -s {output.assembly:q}
+
+        (
+            echo "GOLDRUSH COMPLETE"
+            printf "End time: "
+            date
+        ) | tee -a {log:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# Verkko hybrid assembly
+# One hybrid HiFi + ONT assembly is generated for each sample.
+# ------------------------------------------------------------------------------
+
+rule verkko_assembly:
+    input:
+        validation=VALIDATION_OK,
+        hifi=pb_fastq_for_sample,
+        ont=ont_fastq_for_sample
+    output:
+        assembly=str(RESULTS_ROOT / "assemblies" / "verkko" / "{sample}" / "assembly.fasta")
+    log:
+        str(RESULTS_ROOT / "logs" / "verkko" / "{sample}.log")
+    message:
+        "Verkko hybrid assembly: {wildcards.sample}"
+    threads:
+        THREADS
+    resources:
+        mem_mb=9000
+    params:
+        image=DOCKER_IMAGES["verkko2"],
+        workdir=lambda wc: str(RESULTS_ROOT / "work" / "verkko" / wc.sample)
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.workdir:q} "$(dirname {output.assembly:q})" "$(dirname {log:q})"
+
+        (
+            echo "============================================================"
+            echo "VERKKO START"
+            echo "============================================================"
+            echo "Sample:     {wildcards.sample}"
+            echo "Image:      {params.image}"
+            echo "Threads:    {threads}"
+            echo "HiFi input: {input.hifi}"
+            echo "ONT input:  {input.ont}"
+            echo "Output:     {output.assembly}"
+            printf "Start time: "
+            date
+        ) | tee {log:q}
+
+        docker run --rm \
+            --cpus {threads} \
+            --memory {resources.mem_mb}m \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -e TMPDIR=/tmp \
+            --workdir {BASE_DIR_STR:q} \
+            {DOCKER_MOUNTS} \
+            {params.image:q} \
+            verkko \
+                -d {params.workdir:q} \
+                --hifi {input.hifi:q} \
+                --nano {input.ont:q} \
+                --local \
+                --local-cpus {threads} \
+                --local-memory {LOCAL_MEMORY_GB} \
+            2>&1 | tee -a {log:q}
+
+        cp "{params.workdir}/assembly.fasta" {output.assembly:q}
+        test -s {output.assembly:q}
+
+        (
+            echo "VERKKO COMPLETE"
+            printf "End time: "
+            date
+        ) | tee -a {log:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# ntLink scaffolding
+# Each GoldRush assembly is scaffolded with its corresponding long-read dataset.
+# ------------------------------------------------------------------------------
+
+rule ntlink_scaffold:
+    input:
+        validation=VALIDATION_OK,
+        draft=str(RESULTS_ROOT / "assemblies" / "goldrush" / "{sample}.{technology}" / "assembly.fasta"),
+        reads=fastq_for
+    output:
+        assembly=str(
+            RESULTS_ROOT / "assemblies" / "ntlink_goldrush" / "{sample}.{technology}" / "assembly.fasta"
+        )
+    log:
+        str(RESULTS_ROOT / "logs" / "ntlink" / "{sample}.{technology}.log")
+    message:
+        "ntLink scaffolding: {wildcards.sample} {wildcards.technology}"
+    threads:
+        THREADS
+    resources:
+        mem_mb=6000
+    params:
+        image=DOCKER_IMAGES["ntlink"],
+        workdir=lambda wc: str(RESULTS_ROOT / "work" / "ntlink_goldrush" / f"{wc.sample}.{wc.technology}")
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p {params.workdir:q} "$(dirname {output.assembly:q})" "$(dirname {log:q})"
+
+        (
+            echo "============================================================"
+            echo "NTLINK START"
+            echo "============================================================"
+            echo "Sample:     {wildcards.sample}"
+            echo "Technology: {wildcards.technology}"
+            echo "Image:      {params.image}"
+            echo "Threads:    {threads}"
+            echo "Draft:      {input.draft}"
+            echo "Reads:      {input.reads}"
+            echo "Output:     {output.assembly}"
+            printf "Start time: "
+            date
+        ) | tee {log:q}
+
+        cp {input.draft:q} "{params.workdir}/draft.fasta"
+
+        if [[ ! -s "{params.workdir}/reads.fastq" ]]; then
+            echo "Preparing uncompressed ntLink input FASTQ..." | tee -a {log:q}
+            gzip -cd {input.reads:q} > "{params.workdir}/reads.fastq.tmp"
+            mv "{params.workdir}/reads.fastq.tmp" "{params.workdir}/reads.fastq"
+        fi
+
+        docker run --rm \
+            --cpus {threads} \
+            --memory {resources.mem_mb}m \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -e TMPDIR=/tmp \
+            --workdir {params.workdir:q} \
+            {DOCKER_MOUNTS} \
+            {params.image:q} \
+            ntLink scaffold \
+                target=draft.fasta \
+                reads=reads.fastq \
+                t={threads} \
+            2>&1 | tee -a {log:q}
+
+        cp "{params.workdir}/draft.fasta.k32.w100.z1000.ntLink.scaffolds.fa" {output.assembly:q}
+        test -s {output.assembly:q}
+
+        (
+            echo "NTLINK COMPLETE"
+            printf "End time: "
+            date
+        ) | tee -a {log:q}
+        """
+
+
+# ------------------------------------------------------------------------------
+# Final checkpoint
+# ------------------------------------------------------------------------------
+
+rule workflow_complete:
+    input:
+        validation=VALIDATION_OK,
+        assemblies=EXPECTED_OUTPUTS
+    output:
+        WORKFLOW_OK
+    run:
+        Path(output[0]).parent.mkdir(parents=True, exist_ok=True)
+        Path(output[0]).write_text("Chromosome 21 assembler workflow completed.\n")

@@ -1,0 +1,19 @@
+assembler	sample	technology	dataset_type	input_fastq	assembly_path	file_size_bytes	contig_count	total_length_bp	longest_contig_bp	n50_bp	status
+Flye	HG002	ont	human_1k_smoke_test	data/reads/HG002.ont.1k.fastq.gz	results/assemblies/HG002.ont.flye/assembly.fasta	1015140	1	998488	998488	998488	PASS
+Flye	HG002	pb	human_1k_smoke_test	data/reads/HG002.pb.1k.fastq.gz	results/assemblies/HG002.pb.flye/assembly.fasta	1016676	1	999999	999999	999999	PASS
+Flye	HG003	ont	human_1k_smoke_test	data/reads/HG003.ont.1k.fastq.gz	results/assemblies/HG003.ont.flye/assembly.fasta	1015428	1	998771	998771	998771	PASS
+Flye	HG003	pb	human_1k_smoke_test	data/reads/HG003.pb.1k.fastq.gz	results/assemblies/HG003.pb.flye/assembly.fasta	1016676	1	999999	999999	999999	PASS
+Flye	HG004	ont	human_1k_smoke_test	data/reads/HG004.ont.1k.fastq.gz	results/assemblies/HG004.ont.flye/assembly.fasta	1016368	1	999696	999696	999696	PASS
+Flye	HG004	pb	human_1k_smoke_test	data/reads/HG004.pb.1k.fastq.gz	results/assemblies/HG004.pb.flye/assembly.fasta	1016676	1	999999	999999	999999	PASS
+GoldRush	HG002	pb	human_1k_smoke_test	data/reads/HG002.pb.1k.fastq.gz	results/smoke_test/goldrush/HG002.pb/assembly.fasta	15023	1	14896	14896	14896	PASS
+GoldRush	HG003	ont	human_1k_smoke_test	data/reads/HG003.ont.1k.fastq.gz	results/smoke_test/goldrush/HG003.ont/assembly.fasta	15101	1	15000	15000	15000	PASS
+GoldRush	HG003	pb	human_1k_smoke_test	data/reads/HG003.pb.1k.fastq.gz	results/smoke_test/goldrush/HG003.pb/assembly.fasta	20107	1	20000	20000	20000	PASS
+GoldRush	HG004	ont	human_1k_smoke_test	data/reads/HG004.ont.1k.fastq.gz	results/smoke_test/goldrush/HG004.ont/assembly.fasta	15101	1	15000	15000	15000	PASS
+GoldRush	HG004	pb	human_1k_smoke_test	data/reads/HG004.pb.1k.fastq.gz	results/smoke_test/goldrush/HG004.pb/assembly.fasta	20107	1	20000	20000	20000	PASS
+ntLink	HG002	pb	human_1k_smoke_test	data/reads/HG002.pb.1k.fastq.gz	results/smoke_test/ntlink/HG002.pb/assembly.fasta	15033	1	14896	14896	14896	PASS
+ntLink	HG003	ont	human_1k_smoke_test	data/reads/HG003.ont.1k.fastq.gz	results/smoke_test/ntlink/HG003.ont/assembly.fasta	15111	1	15000	15000	15000	PASS
+ntLink	HG003	pb	human_1k_smoke_test	data/reads/HG003.pb.1k.fastq.gz	results/smoke_test/ntlink/HG003.pb/assembly.fasta	20117	1	20000	20000	20000	PASS
+ntLink	HG004	ont	human_1k_smoke_test	data/reads/HG004.ont.1k.fastq.gz	results/smoke_test/ntlink/HG004.ont/assembly.fasta	15111	1	15000	15000	15000	PASS
+ntLink	HG004	pb	human_1k_smoke_test	data/reads/HG004.pb.1k.fastq.gz	results/smoke_test/ntlink/HG004.pb/assembly.fasta	20117	1	20000	20000	20000	PASS
+Verkko	E_coli	HiFi+ONT	official_ecoli_test		results/smoke_test/verkko/ecoli/assembly.fasta	4680509	3	4680458	4653186	4653186	PASS
+Flye	HG002	ont	human_1k_smoke_test	data/reads/HG002.ont.1k.fastq.gz	results/smoke_test_assemblies/HG002.ont.flye/assembly.fasta	1015140	1	998488	998488	998488	PASS

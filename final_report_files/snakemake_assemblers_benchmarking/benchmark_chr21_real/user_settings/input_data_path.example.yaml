@@ -1,0 +1,35 @@
+# ============================================================
+# INPUT DATA LOCATION
+# ============================================================
+#
+# This is the ONLY setting that normally needs to be changed
+# when running the chromosome 21 assembler benchmark on a
+# different computer or server.
+#
+# 1. Copy this file:
+#
+#      input_data_path.example.yaml
+#
+#    to:
+#
+#      input_data_path.local.yaml
+#
+# 2. Change ONLY the path after "input_root:".
+#
+# 3. Do NOT edit Snakefile.assemblers.
+#
+# The selected directory must contain:
+#
+# HG002/
+# HG003/
+# HG004/
+#
+# with the expected PacBio HiFi and ONT chromosome 21 FASTQs.
+#
+# Example:
+#
+# input_root: "/data/project/final_normalized"
+#
+# ============================================================
+
+input_root: "/path/to/final_normalized"

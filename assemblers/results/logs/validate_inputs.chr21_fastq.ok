@@ -1,0 +1,6 @@
+Assembler workflow validation passed.
+input_mode=chr21_fastq
+input_root=/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized
+samples=3
+datasets=6
+docker_images=nicolasardila1/lrs-flye2:2.9.6,nicolasardila1/lrs-goldrush:1.2.2,nicolasardila1/lrs-ntlink:1.3.11,nicolasardila1/lrs-verkko2:2.3.2

@@ -1,0 +1,6 @@
+SIX MATCHED CHROMOSOME-21 INPUTS READY
+Samples: HG002, HG003, HG004
+Technologies: HiFi, ONT
+Target coverage: 30x
+Summary: /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/results/tables/final_normalized_inputs.tsv
+STATUS: PASS

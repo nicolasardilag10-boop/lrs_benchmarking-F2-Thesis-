@@ -1,25 +1,25 @@
 panel	panel_description	sample	read_technology	aligner	memory_gb	memory_value_type	source_column
-A	Configured RAM limit	HG002	ONT and PacBio	minimap2	64.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG002	ONT and PacBio	pbmm2	64.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG002	ONT and PacBio	VACmap	48.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG002	ONT and PacBio	VG Giraffe	160.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG003	ONT and PacBio	minimap2	64.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG003	ONT and PacBio	pbmm2	64.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG003	ONT and PacBio	VACmap	48.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG003	ONT and PacBio	VG Giraffe	160.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG004	ONT and PacBio	minimap2	64.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG004	ONT and PacBio	pbmm2	64.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG004	ONT and PacBio	VACmap	48.0	Configured RAM limit	command_ram_limit_gb
-A	Configured RAM limit	HG004	ONT and PacBio	VG Giraffe	160.0	Configured RAM limit	command_ram_limit_gb
-B	Measured peak RSS — ONT	HG002	ONT	minimap2	37.653	Measured peak RSS	peak_ram_gb
-B	Measured peak RSS — ONT	HG002	ONT	pbmm2	67.138	Measured peak RSS	peak_ram_gb
-C	Measured peak RSS — PacBio HiFi	HG002	PacBio	minimap2	41.785	Measured peak RSS	peak_ram_gb
-C	Measured peak RSS — PacBio HiFi	HG002	PacBio	pbmm2	65.782	Measured peak RSS	peak_ram_gb
-B	Measured peak RSS — ONT	HG003	ONT	minimap2	36.486	Measured peak RSS	peak_ram_gb
-B	Measured peak RSS — ONT	HG003	ONT	pbmm2	62.66	Measured peak RSS	peak_ram_gb
-C	Measured peak RSS — PacBio HiFi	HG003	PacBio	minimap2	36.334	Measured peak RSS	peak_ram_gb
-C	Measured peak RSS — PacBio HiFi	HG003	PacBio	pbmm2	59.809	Measured peak RSS	peak_ram_gb
-B	Measured peak RSS — ONT	HG004	ONT	minimap2	38.123	Measured peak RSS	peak_ram_gb
-B	Measured peak RSS — ONT	HG004	ONT	pbmm2	63.992	Measured peak RSS	peak_ram_gb
-C	Measured peak RSS — PacBio HiFi	HG004	PacBio	minimap2	36.517	Measured peak RSS	peak_ram_gb
-C	Measured peak RSS — PacBio HiFi	HG004	PacBio	pbmm2	60.409	Measured peak RSS	peak_ram_gb
+a	Configured RAM limit	HG002	ONT and PacBio	minimap2	64.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG002	ONT and PacBio	pbmm2	64.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG002	ONT and PacBio	VACmap	48.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG002	ONT and PacBio	VG Giraffe	160.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG003	ONT and PacBio	minimap2	64.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG003	ONT and PacBio	pbmm2	64.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG003	ONT and PacBio	VACmap	48.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG003	ONT and PacBio	VG Giraffe	160.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG004	ONT and PacBio	minimap2	64.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG004	ONT and PacBio	pbmm2	64.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG004	ONT and PacBio	VACmap	48.0	Configured RAM limit	command_ram_limit_gb
+a	Configured RAM limit	HG004	ONT and PacBio	VG Giraffe	160.0	Configured RAM limit	command_ram_limit_gb
+b	Measured peak RSS — ONT	HG002	ONT	minimap2	37.653	Measured peak RSS	peak_ram_gb
+b	Measured peak RSS — ONT	HG002	ONT	pbmm2	67.138	Measured peak RSS	peak_ram_gb
+c	Measured peak RSS — PacBio HiFi	HG002	PacBio	minimap2	41.785	Measured peak RSS	peak_ram_gb
+c	Measured peak RSS — PacBio HiFi	HG002	PacBio	pbmm2	65.782	Measured peak RSS	peak_ram_gb
+b	Measured peak RSS — ONT	HG003	ONT	minimap2	36.486	Measured peak RSS	peak_ram_gb
+b	Measured peak RSS — ONT	HG003	ONT	pbmm2	62.66	Measured peak RSS	peak_ram_gb
+c	Measured peak RSS — PacBio HiFi	HG003	PacBio	minimap2	36.334	Measured peak RSS	peak_ram_gb
+c	Measured peak RSS — PacBio HiFi	HG003	PacBio	pbmm2	59.809	Measured peak RSS	peak_ram_gb
+b	Measured peak RSS — ONT	HG004	ONT	minimap2	38.123	Measured peak RSS	peak_ram_gb
+b	Measured peak RSS — ONT	HG004	ONT	pbmm2	63.992	Measured peak RSS	peak_ram_gb
+c	Measured peak RSS — PacBio HiFi	HG004	PacBio	minimap2	36.517	Measured peak RSS	peak_ram_gb
+c	Measured peak RSS — PacBio HiFi	HG004	PacBio	pbmm2	60.409	Measured peak RSS	peak_ram_gb

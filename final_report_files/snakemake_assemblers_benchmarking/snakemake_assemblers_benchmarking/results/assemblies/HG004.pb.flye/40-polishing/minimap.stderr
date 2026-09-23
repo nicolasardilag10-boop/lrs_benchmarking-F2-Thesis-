@@ -1,0 +1,11 @@
+[samfaipath] build FASTA index...
+[M::mm_idx_gen::0.029*0.97] collected minimizers
+[M::mm_idx_gen::0.041*1.49] sorted minimizers
+[M::main::0.041*1.49] loaded/built the index for 1 target sequence(s)
+[M::mm_mapopt_update::0.043*1.46] mid_occ = 50
+[M::mm_idx_stat] kmer size: 19; skip: 19; is_hpc: 0; #seq: 1
+[M::mm_idx_stat::0.045*1.45] distinct minimizers: 99988 (100.00% are singletons); average occurrences: 1.000; average spacing: 10.001; total length: 999999
+[M::worker_pipeline::0.289*1.06] mapped 1 sequences
+[M::main] Version: 2.24-r1155-dirty
+[M::main] CMD: flye-minimap2 -x map-hifi -t 4 -a -p 0.5 -N 10 --sam-hit-only -L -K 1G -z 1000 -Q --secondary-seq -I 64G /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/assemblies/HG004.pb.flye/40-polishing/filtered_contigs.fasta /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/assemblies/HG004.pb.flye/30-contigger/graph_final.fasta
+[M::main] Real time: 0.294 sec; CPU: 0.309 sec; Peak RSS: 0.024 GB

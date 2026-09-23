@@ -10,7 +10,7 @@ The assessment is intentionally separated from `assembly_analysis/`:
 ## Repository explorer
 
 <!-- AUTO_REPOSITORY_TREE_START -->
-Generated from Git-tracked files. Expand only the directory you need. On GitHub, press **`t`** for fast filename search.
+Generated from version-control candidates. Directories remain compact; use this module's curated sections for canonical files.
 
 - [`README.md`](README.md)
 - [`assembly_quality_busco.smk`](assembly_quality_busco.smk)

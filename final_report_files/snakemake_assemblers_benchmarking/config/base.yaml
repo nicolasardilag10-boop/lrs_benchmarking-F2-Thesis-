@@ -1,0 +1,89 @@
+# =============================================================================
+# COMMON ASSEMBLER WORKFLOW CONFIGURATION
+# =============================================================================
+# Settings shared by local testing and server execution.
+#
+# Machine-specific directories do NOT belong here.
+# See:
+#   config/local.yaml
+#   config/server.yaml
+# =============================================================================
+
+sample_sheet: "samples.tsv"
+
+# ---------------------------------------------------------------------------
+# Biological target
+# ---------------------------------------------------------------------------
+
+chromosome: "chr21"
+genome_size: 46709983
+min_mapq: 20
+target_coverage: 30
+target_bases: 1401299490
+
+
+# ---------------------------------------------------------------------------
+# Assemblers
+# ---------------------------------------------------------------------------
+
+active_assemblers:
+  - flye
+  - goldrush
+  - ntlink
+  - verkko
+
+# ---------------------------------------------------------------------------
+# Output locations
+# ---------------------------------------------------------------------------
+
+output_root: "results"
+chr21_output_dir: "results/chr21"
+
+# ---------------------------------------------------------------------------
+# Input naming conventions
+# ---------------------------------------------------------------------------
+#
+# samples.tsv contains ONLY:
+#
+# sample    technology
+#
+# It does NOT contain FASTQ paths.
+#
+# The workflow automatically combines:
+#
+# input_root + sample + technology + pattern
+#
+# Example:
+#
+# /data/chr21 + HG002 + ont
+#
+# becomes:
+#
+# /data/chr21/HG002.ont.30x.fastq.gz
+#
+# ---------------------------------------------------------------------------
+
+chr21_fastq_pattern: "{sample}/{sample}.{read_label}.chr21.primary.mapq20.30x.fastq.gz
+technology_filename_map:
+  pb:hifi
+  ont:ont
+
+
+# Default value retained for compatibility with existing rules.
+threads: 4
+
+
+# ---------------------------------------------------------------------------
+# Progress and logging
+# ---------------------------------------------------------------------------
+
+progress_dir: "results/progress"
+log_dir: "results/logs"
+
+# Version-pinned assembler containers.
+# These are workflow infrastructure and normally do not need to be changed.
+containers:
+  flye2: "nicolasardila1/lrs-flye2:2.9.6"
+  goldrush: "nicolasardila1/lrs-goldrush:1.2.2"
+  ntlink: "nicolasardila1/lrs-ntlink:1.3.11"
+  verkko2: "nicolasardila1/lrs-verkko2:2.3.2"

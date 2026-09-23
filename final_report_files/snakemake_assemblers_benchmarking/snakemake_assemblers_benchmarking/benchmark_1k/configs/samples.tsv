@@ -1,0 +1,7 @@
+sample	technology	fastq
+HG002	ont	benchmark_1k/inputs/reads/HG002.ont.1k.fastq.gz
+HG002	pb	benchmark_1k/inputs/reads/HG002.pb.1k.fastq.gz
+HG003	ont	benchmark_1k/inputs/reads/HG003.ont.1k.fastq.gz
+HG003	pb	benchmark_1k/inputs/reads/HG003.pb.1k.fastq.gz
+HG004	ont	benchmark_1k/inputs/reads/HG004.ont.1k.fastq.gz
+HG004	pb	benchmark_1k/inputs/reads/HG004.pb.1k.fastq.gz

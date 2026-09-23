@@ -1,0 +1,2 @@
+sample	technology	chromosome	chromosome_length	minimum_mapq	reads	total_read_bases	mean_read_length	median_read_length	read_n50	maximum_read_length	sequence_coverage	mapped_cigar_bases	mapped_cigar_coverage	target_coverage	bam	validation_status
+HG004	ont	chr21	46709983	20	160715	3633362095	22607.486	10098.000	52350	280153	77.785558	3386878728	72.508670	30.000000	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_extracted/HG004/HG004.ont.chr21.primary.mapq20.bam	PASS

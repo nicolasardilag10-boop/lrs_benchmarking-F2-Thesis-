@@ -1,0 +1,12 @@
+archive/migration_snapshots/20260821_114736/git_diff_cached_before.patch
+archive/unclassified/BASH.accidental_heredoc
+archive/unclassified/root_artifacts_20260821_114736/%1
+archive/unclassified/root_artifacts_20260821_114736/.tmp
+archive/unclassified/root_artifacts_20260821_114736/FETCH_HEAD
+archive/unclassified/root_artifacts_20260821_114736/Final_reports
+archive/unclassified/root_artifacts_20260821_114736/echo
+archive/unclassified/root_artifacts_20260821_114736/pbmm2
+container_validation/sniffles2/images.txt
+docs/variant_caller_validation/docs/docker_references_static_scan.txt
+docs/variant_caller_validation/docs/docker_status_note.md
+variant_caller_validation/docs/docker_references.txt

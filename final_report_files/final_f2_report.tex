@@ -1,0 +1,225 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Final report document for F2 Practicals
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[12pt, letterpaper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+
+\title{\textbf{F2 Practicals test}}
+\author{Nicolas Andres Ardila Gonzalez\thanks{Funded by the Overleaf team.}}
+\date{July 2026}
+
+\graphicspath{{images/}}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.75em}
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\begin{abstract}
+This document presents a short introduction to the practical exercises and the structure used in the final report.
+
+The abstract summarizes the key sections, including formatted text, figures, lists, mathematics, and tables.
+
+A clean layout helps make the content easier to read and the technical examples simpler to follow.
+\end{abstract}
+
+\newpage
+\tableofcontents
+
+\newpage
+
+%Introduction section
+\section{Introduction}
+
+Long-read sequencing has advanced through High Fidelity (HiFi) sequencing technology developed by Pacific Biosciences, producing read lengths of 10--25 kbp with an accuracy of 99.95\%. The most recent release from Oxford Nanopore Technologies is the R10 chemistry, which can achieve reads of up to 882 kbp and accuracy above 99\%. Its implementation has been relevant for resolving complex and large structural variants (SVs), repetitive regions, and human chromosomes from telomere to telomere~\cite{Chang2025}. Long reads are important because they can resolve repetitive and complex regions with sufficient accuracy to assemble, for instance, human chromosomes from telomere to telomere, and they are especially valuable for structural variant detection~\cite{Rausch2025}.
+
+Structural variants are significant types of DNA mutations larger than 50 bp. They are described as one of the most relevant causes of genetic variation and may contribute to disease-associated phenotypic characteristics, including cancer, infection, and response to treatment. Their detection requires high alignment accuracy to identify duplications, inversions, translocations, and complex clustered rearrangements. Inadequate detection may represent a genomic barrier to understanding genetic variation and the role of SVs in patient disease~\cite{Helal2024}~\cite{vacmap2025}~\cite{Sirén2025}. Long-read sequencing analysis is commonly used in genomic regions with tandem repeats, where SVs are predominantly observed and require high resolution. However, long reads face the challenge of high sequencing error rates due to their length~\cite{vacmap2025}. Therefore, the use of effective downstream aligners is important to address this detection issue.
+
+Sequence alignment is a critical step during downstream analysis in genomic research and clinical diagnostics. Its accuracy is required to ensure correct variant detection, genome assembly, personalized medicine, and comparative genomics. Historically, these tools have relied on a reference genome and performed subalignments using a seed-chain approach based on minimizers. This consists of seeds or matches of k-mers with the reference genome, which are selected co-linearly to form chains. These chains are then extended bidirectionally until significant differences between the reads and the reference sequence are found~\cite{vacmap2025}. Multiple types of genomic algorithms have been developed, but this study focuses mainly on minimizer-based aligners, graph aligners, and SV-aware aligners.
+
+%TYPES OF ALIGNERS
+Seed-and-chain aligners implement a co-linear chaining algorithm. Chain selection is performed through a primary chain selection process. A relevant method based on this approach is Minimap2, which implements a seed-chain-align strategy. In this strategy, minimizers are used as seeds to rapidly identify potential alignments, form chains, and finally fill the gaps using base-level alignment with algorithms such as Smith-Waterman-Gotoh~\cite{Liyanage2024}. One limitation of the reference genome approach is that it can generate multiple redundant subalignments, which require an additional step to categorize rearrangements. For example, an inversion requires multiple chain alignments to flank the affected regions~\cite{vacmap2025}. Another example is pbmm2, a wrapper around minimap2 that optimizes alignment parameters, generates sorted output files, and performs an additional post-processing step for PacBio reads~\cite{Wang2026}.
+
+Graph aligner algorithms initially align reads to partial order alignment (POA) graphs and then align them to acyclic graphs. Graph chaining algorithms generally use distance calculations obtained from a linear approach to the graph. Vacmap-Giraffe is an updated version in which long and short reads can be analyzed, and it uses a seed-chain-extend framework based on a new data structure for chaining distance calculations. It is considered one of the fastest graph or linear read mappers, with high accuracy and useful downstream variant calling performance and distingish structural variants . Although GraphAligner is a useful method, it is limited by slow processing due to the use of arbitrary graphs, whose complexity can increase substantially~\cite{Chang2025}~\cite{Sirén2025}.
+
+SV-aware aligners such as VACmap includes matches as quadruples called anchors that contain the start positions of the long read and reference sequence, the strand match, and the anchor length. It orders the end positions of the long read. Then, the non-linear chaining algorithm promotes extension of the chain to subsequent anchors that preserve a linear relationship with the preceding anchor. This enhances the connection with a positive score and penalizes extension to anchors that disrupt linearity by assigning a negative score. Thus, the optimal non-linear alignment is the chain with the highest aggregate score, corresponding to the longest path. To determine each linear subalignment, this non-linear alignment can be subdivided at a non-linear junction, eliminating the traditional necessity of post-alignment steps to reconstruct the rearrangement from a pool of error-prone independent subalignments~\cite{vacmap2025}.
+
+These different types of aligners may produce different variant-calling outcomes and performance profiles, including differences in sequencing quality, variant-calling performance, phasing performance, computational cost, F1 score, precision and recall, false discovery rate, false negative rate, and switch error rate~\cite{Wang2026}. Thus, the scope of this study was to implement a benchmark comparing performance using human genome samples obtained from the Genome in a Bottle website and the aligners minimap2, pbmm2, VG Giraffe, and VACmap.
+
+
+\section{Add images or figures}
+
+% The example figure is commented out because the image file is missing.
+%\begin{figure}[h]
+%    \centeringDing, H., Sedlazeck, F. J., Proukakis, C., Morley, C., Toffoli, M., Schapira, A. H., ... & Zhu, S. (2025). VACmap: an accurate long-read aligner for unraveling complex genomic rearrangements. Nature Communications, 16(1), 11198.
+%    \includegraphics[width=0.75\textwidth]{Paper journal logo.png}
+%    \caption{This is an example of figure}
+%    \label{fig:placeholder}
+%\end{figure}
+
+\section{Using lists}
+
+\begin{enumerate}
+    \item This is the first entry in our list.
+    \item The list numbers increase with each entry we add.
+\end{enumerate}
+
+\vspace{20pt}
+
+\section{Math Mode}
+
+In physics, the mass-energy equivalence is stated by the equation $E=mc^2$, discovered in 1895 by Albert Einstein.
+
+This is also typeset in inline math mode as $E=mc^2$ and display math mode as:
+\[
+E = mc^2
+\]
+
+In natural units ($c = 1$), the formula expresses the identity:
+\begin{equation}
+E = m
+\end{equation}
+
+Subscripts in math mode are written as $a_b$ and superscripts as $a^b$. These can be combined and nested to write expressions such as:
+\[
+T^{i_1 i_2 \dots i_p}_{j_1 j_2 \dots j_q} = T(x^{i_1}, \dots, x^{i_p}, e_{j_1}, \dots, e_{j_q})
+\]
+
+We write integrals using $\int$ and fractions using $\frac{a}{b}$:
+\[
+\int_0^1 \frac{dx}{e^x} = \frac{e-1}{e}
+\]
+
+Lower case Greek letters are written as $\omega$, $\delta$, etc., while upper case Greek letters are written as $\Omega$, $\Delta$.
+
+Mathematical operators are prefixed with a backslash, e.g. $\sin(\beta)$, $\cos(\alpha)$, $\log(x)$.
+
+\subsection{First example}
+
+The well-known Pythagorean theorem
+\[x^2 + y^2 = z^2\]
+was proved to be invalid for other exponents, meaning there are no integer solutions for $n > 2$ in:
+\[x^n + y^n = z^n\]
+
+\subsection{Second example}
+
+This is a simple math expression $\sqrt{x^2+1}$ inside text.
+
+\begin{displaymath}
+\sqrt{x^2+1}
+\end{displaymath}
+
+\begin{equation*}
+\sqrt{x^2+1}
+\end{equation*}
+
+\section{Basic document structure}
+
+Paragraphs are separated by leaving a blank line between them, instead of using manual line breaks. This keeps the text readable and the layout consistent.
+
+In normal text, use a blank line to start a new paragraph. Use line breaks such as \\\\ only for short explicit breaks within the same paragraph when needed.
+
+\section{Creating tables}
+
+\begin{center}
+\begin{tabular}{c c c}
+ cell1 & cell2 & cell3 \\
+ cell4 & cell5 & cell6 \\
+ cell7 & cell8 & cell9
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+ \hline
+ cell1 & cell2 & cell3 \\
+ cell4 & cell5 & cell6 \\
+ cell7 & cell8 & cell9 \\
+ \hline
+\end{tabular}
+\end{center}
+
+% Create a table with cleaner formatting
+\begin{center}
+ \begin{tabular}{cccc}
+ \toprule
+ Col1 & Col2 & Col3 & Col4 \\
+ \midrule
+ 1 & 6 & 87837 & 787 \\
+ 2 & 7 & 78 & 5415 \\
+ 3 & 545 & 778 & 7507 \\
+ 4 & 545 & 18744 & 7560 \\
+ 5 & 88 & 788 & 6344 \\
+ \bottomrule
+\end{tabular}
+\end{center}
+
+Table \ref{table:data} shows how to add a table caption and reference a table.
+\begin{table}[h!]
+\centering
+\begin{tabular}{cccc}
+ \toprule
+ Col1 & Col2 & Col3 & Col4 \\
+ \midrule
+ 1 & 6 & 87837 & 787 \\
+ 2 & 7 & 78 & 5415 \\
+ 3 & 545 & 778 & 7507 \\
+ 4 & 545 & 18744 & 7560 \\
+ 5 & 88 & 788 & 6344 \\
+ \bottomrule
+\end{tabular}
+\caption{Table to test captions and labels.}
+\label{table:data}
+\end{table}
+
+\section*{References}
+\begin{thebibliography}{9}
+\bibitem{latexcompanion}
+Michel Goossens, Frank Mittelbach, and Alexander Samarin.
+\textit{The \LaTeX{} Companion}.
+Addison-Wesley, 1993.
+
+\bibitem{vacmap2025}
+H. Ding, F. J. Sedlazeck, C. Proukakis, C. Morley, M. Toffoli, A. H. Schapira, S. Zhu.
+"VACmap: an accurate long-read aligner for unraveling complex genomic rearrangements." \textit{Nature Communications}, 16(1), 11198, 2025.
+
+\bibitem{Liyanage2024}
+K. Liyanage.
+"Acceleration of DNA Sequence Alignment Tools Using Hardware-Software Co-Design." Doctoral dissertation, University of New South Wales, 2024.
+
+\bibitem{Chang2025}
+X. Chang, A. M. Novak, J. M. Eizenga, J. Sir\'en, J. Monlong, S. Negi, ... Human Pangenome Reference Consortium.
+"Rapid, accurate long- and short-read mapping to large pangenome graphs with vg Giraffe." bioRxiv, 2025-09.
+
+\bibitem{Rausch2025}
+Rausch, T., Marschall, T., \& Korbel, J. O. (2025). The impact of long-read sequencing on human population-scale genomics. Genome research, 35(4), 593-598.
+
+\bibitem{Wang2026}
+Wang, J., \& Robinson, M. D. (2026). Systematic benchmarking of small variant calling pipelines for long-read RNA sequencing data. bioRxiv, 2026-04.
+
+
+\bibitem{Helal2024}
+Helal, A. A., Saad, B. T., Saad, M. T., Mosaad, G. S., \& Aboshanab, K. M. (2024). Benchmarking long-read aligners and SV callers for structural variation detection in Oxford nanopore sequencing data. Scientific Reports, 14(1), 6160.
+
+\bibitem{Mahmoud2025}
+Mahmoud, M., Agustinho, D. P., \& Sedlazeck, F. J. (2025). A Hitchhiker's Guide to long-read genomic analysis. Genome research, 35(4), 545-558.
+
+\bibitem{Sirén2025}
+Sirén, J., Monlong, J., Chang, X., Novak, A. M., Eizenga, J. M., Markello, C., ... & Paten, B. (2021). Pangenomics enables genotyping of known structural variants in 5202 diverse genomes. Science, 374(6574), abg8871.
+
+\end{thebibliography}
+
+
+\end{document}

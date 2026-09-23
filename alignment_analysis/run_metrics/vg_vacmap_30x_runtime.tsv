@@ -1,0 +1,13 @@
+sample	technology	aligner	runtime_hms	runtime_seconds	runtime_hours	source_log
+HG002	ONT	VACmap	13:55:16	50116	13.921111111111111	alignment_analysis/logs/logs_VG_VACmap/HG002.ont.30x.hg38.vacmap-ont.map_sort.log
+HG003	ONT	VACmap	13:53:52	50032	13.897777777777778	alignment_analysis/logs/logs_VG_VACmap/HG003.ont.30x.hg38.vacmap-ont.map_sort.log
+HG004	ONT	VACmap	13:24:47	48287	13.413055555555555	alignment_analysis/logs/logs_VG_VACmap/HG004.ont.30x.hg38.vacmap-ont.map_sort.log
+HG002	ONT	VG Giraffe	03:26:23	12383	3.439722222222222	alignment_analysis/logs/logs_VG_VACmap/HG002.ont.30x.hg38.vg-ont.map_sort.log
+HG003	ONT	VG Giraffe	04:27:38	16058	4.460555555555556	alignment_analysis/logs/logs_VG_VACmap/HG003.ont.30x.hg38.vg-ont.map_sort.log
+HG004	ONT	VG Giraffe	04:48:21	17301	4.805833333333333	alignment_analysis/logs/logs_VG_VACmap/HG004.ont.30x.hg38.vg-ont.map_sort.log
+HG002	PacBio HiFi	VACmap	09:30:57	34257	9.515833333333331	alignment_analysis/logs/logs_VG_VACmap/HG002.pb.30x.hg38.vacmap-pb.map_sort.log
+HG003	PacBio HiFi	VACmap	09:11:59	33119	9.199722222222222	alignment_analysis/logs/logs_VG_VACmap/HG003.pb.30x.hg38.vacmap-pb.map_sort.log
+HG004	PacBio HiFi	VACmap	08:55:37	32137	8.926944444444445	alignment_analysis/logs/logs_VG_VACmap/HG004.pb.30x.hg38.vacmap-pb.map_sort.log
+HG002	PacBio HiFi	VG Giraffe	03:48:05	13685	3.801388888888889	alignment_analysis/logs/logs_VG_VACmap/HG002.pb.30x.hg38.vg-pb.map_sort.log
+HG003	PacBio HiFi	VG Giraffe	03:36:24	12984	3.6066666666666665	alignment_analysis/logs/logs_VG_VACmap/HG003.pb.30x.hg38.vg-pb.map_sort.log
+HG004	PacBio HiFi	VG Giraffe	03:22:11	12131	3.3697222222222223	alignment_analysis/logs/logs_VG_VACmap/HG004.pb.30x.hg38.vg-pb.map_sort.log

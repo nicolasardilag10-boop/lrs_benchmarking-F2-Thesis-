@@ -1,0 +1,7 @@
+sample	technology	fastq
+SIM01	ont	benchmark_chr21_simulated/inputs/reads/SIM01.ont.fastq.gz
+SIM01	pb	benchmark_chr21_simulated/inputs/reads/SIM01.pb.fastq.gz
+SIM02	ont	benchmark_chr21_simulated/inputs/reads/SIM02.ont.fastq.gz
+SIM02	pb	benchmark_chr21_simulated/inputs/reads/SIM02.pb.fastq.gz
+SIM03	ont	benchmark_chr21_simulated/inputs/reads/SIM03.ont.fastq.gz
+SIM03	pb	benchmark_chr21_simulated/inputs/reads/SIM03.pb.fastq.gz

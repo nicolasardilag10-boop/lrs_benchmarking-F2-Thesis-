@@ -1,0 +1,238 @@
+                                   F2 Practicals test
+
+                             Nicolas Andres Ardila Gonzalez∗
+
+                                        July 2026
+
+
+
+
+∗
+    Funded by the Overleaf team.
+
+
+                                            1
+                                      Abstract
+
+    This document presents a short introduction to the practical exercises and the
+structure used in the final report.
+    The abstract summarizes the key sections, including formatted text, figures, lists,
+mathematics, and tables.
+    A clean layout helps make the content easier to read and the technical examples
+simpler to follow.
+
+
+
+
+                                          2
+Contents
+
+1 Introduction                                                                                4
+
+2 Add images or figures                                                                       5
+
+3 Using lists                                                                                 5
+
+4 Math Mode                                                                                   5
+  4.1   First example . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   6
+  4.2   Second example . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    6
+
+5 Basic document structure                                                                    6
+
+6 Creating tables                                                                             7
+
+
+
+
+                                               3
+1    Introduction
+
+Long Reads has developed the High Fidelity (HiFi) reads from Pacific Biosciences with lengths
+from 10-25 kbp with an accuracy of 99.95%. The most recent released is the R10 Chemistry
+of Oxford Nanopore Technologies where 882kpbs and accuracy over 99% is achieved. This
+allow them to be useful to resolve complex and large structural variants [4].
+Sequence alignment is a critical step during downstream analysis in genomic research and
+clinical diagnostics. Its accuracy is required to guarantee adequate variant detection, genome
+assembly, personalized medicine, and comparative genomics [2].
+Minimap implements a seed-chain-align approach, where minimizers are used as seeds to
+recognize potential alignments quickly [3]
+Sequence alignment is a critical step during the downstream analysis in genomic research
+clinical diagnostics. Its accuracy is require to guarantee adequate variant detection, genome
+assembly, personalized medicine and comparative genomics [3]
+Structural variants are alterations >50 bp described to be one of the most effect drivers in
+genetic variation. Their detection require high alignment accuracy to identify duplications,
+inversions, translocations and complex cluster rearrangements. Their inadequate detection
+might represent a genomic barrier into understanding genetic variation and their role in the
+patient diseases [2].
+VACmap has a main differences with the reference and read sequences due to it heavily
+penalize splits when searching for chains causing that in complex SV as duplication, inversion,
+translocations or cluster combinations to being not considered [2].
+Vacmap on the other hand include the matches as quadruple called anchors, where start
+position of long read and references sequences, strand match and anchors length are included.
+They order the end positions of long read. Then the non linear chaining algorithm promotes
+extension of the chain to subsequent anchors which preserved linear relationship with the
+proceding anchor, enhance connection with a positive score. It penalize extension to anchors
+which disrupt linearity by assesing negative score to such conections. So the optimal non/linear
+alignment ist the chain with the highest aggregate score (the longest path). To determine
+each linear subalignet this non/linear alignment can be subdived to a non-linear junction,
+eliminating the traditional neccesity of post alingment steps to reconstruct the rearrangament
+from a poll of error prone independent subalignments [2].
+Implementation of long/read sequencing analysis are commonly implemented specially in the
+genome regions with tandem repeats where SV are predominantly observed. However long
+reads, has the challenge has high sequencing errors due to their length [2].
+In the past it was implemented always algorithm with a reference genome where subalignments
+are doing using a see-chain-approach call as minimizers. This consist on seeds or matches of
+k-mers with the genome reference, which are co-linear selected to form chains, then those are
+extenden bidirectionally until finding significant differences from the reads and the reference
+
+
+                                               4
+sequence [2].
+Commonly the reference genome approach is not adequate due to the multiple redundant
+subalignment which require additional step to categorize and inversion (it requires multiple
+chain alignment to flank the regions) [2].
+Minimizer implement a co-linear chaining algorithm. Where chain selection is done by the
+primary chain selection. It first initialize with a empty set Q and chaining scores. If it is
+overlapped with shorter chain in Q by 50
+Algorithms such us YAHA and NGMLR works similarly with a graph aligner approach where
+subalignments combinations are use to determine the optimal joint score. However, they fail
+specially with inversion, translocation and duplication. They commonly misaligned insertion
+due to it use a linear alignment algorithm which selectively decide for single continuos
+alignment and treat duplication, commonly require two spliting reads, as insertion. Inversions
+and translocations are commonly misaligned and penalized and thus avoided [2].
+Some of the greatest discoveries in science were made by accident.
+
+
+
+2     Add images or figures
+
+3     Using lists
+    1. This is the first entry in our list.
+
+    2. The list numbers increase with each entry we add.
+
+
+
+
+4     Math Mode
+
+In physics, the mass-energy equivalence is stated by the equation E = mc2 , discovered in
+1895 by Albert Einstein.
+This is also typeset in inline math mode as E = mc2 and display math mode as:
+
+                                              E = mc2
+
+In natural units (c = 1), the formula expresses the identity:
+
+                                              E=m                                          (1)
+
+
+
+                                                 5
+Subscripts in math mode are written as ab and superscripts as ab . These can be combined
+and nested to write expressions such as:
+                                 i i ...i
+                               Tj11j22...jqp = T (xi1 , . . . , xip , ej1 , . . . , ejq )
+
+                               and fractions using ab :
+                           R
+We write integrals using
+                                          Z 1
+                                              dx     e−1
+                                               x
+                                                 =
+                                           0 e          e
+
+Lower case Greek letters are written as ω, δ, etc., while upper case Greek letters are written
+as Ω, ∆.
+Mathematical operators are prefixed with a backslash, e.g. sin(β), cos(α), log(x).
+
+
+4.1    First example
+
+The well-known Pythagorean theorem
+                                                  x2 + y 2 = z 2
+was proved to be invalid for other exponents, meaning there are no integer solutions for n > 2
+in:
+                                        xn + y n = z n
+
+
+4.2    Second example
+                                        √
+This is a simple math expression            x2 + 1 inside text.
+
+                                                     √
+                                                         x2 + 1
+
+                                                     √
+                                                         x2 + 1
+
+
+
+5     Basic document structure
+
+Paragraphs are separated by leaving a blank line between them, instead of using manual line
+breaks. This keeps the text readable and the layout consistent.
+In normal text, use a blank line to start a new paragraph. Use line breaks such as
+
+only for short explicit breaks within the same paragraph when needed.
+
+                                                           6
+6    Creating tables
+
+                                     cell1    cell2   cell3
+                                     cell4    cell5   cell6
+                                     cell7    cell8   cell9
+
+
+                                     cell1    cell2 cell3
+                                     cell4    cell5 cell6
+                                     cell7    cell8 cell9
+
+
+                                Col1    Col2       Col3    Col4
+                                 1       6         87837    787
+                                 2       7           78    5415
+                                 3      545         778    7507
+                                 4      545        18744   7560
+                                 5       88         788    6344
+
+
+Table 1 shows how to add a table caption and reference a table.
+
+                                Col1    Col2       Col3    Col4
+                                 1       6         87837    787
+                                 2       7           78    5415
+                                 3      545         778    7507
+                                 4      545        18744   7560
+                                 5       88         788    6344
+
+                        Table 1: Table to test captions and labels.
+
+
+
+
+References
+
+References
+[1] Michel Goossens, Frank Mittelbach, and Alexander Samarin. The LATEX Companion.
+    Addison-Wesley, 1993.
+
+[2] H. Ding, F. J. Sedlazeck, C. Proukakis, C. Morley, M. Toffoli, A. H. Schapira, S. Zhu.
+    "VACmap: an accurate long-read aligner for unraveling complex genomic rearrangements."
+    Nature Communications, 16(1), 11198, 2025.
+
+
+                                               7
+[3] K. Liyanage. "Acceleration of DNA Sequence Alignment Tools Using Hardware-Software
+    Co-Design." Doctoral dissertation, University of New South Wales, 2024.
+
+[4] X. Chang, A. M. Novak, J. M. Eizenga, J. Sirén, J. Monlong, S. Negi, ... Human
+    Pangenome Reference Consortium. "Rapid, accurate long- and short-read mapping to
+    large pangenome graphs with vg Giraffe." bioRxiv, 2025-09.
+
+
+
+
+                                          8
+

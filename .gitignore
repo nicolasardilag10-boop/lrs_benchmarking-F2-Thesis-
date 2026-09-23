@@ -159,6 +159,11 @@ archive/unclassified/
 /container_validation/
 /results/
 
+# Keep the generated-results guide versioned while ignoring result contents.
+!/results/
+/results/*
+!/results/README.md
+
 # LaTeX generated files
 final_report_files/*.aux
 final_report_files/*.bbl
@@ -166,6 +171,7 @@ final_report_files/*.fdb_latexmk
 final_report_files/*.fls
 final_report_files/*.out
 final_report_files/*.toc
+final_report_files/*.synctex.gz
 
 # Temporary aligner workflow artifacts
 final_report_files/snakemake_aligners_benchmarking/.dryrun_inputs/
@@ -177,3 +183,20 @@ final_report_files/snakemake_aligners_benchmarking/results/stats/
 final_report_files/snakemake_aligners_benchmarking/results/vacmap_diagnostic/
 final_report_files/snakemake_aligners_benchmarking/results/vacmap_diagnostic_20260806/
 final_report_files/snakemake_aligners_benchmarking/results/vacmap_manual_test/
+
+# Bulk pipeline outputs (path-independent; also covers the nested
+# final_report_files/snakemake_assemblers_benchmarking/snakemake_assemblers_benchmarking/ copy)
+**/.conda/
+archive/installers/
+**/work/
+**/0-correction/
+**/goldrush_intermediate_files/
+**/container_validation/
+**/validation_external/
+**/results/smoke_test*/
+*.pickle
+*.paf
+*.cnspack
+final_report_files/snakemake_aligners_benchmarking/results/audit/*.stats.txt
+archive/tutorials/
+docs/cleanup_audit/*/exact_duplicate_files.txt

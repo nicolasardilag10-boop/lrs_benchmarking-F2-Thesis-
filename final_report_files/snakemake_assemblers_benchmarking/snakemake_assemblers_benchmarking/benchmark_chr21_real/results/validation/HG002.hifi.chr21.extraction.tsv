@@ -1,0 +1,2 @@
+sample	technology	chromosome	filter	reads	total_read_bases	chromosome_length	estimated_input_coverage	mapped_cigar_bases	mapped_cigar_coverage	target_coverage	coverage_status	bam
+HG002	PacBio_HiFi	chr21	primary_MAPQ20	98959	1484117464	46709983	31.7730	1468970959	31.4488	30	READY_FOR_30X_DOWNSAMPLING	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/pacbio/HG002/HG002.hifi.chr21.primary.q20.bam

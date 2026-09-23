@@ -1,0 +1,25 @@
+sample	read_technology	aligner	configuration	runtime_configuration	runtime_matches_benchmark_configuration	wallclock_runtime_hours	wallclock_runtime_seconds	wallclock_runtime_hms	wallclock_runtime_source_log	threads
+HG002	ONT	minimap2	mm2-ont	mm2-ont	True	2.499085555555556	8996.708	02:29:57	mm2.run_metrics.tsv	64
+HG003	ONT	minimap2	mm2-ont	mm2-ont	True	2.538790555555556	9139.646	02:32:20	mm2.run_metrics.tsv	64
+HG004	ONT	minimap2	mm2-ont	mm2-ont	True	2.375456111111111	8551.642	02:22:32	mm2.run_metrics.tsv	64
+HG002	ONT	pbmm2	pbmm2-ont	pbmm2-ont	True	1.733333333333	6240.0	01:44:00	alignment_analysis/logs/Logs_files_pbmm2/HG002.ont.30x.hg38.pbmm2-ont.cram.log	64
+HG003	ONT	pbmm2	pbmm2-ont	pbmm2-ont	True	1.616666666667	5820.0	01:37:00	alignment_analysis/logs/Logs_files_pbmm2/HG003.ont.30x.hg38.pbmm2-ont.cram.log	64
+HG004	ONT	pbmm2	pbmm2-ont	pbmm2-ont	True	1.483333333333	5340.0	01:29:00	alignment_analysis/logs/Logs_files_pbmm2/HG004.ont.30x.hg38.pbmm2-ont.cram.log	64
+HG002	ONT	VACmap	vacmap-ont	vacmap-ont	True	13.921111111111111	50116.0	13:55:16	alignment_analysis/logs/logs_VG_VACmap/HG002.ont.30x.hg38.vacmap-ont.map_sort.log	16
+HG003	ONT	VACmap	vacmap-ont	vacmap-ont	True	13.897777777777778	50032.0	13:53:52	alignment_analysis/logs/logs_VG_VACmap/HG003.ont.30x.hg38.vacmap-ont.map_sort.log	16
+HG004	ONT	VACmap	vacmap-ont	vacmap-ont	True	13.413055555555555	48287.0	13:24:47	alignment_analysis/logs/logs_VG_VACmap/HG004.ont.30x.hg38.vacmap-ont.map_sort.log	16
+HG002	ONT	VG Giraffe	vg-ont	vg-ont	True	3.439722222222222	12383.0	03:26:23	alignment_analysis/logs/logs_VG_VACmap/HG002.ont.30x.hg38.vg-ont.map_sort.log	16
+HG003	ONT	VG Giraffe	vg-ont	vg-ont	True	4.460555555555556	16058.0	04:27:38	alignment_analysis/logs/logs_VG_VACmap/HG003.ont.30x.hg38.vg-ont.map_sort.log	16
+HG004	ONT	VG Giraffe	vg-ont	vg-ont	True	4.805833333333333	17301.0	04:48:21	alignment_analysis/logs/logs_VG_VACmap/HG004.ont.30x.hg38.vg-ont.map_sort.log	16
+HG002	PacBio	minimap2	mm2-pb	mm2-pb	True	1.1192869444444444	4029.433	01:07:09	mm2.run_metrics.tsv	64
+HG003	PacBio	minimap2	mm2-pb	mm2-ont	False	1.793497777778	6456.592	01:47:37	run_metrics/mm2.run_metrics.tsv	64
+HG004	PacBio	minimap2	mm2-pb	mm2-ont	False	1.751117222222	6304.022	01:45:04	run_metrics/mm2.run_metrics.tsv	64
+HG002	PacBio	pbmm2	pbmm2-pb	pbmm2-pb	True	1.433333333333	5160.0	01:26:00	alignment_analysis/logs/Logs_files_pbmm2/HG002.pb.30x.hg38.pbmm2-ont.cram.log	64
+HG003	PacBio	pbmm2	pbmm2-pb	pbmm2-pb	True	1.533333333333	5520.0	01:32:00	alignment_analysis/logs/Logs_files_pbmm2/HG003.pb.30x.hg38.pbmm2-pb.cram.log	64
+HG004	PacBio	pbmm2	pbmm2-pb	pbmm2-pb	True	1.383333333333	4980.0	01:23:00	alignment_analysis/logs/Logs_files_pbmm2/HG004.pb.30x.hg38.pbmm2-pb.cram.log	64
+HG002	PacBio	VACmap	vacmap-pb	vacmap-pb	True	9.515833333333331	34257.0	09:30:57	alignment_analysis/logs/logs_VG_VACmap/HG002.pb.30x.hg38.vacmap-pb.map_sort.log	16
+HG003	PacBio	VACmap	vacmap-pb	vacmap-pb	True	9.199722222222222	33119.0	09:11:59	alignment_analysis/logs/logs_VG_VACmap/HG003.pb.30x.hg38.vacmap-pb.map_sort.log	16
+HG004	PacBio	VACmap	vacmap-pb	vacmap-pb	True	8.926944444444445	32137.0	08:55:37	alignment_analysis/logs/logs_VG_VACmap/HG004.pb.30x.hg38.vacmap-pb.map_sort.log	16
+HG002	PacBio	VG Giraffe	vg-pb	vg-pb	True	3.801388888888889	13685.0	03:48:05	alignment_analysis/logs/logs_VG_VACmap/HG002.pb.30x.hg38.vg-pb.map_sort.log	16
+HG003	PacBio	VG Giraffe	vg-pb	vg-pb	True	3.6066666666666665	12984.0	03:36:24	alignment_analysis/logs/logs_VG_VACmap/HG003.pb.30x.hg38.vg-pb.map_sort.log	16
+HG004	PacBio	VG Giraffe	vg-pb	vg-pb	True	3.3697222222222223	12131.0	03:22:11	alignment_analysis/logs/logs_VG_VACmap/HG004.pb.30x.hg38.vg-pb.map_sort.log	16

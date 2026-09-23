@@ -1,0 +1,6 @@
+Building DAG of jobs...
+environment	container	location
+envs/ntlink.yaml		.snakemake/conda/fd6a9e2929f4f9664be92c40214bb0b3_
+envs/verkko.yaml		.snakemake/conda/214640c6bd7ea03aa1bd9afdf749c484_
+envs/flye.yaml		.snakemake/conda/fc65294765920755e60b8a362445088e_
+envs/goldrush.yaml		.snakemake/conda/b7e368898dd31c80dbf249ab343a5e82_

@@ -1,0 +1,8 @@
+EXTRACTED CHROMOSOME-21 BAM READY
+Sample: HG002
+Technology: ont
+Reads: 112127
+Sequence coverage: 49.707512x
+Read N50: 59568
+BAM: /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_extracted/HG002/HG002.ont.chr21.primary.mapq20.bam
+STATUS: PASS

@@ -1,0 +1,17 @@
+name: Repository tree documentation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify-repository-tree:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify README repository trees
+        run: python3 scripts/update_repository_tree.py --check

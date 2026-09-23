@@ -1,0 +1,1 @@
+warning[vg::giraffe]: Refusing to perform too-large tail alignment of 16297 bp against 24660 bp tree which would use more than 1572864 cells and might exhaust Dozeu's allocator; suppressing further warnings.

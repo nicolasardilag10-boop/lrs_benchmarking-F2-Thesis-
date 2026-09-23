@@ -1,0 +1,10 @@
+./cuteSV.hg38.smk
+./ilmn.snv_calling.clair3.smk
+./ont.snv_calling.clair3.smk
+./ont.snv_calling.deepvariant.smk
+./pb.snv_calling.clair3.smk
+./pb.snv_calling.deepvariant.smk
+./pbsv.hg38.smk
+./sawfish.hg38.smk
+./sniffles2.hg38.smk
+./wgs.snv_calling.deepvariant.smk

@@ -1,0 +1,133 @@
+=== PROJECT STATE ===
+Date: 2026-08-05T09:43:56+02:00
+Directory: /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking
+
+=== GIT COMMIT ===
+16a5f680b17a059e349f01af75e090dd0b239c04
+
+=== GIT STATUS ===
+ M "../../SV aligners call/configs/aligner_validation.yaml"
+ M ../snakemake_aligners_benchmarking/results/figures/final_alignment_error_rate.pdf
+ M ../snakemake_aligners_benchmarking/results/figures/final_alignment_error_rate.png
+ M ../snakemake_aligners_benchmarking/results/figures/mapped_bases.pdf
+ M ../snakemake_aligners_benchmarking/results/figures/mapped_bases_cigar.pdf
+ M ../snakemake_aligners_benchmarking/results/tables/alignment_summary.tsv
+ M ../snakemake_aligners_benchmarking/results/tables/paired_alignment_tests.tsv
+ M ../snakemake_aligners_benchmarking/results/tables/plot_arrays.npz
+ M ../snakemake_aligners_benchmarking/results/tables/plot_data_clean.tsv
+ M ../snakemake_aligners_benchmarking/results/tables/plot_data_pivot.tsv
+ M rules/common.smk
+ M rules/goldrush.smk
+ M rules/ntlink.smk
+ M rules/verkko.smk
+?? ../../%1
+?? ../../FETCH_HEAD
+?? ../../Final_reports
+?? "../../SV aligners call/CONSTITUTION_NICOLAS.backup_before_aligner_rules_20260730_151529.md"
+?? "../../SV aligners call/CONSTITUTION_NICOLAS.backup_before_sv_rules_20260730_143948.md"
+?? "../../SV aligners call/CONSTITUTION_NICOLAS.before_sv_caller_rules.md"
+?? "../../SV aligners call/results/"
+?? ../../alignment_analysis/test_alignment/
+?? ../../container_validation/
+?? ../../docs/variant_caller_inventory.tsv
+?? ../../docs/variant_caller_validation/
+?? ../../file.sh
+?? ../2$
+?? ../commands_latex_files.tex
+?? ../final_f2_report.aux
+?? ../final_f2_report.bbl
+?? ../final_f2_report.fdb_latexmk
+?? ../final_f2_report.fls
+?? ../final_f2_report.out
+?? ../final_f2_report.pdf
+?? ../final_f2_report.tex
+?? ../final_f2_report.toc
+?? ../out.txt
+?? ../out2.txt
+?? ../out4.txt
+?? ../snakemake-last-mile-tutorial/
+?? ../snakemake-tutorial/
+?? ../snakemake_aligners_benchmarking/audit_aligners_from_start.sh
+?? ../snakemake_aligners_benchmarking/config.before_deactivate_graph_aligners.yaml
+?? ../snakemake_aligners_benchmarking/config.before_vg_giraffe_20260801_114400.yaml
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml.backup_20260729_104518
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/config.dryrun.yaml.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/config.vg_test_working.yaml
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_103234
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_104518
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/config.yaml.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/dag.svg
+?? ../snakemake_aligners_benchmarking/data/
+?? ../snakemake_aligners_benchmarking/final_validation_snapshot/
+?? ../snakemake_aligners_benchmarking/results/audit/
+?? ../snakemake_aligners_benchmarking/results/provenance/
+?? ../snakemake_aligners_benchmarking/results/tables/alignment_summary.before_vg_error_fix.tsv
+?? ../snakemake_aligners_benchmarking/results/tables/alignment_summary.before_vg_na.tsv
+?? ../snakemake_aligners_benchmarking/rulegraph_aligners.svg
+?? ../snakemake_aligners_benchmarking/run_dryrun_only_test.sh
+?? ../snakemake_aligners_benchmarking/samples.tsv
+?? ../snakemake_aligners_benchmarking/samples.tsv.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/samples.tsv.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/setup_full_aligners_pipeline.sh
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_line58_fix.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_quality_name_cleanup.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_quality_report_fix.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_report_fix.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.before_validate_environment_backup.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.dryrun.smk
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_103234
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_104518
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_104630
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260729_104655
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_20260731_123513
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_37_jobs_20260731_124349
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_before_brace_fix_20260731_143344
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_before_pbmm2_fix_20260731_123557
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.backup_before_stage_checkpoints_20260731_143231
+?? ../snakemake_aligners_benchmarking/snakemake_aligners.smk.bak
+?? ../snakemake_aligners_benchmarking/tools/
+?? %1
+?? 1
+?? assembler_workflow_complete.txt
+?? backups/
+?? config.chr21.yaml
+?? config.real.yaml
+?? envs/goldrush.yaml
+?? envs/ntlink.yaml
+?? envs/verkko.yaml
+?? envs/verkko2.yaml
+?? prepare_chr21_reads.sh
+?? rules/common.smk.backup_before_env_path_fix_20260803_091412
+?? rules/common.smk.backup_env_fix_20260803_091443
+?? rules/common.smk.backup_env_paths_20260803_091238
+?? rules/goldrush.smk.backup_before_gzip_fix_20260805_090314
+?? rules/ntlink.smk.backup_before_gzip_fix_20260805_090315
+?? rules/ntlink.smk.backup_before_implementation_20260803_140610
+?? scripts/
+?? smoke_test/
+?? snakemake_assemblers.before_split_20260731_133203.smk
+?? ../../local_sv_validation/
+?? ../../scripts/
+?? ../../variant_caller_validation/
+?? ../../workflow/
+
+=== CONFIG ===
+sample_sheet: samples.tsv
+
+active_assemblers:
+  - flye
+
+genome_size: 3.1g
+threads: 4
+
+=== SAMPLE SHEET ===
+sample	technology	fastq
+HG002	ont	data/reads/HG002.ont.1k.fastq.gz
+HG002	pb	data/reads/HG002.pb.1k.fastq.gz
+HG003	ont	data/reads/HG003.ont.1k.fastq.gz
+HG003	pb	data/reads/HG003.pb.1k.fastq.gz
+HG004	ont	data/reads/HG004.ont.1k.fastq.gz
+HG004	pb	data/reads/HG004.pb.1k.fastq.gz

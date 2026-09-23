@@ -1,0 +1,10 @@
+Assembler: Verkko
+Verkko version: 2.3.2
+Test dataset: official E. coli HiFi 24x + ONT 50x
+Status: PASS
+Contigs: 3
+Total bases: 4680458
+Longest contig: 4653186
+N50: 4653186
+Assembly: results/smoke_test/verkko/ecoli/assembly.fasta
+Date: 2026-08-04T22:16:16+02:00

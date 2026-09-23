@@ -1,0 +1,10 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  - python=3.11
+  - snakemake-minimal=7.32.4
+  - verkko=2.3.2
+  - "networkx>=2.6,<3.6"

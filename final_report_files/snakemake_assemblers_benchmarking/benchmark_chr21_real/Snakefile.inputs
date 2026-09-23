@@ -1,0 +1,704 @@
+from __future__ import annotations
+
+import csv
+import math
+import os
+from pathlib import Path
+
+
+ROOT = "benchmark_chr21_real"
+
+SOURCE_MANIFEST = f"{ROOT}/config/sources.resolved.tsv"
+SOURCE_CHECKPOINT = (
+    f"{ROOT}/results/checkpoints/source/"
+    "all_sources_validated.ok"
+)
+
+WINDOW_SIZE = 1_000_000
+EXCLUDED_FLAGS = 2308
+
+
+ROWS = {}
+
+with open(SOURCE_MANIFEST, encoding="utf-8") as handle:
+    reader = csv.DictReader(handle, delimiter="\t")
+
+    for row in reader:
+        key = (
+            row["sample"],
+            row["technology"],
+        )
+
+        if row["source_validation"] != "PASS":
+            raise ValueError(
+                f"Source validation is not PASS for {key}"
+            )
+
+        ROWS[key] = row
+
+
+DATASETS = sorted(ROWS)
+
+DATASET_SAMPLES = [
+    sample
+    for sample, technology in DATASETS
+]
+
+DATASET_TECHNOLOGIES = [
+    technology
+    for sample, technology in DATASETS
+]
+
+
+WINDOW_IDS = {}
+WINDOW_COORDINATES = {}
+
+for sample, technology in DATASETS:
+    row = ROWS[(sample, technology)]
+    chromosome_length = int(row["chromosome_length"])
+    number_of_windows = math.ceil(
+        chromosome_length / WINDOW_SIZE
+    )
+
+    ids = []
+
+    for window_number in range(1, number_of_windows + 1):
+        window_id = f"{window_number:03d}"
+        start = (window_number - 1) * WINDOW_SIZE + 1
+        end = min(
+            window_number * WINDOW_SIZE,
+            chromosome_length,
+        )
+
+        ids.append(window_id)
+
+        WINDOW_COORDINATES[
+            (
+                sample,
+                technology,
+                window_id,
+            )
+        ] = (
+            start,
+            end,
+        )
+
+    WINDOW_IDS[(sample, technology)] = ids
+
+
+CHUNK_PATTERN = (
+    f"{ROOT}/work/final_inputs/"
+    "{sample}/{technology}/chunks/"
+    "window_{window}.bam"
+)
+
+EXTRACTED_BAM_PATTERN = (
+    f"{ROOT}/inputs/final_extracted/"
+    "{sample}/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.bam"
+)
+
+EXTRACTED_BAI_PATTERN = (
+    EXTRACTED_BAM_PATTERN + ".bai"
+)
+
+EXTRACTION_SUMMARY_PATTERN = (
+    f"{ROOT}/results/validation/final_extracted/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.tsv"
+)
+
+EXTRACTION_CHECKPOINT_PATTERN = (
+    f"{ROOT}/results/checkpoints/extraction/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.ok"
+)
+
+NORMALIZED_FASTQ_PATTERN = (
+    f"{ROOT}/inputs/final_normalized/"
+    "{sample}/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.30x.fastq.gz"
+)
+
+NORMALIZED_NAMES_PATTERN = (
+    f"{ROOT}/results/provenance/final_normalized/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.30x.names.txt"
+)
+
+NORMALIZATION_SUMMARY_PATTERN = (
+    f"{ROOT}/results/validation/final_normalized/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.30x.tsv"
+)
+
+NORMALIZATION_CHECKPOINT_PATTERN = (
+    f"{ROOT}/results/checkpoints/normalization/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.30x.ok"
+)
+
+NORMALIZATION_LOG_PATTERN = (
+    f"{ROOT}/results/logs/normalization/final/"
+    "{sample}.{technology}."
+    "chr21.primary.mapq20.30x.log"
+)
+
+
+def chunk_path(
+    sample: str,
+    technology: str,
+    window: str,
+) -> str:
+    return CHUNK_PATTERN.format(
+        sample=sample,
+        technology=technology,
+        window=window,
+    )
+
+
+def dataset_chunks(wildcards):
+    return [
+        chunk_path(
+            wildcards.sample,
+            wildcards.technology,
+            window_id,
+        )
+        for window_id
+        in WINDOW_IDS[
+            (
+                wildcards.sample,
+                wildcards.technology,
+            )
+        ]
+    ]
+
+
+ALL_EXTRACTION_CHECKPOINTS = [
+    (
+        f"{ROOT}/results/checkpoints/extraction/"
+        f"{sample}.{technology}.chr21.primary.mapq20.ok"
+    )
+    for sample, technology in DATASETS
+]
+
+ALL_EXTRACTION_SUMMARIES = [
+    (
+        f"{ROOT}/results/validation/final_extracted/"
+        f"{sample}.{technology}.chr21.primary.mapq20.tsv"
+    )
+    for sample, technology in DATASETS
+]
+
+ALL_NORMALIZATION_CHECKPOINTS = [
+    (
+        f"{ROOT}/results/checkpoints/normalization/"
+        f"{sample}.{technology}.chr21.primary.mapq20.30x.ok"
+    )
+    for sample, technology in DATASETS
+]
+
+ALL_NORMALIZATION_SUMMARIES = [
+    (
+        f"{ROOT}/results/validation/final_normalized/"
+        f"{sample}.{technology}.chr21.primary.mapq20.30x.tsv"
+    )
+    for sample, technology in DATASETS
+]
+
+
+rule all:
+    input:
+        f"{ROOT}/results/checkpoints/final_inputs_ready.ok",
+        f"{ROOT}/results/tables/final_normalized_inputs.tsv",
+
+
+rule extract_remote_window:
+    input:
+        source_checkpoint=SOURCE_CHECKPOINT,
+    output:
+        bam=CHUNK_PATTERN,
+    params:
+        bam_url=lambda wc: ROWS[
+            (wc.sample, wc.technology)
+        ]["source_bam_url"],
+        chromosome=lambda wc: ROWS[
+            (wc.sample, wc.technology)
+        ]["chromosome_name"],
+        start=lambda wc: WINDOW_COORDINATES[
+            (
+                wc.sample,
+                wc.technology,
+                wc.window,
+            )
+        ][0],
+        end=lambda wc: WINDOW_COORDINATES[
+            (
+                wc.sample,
+                wc.technology,
+                wc.window,
+            )
+        ][1],
+        region=lambda wc: (
+            f"{ROWS[(wc.sample, wc.technology)]['chromosome_name']}:"
+            f"{WINDOW_COORDINATES[(wc.sample, wc.technology, wc.window)][0]}-"
+            f"{WINDOW_COORDINATES[(wc.sample, wc.technology, wc.window)][1]}"
+        ),
+        minimum_mapq=lambda wc: int(
+            ROWS[(wc.sample, wc.technology)]["minimum_mapq"]
+        ),
+    resources:
+        remote_slots=1,
+    threads:
+        1
+    log:
+        f"{ROOT}/results/logs/extraction/final/"
+        "{sample}.{technology}."
+        "window_{window}.log"
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p \
+            "$(dirname '{output.bam}')" \
+            "$(dirname '{log}')"
+
+        temporary="{output.bam}.partial"
+
+        rm -f "$temporary"
+
+        trap 'rm -f "$temporary"' EXIT
+
+        samtools view \
+            -h \
+            '{params.bam_url}' \
+            '{params.region}' \
+            2> '{log}' \
+        | python3 \
+            benchmark_chr21_real/scripts/filter_sam_start_window.py \
+            '{params.chromosome}' \
+            '{params.start}' \
+            '{params.end}' \
+            '{EXCLUDED_FLAGS}' \
+            '{params.minimum_mapq}' \
+            2>> '{log}' \
+        | samtools view \
+            -b \
+            -o "$temporary" \
+            - \
+            2>> '{log}'
+
+        samtools quickcheck "$temporary"
+
+        (
+            echo "region={params.region}"
+            echo "records=$(samtools view -c "$temporary")"
+            echo "bytes=$(stat -c %s "$temporary")"
+            echo "STATUS=PASS"
+        ) >> '{log}'
+
+        mv "$temporary" '{output.bam}'
+
+        trap - EXIT
+        """
+
+
+rule merge_extracted_windows:
+    input:
+        chunks=dataset_chunks,
+    output:
+        bam=EXTRACTED_BAM_PATTERN,
+        bai=EXTRACTED_BAI_PATTERN,
+    threads:
+        2
+    log:
+        f"{ROOT}/results/logs/extraction/final/"
+        "{sample}.{technology}.merge.log"
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p \
+            "$(dirname '{output.bam}')" \
+            "$(dirname '{log}')"
+
+        temporary_bam="{output.bam}.partial"
+        temporary_bai="$temporary_bam.bai"
+
+        rm -f \
+            "$temporary_bam" \
+            "$temporary_bai"
+
+        trap \
+            'rm -f "$temporary_bam" "$temporary_bai"' \
+            EXIT
+
+        samtools merge \
+            -f \
+            -@ {threads} \
+            "$temporary_bam" \
+            {input.chunks:q} \
+            > '{log}' \
+            2>&1
+
+        samtools quickcheck "$temporary_bam"
+
+        samtools index \
+            -@ {threads} \
+            "$temporary_bam"
+
+        samtools idxstats \
+            "$temporary_bam" \
+            > /dev/null
+
+        (
+            echo "records=$(samtools view -c "$temporary_bam")"
+            echo "bytes=$(stat -c %s "$temporary_bam")"
+            echo "STATUS=PASS"
+        ) >> '{log}'
+
+        mv "$temporary_bam" '{output.bam}'
+        mv "$temporary_bai" '{output.bai}'
+
+        trap - EXIT
+        """
+
+
+rule validate_extracted_bam:
+    input:
+        bam=EXTRACTED_BAM_PATTERN,
+        bai=EXTRACTED_BAI_PATTERN,
+    output:
+        summary=EXTRACTION_SUMMARY_PATTERN,
+        checkpoint=EXTRACTION_CHECKPOINT_PATTERN,
+    params:
+        chromosome=lambda wc: ROWS[
+            (wc.sample, wc.technology)
+        ]["chromosome_name"],
+        chromosome_length=lambda wc: int(
+            ROWS[
+                (wc.sample, wc.technology)
+            ]["chromosome_length"]
+        ),
+        minimum_mapq=lambda wc: int(
+            ROWS[
+                (wc.sample, wc.technology)
+            ]["minimum_mapq"]
+        ),
+        target_coverage=lambda wc: float(
+            ROWS[
+                (wc.sample, wc.technology)
+            ]["target_coverage"]
+        ),
+    log:
+        f"{ROOT}/results/logs/extraction/final/"
+        "{sample}.{technology}.validation.log"
+    shell:
+        r"""
+        set -euo pipefail
+
+        mkdir -p \
+            "$(dirname '{output.summary}')" \
+            "$(dirname '{output.checkpoint}')" \
+            "$(dirname '{log}')"
+
+        python3 \
+            benchmark_chr21_real/scripts/validate_extracted_chr21_bam.py \
+            --bam '{input.bam}' \
+            --summary '{output.summary}' \
+            --checkpoint '{output.checkpoint}' \
+            --sample '{wildcards.sample}' \
+            --technology '{wildcards.technology}' \
+            --chromosome '{params.chromosome}' \
+            --chromosome-length '{params.chromosome_length}' \
+            --minimum-mapq '{params.minimum_mapq}' \
+            --target-coverage '{params.target_coverage}' \
+            > '{log}' \
+            2>&1
+        """
+
+
+rule normalize_dataset_to_30x:
+    input:
+        bam=EXTRACTED_BAM_PATTERN,
+        extraction_summary=EXTRACTION_SUMMARY_PATTERN,
+    output:
+        fastq=NORMALIZED_FASTQ_PATTERN,
+        names=NORMALIZED_NAMES_PATTERN,
+        summary=NORMALIZATION_SUMMARY_PATTERN,
+        checkpoint=NORMALIZATION_CHECKPOINT_PATTERN,
+        log=NORMALIZATION_LOG_PATTERN,
+    params:
+        chromosome=lambda wc: ROWS[
+            (wc.sample, wc.technology)
+        ]["chromosome_name"],
+        chromosome_length=lambda wc: int(
+            ROWS[
+                (wc.sample, wc.technology)
+            ]["chromosome_length"]
+        ),
+        target_coverage=lambda wc: float(
+            ROWS[
+                (wc.sample, wc.technology)
+            ]["target_coverage"]
+        ),
+        seed=lambda wc: int(
+            ROWS[
+                (wc.sample, wc.technology)
+            ]["seed"]
+        ),
+    shell:
+        r"""
+        set -euo pipefail
+
+        python3 \
+            benchmark_chr21_real/scripts/normalize_chr21_bam_to_coverage.py \
+            --input-bam '{input.bam}' \
+            --output-fastq '{output.fastq}' \
+            --selected-names '{output.names}' \
+            --summary '{output.summary}' \
+            --checkpoint '{output.checkpoint}' \
+            --log '{output.log}' \
+            --sample '{wildcards.sample}' \
+            --technology '{wildcards.technology}' \
+            --chromosome '{params.chromosome}' \
+            --chromosome-length '{params.chromosome_length}' \
+            --target-coverage '{params.target_coverage}' \
+            --seed '{params.seed}' \
+            --selection-policy primary_MAPQ20_source
+        """
+
+
+rule all_extractions_complete:
+    input:
+        summaries=ALL_EXTRACTION_SUMMARIES,
+    output:
+        f"{ROOT}/results/checkpoints/"
+        "all_final_extractions_complete.ok"
+    run:
+        Path(output[0]).parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        Path(output[0]).write_text(
+            "\n".join(
+                [
+                    "ALL FINAL EXTRACTIONS COMPLETE",
+                    f"Datasets: {len(input)}",
+                    "STATUS: PASS",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+
+rule final_normalized_summary:
+    input:
+        extraction_summaries=ALL_EXTRACTION_SUMMARIES,
+        normalization_summaries=ALL_NORMALIZATION_SUMMARIES,
+    output:
+        f"{ROOT}/results/tables/final_normalized_inputs.tsv"
+    run:
+        extraction_rows = {}
+
+        for filename in input.extraction_summaries:
+            with open(
+                filename,
+                encoding="utf-8",
+            ) as handle:
+                row = next(
+                    csv.DictReader(
+                        handle,
+                        delimiter="\t",
+                    )
+                )
+
+            key = (
+                row["sample"],
+                row["technology"],
+            )
+
+            extraction_rows[key] = row
+
+        output_rows = []
+
+        for filename in input.normalization_summaries:
+            with open(
+                filename,
+                encoding="utf-8",
+            ) as handle:
+                normalized = next(
+                    csv.DictReader(
+                        handle,
+                        delimiter="\t",
+                    )
+                )
+
+            key = (
+                normalized["sample"],
+                normalized["technology"],
+            )
+
+            extracted = extraction_rows[key]
+
+            output_rows.append(
+                {
+                    "sample": normalized["sample"],
+                    "technology": normalized["technology"],
+                    "chromosome": normalized["chromosome"],
+                    "minimum_mapq": extracted["minimum_mapq"],
+                    "extracted_reads": extracted["reads"],
+                    "extracted_read_bases": extracted[
+                        "total_read_bases"
+                    ],
+                    "extracted_coverage": extracted[
+                        "sequence_coverage"
+                    ],
+                    "extracted_read_n50": extracted["read_n50"],
+                    "target_coverage": normalized[
+                        "target_coverage"
+                    ],
+                    "normalized_reads": normalized[
+                        "selected_reads"
+                    ],
+                    "normalized_read_bases": normalized[
+                        "selected_read_bases"
+                    ],
+                    "normalized_coverage": normalized[
+                        "observed_sequence_coverage"
+                    ],
+                    "seed": normalized["seed"],
+                    "normalized_fastq": normalized[
+                        "output_fastq"
+                    ],
+                    "sha256": normalized[
+                        "output_fastq_sha256"
+                    ],
+                    "validation_status": normalized[
+                        "validation_status"
+                    ],
+                }
+            )
+
+        output_rows.sort(
+            key=lambda row: (
+                row["sample"],
+                row["technology"],
+            )
+        )
+
+        if len(output_rows) != 6:
+            raise ValueError(
+                f"Expected 6 final rows; found {len(output_rows)}"
+            )
+
+        for row in output_rows:
+            if row["validation_status"] != "PASS":
+                raise ValueError(
+                    f"Final validation failed: {row}"
+                )
+
+        fields = list(output_rows[0])
+
+        output_path = Path(output[0])
+        output_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        temporary = Path(str(output_path) + ".partial")
+
+        with temporary.open(
+            "w",
+            newline="",
+            encoding="utf-8",
+        ) as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=fields,
+                delimiter="\t",
+            )
+
+            writer.writeheader()
+            writer.writerows(output_rows)
+
+        temporary.replace(output_path)
+
+
+rule all_normalizations_complete:
+    input:
+        normalization_summaries=ALL_NORMALIZATION_SUMMARIES,
+        extraction_checkpoint=(
+            f"{ROOT}/results/checkpoints/"
+            "all_final_extractions_complete.ok"
+        ),
+        summary=(
+            f"{ROOT}/results/tables/"
+            "final_normalized_inputs.tsv"
+        ),
+    output:
+        f"{ROOT}/results/checkpoints/"
+        "all_final_normalizations_complete.ok"
+    run:
+        Path(output[0]).parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        Path(output[0]).write_text(
+            "\n".join(
+                [
+                    "ALL FINAL NORMALIZATIONS COMPLETE",
+                    f"Datasets: {len(input.normalization_summaries)}",
+                    f"Summary: {Path(input.summary).resolve()}",
+                    "STATUS: PASS",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+
+rule final_inputs_checkpoint:
+    input:
+        normalized=(
+            f"{ROOT}/results/checkpoints/"
+            "all_final_normalizations_complete.ok"
+        ),
+        summary=(
+            f"{ROOT}/results/tables/"
+            "final_normalized_inputs.tsv"
+        ),
+    output:
+        f"{ROOT}/results/checkpoints/"
+        "final_inputs_ready.ok"
+    run:
+        Path(output[0]).parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        Path(output[0]).write_text(
+            "\n".join(
+                [
+                    "SIX MATCHED CHROMOSOME-21 INPUTS READY",
+                    "Samples: HG002, HG003, HG004",
+                    "Technologies: HiFi, ONT",
+                    "Target coverage: 30x",
+                    f"Summary: {Path(input.summary).resolve()}",
+                    "STATUS: PASS",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+
+wildcard_constraints:
+    sample="HG00[234]",
+    technology="hifi|ont",
+    window="[0-9]{3}"

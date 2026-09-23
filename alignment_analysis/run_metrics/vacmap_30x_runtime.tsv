@@ -1,0 +1,7 @@
+sample	technology	aligner	runtime_hms	runtime_seconds	runtime_hours	source_log
+HG002	ONT	VACmap	12:35:45	45345	12.595833333333333	alignment_analysis/logs/logs_VG_VACmap/HG002.ont.30x.hg38.vacmap-ont.map_sort.log
+HG002	PacBio HiFi	VACmap	09:00:14	32414	9.00388888888889	alignment_analysis/logs/logs_VG_VACmap/HG002.pb.30x.hg38.vacmap-pb.map_sort.log
+HG003	ONT	VACmap	12:42:00	45720	12.7	alignment_analysis/logs/logs_VG_VACmap/HG003.ont.30x.hg38.vacmap-ont.map_sort.log
+HG003	PacBio HiFi	VACmap	08:42:19	31339	8.705277777777777	alignment_analysis/logs/logs_VG_VACmap/HG003.pb.30x.hg38.vacmap-pb.map_sort.log
+HG004	ONT	VACmap	12:15:16	44116	12.254444444444445	alignment_analysis/logs/logs_VG_VACmap/HG004.ont.30x.hg38.vacmap-ont.map_sort.log
+HG004	PacBio HiFi	VACmap	08:23:19	30199	8.38861111111111	alignment_analysis/logs/logs_VG_VACmap/HG004.pb.30x.hg38.vacmap-pb.map_sort.log

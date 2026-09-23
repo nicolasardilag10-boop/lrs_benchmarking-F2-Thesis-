@@ -1,0 +1,5 @@
+tool	image	digest
+flye2	nicolasardila1/lrs-flye2:2.9.6	sha256:eab7694e8e7060b8dfc7b7e2bfae6042d4271cdbc8f0a2afcfbaa0047526b7bf
+goldrush	nicolasardila1/lrs-goldrush:1.2.2	sha256:1748d54b0ed2990722e6d2ed8acbc7b6c2d9261ea121e4ea6a88f157f807cc00
+ntlink	nicolasardila1/lrs-ntlink:1.3.11	sha256:c080a9431cfee991d41191d1be2bf2ba2bbfcf82cb770bddd39f786e6d879987
+verkko2	nicolasardila1/lrs-verkko2:2.3.2	sha256:89cca9c08b1df408653d3109ee884e6f31f64bfaec761bff32268ea1cae780e8

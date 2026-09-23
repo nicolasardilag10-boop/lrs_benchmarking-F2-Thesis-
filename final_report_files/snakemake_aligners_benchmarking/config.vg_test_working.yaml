@@ -1,0 +1,15 @@
+sample_sheet: samples.tsv
+reference: data/reference/genome.fasta
+
+active_aligners:
+  - minimap2
+  - pbmm2
+  - vacmap
+  - vg_giraffe
+
+vacmap_bin: "conda run -n vacmap_env vacmap"
+
+vg_gbz: data/graph/graph.gbz
+vg_min: data/graph/graph.min
+vg_dist: data/graph/graph.dist
+vg_zipcodes: data/graph/graph.zipcodes

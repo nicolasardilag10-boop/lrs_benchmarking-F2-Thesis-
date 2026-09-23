@@ -19,43 +19,13 @@ variant_calling_analysis/
 ## Repository explorer
 
 <!-- AUTO_REPOSITORY_TREE_START -->
-Generated from Git-tracked files. Expand only the directory you need. On GitHub, press **`t`** for fast filename search.
+Generated from version-control candidates. Directories remain compact; use this module's curated sections for canonical files.
 
 - [`README.md`](README.md)
 
-<details>
-<summary><b>figures/</b> — 1 file</summary>
-
-- [`.gitkeep`](figures/.gitkeep)
-
-</details>
-
-<details>
-<summary><b>scripts/</b> — 2 files</summary>
-
-
-<details open>
-<summary><b>metrics/</b> — 1 file</summary>
-
-- [`.gitkeep`](scripts/metrics/.gitkeep)
-
-</details>
-
-<details open>
-<summary><b>plots/</b> — 1 file</summary>
-
-- [`.gitkeep`](scripts/plots/.gitkeep)
-
-</details>
-
-</details>
-
-<details>
-<summary><b>tables/</b> — 1 file</summary>
-
-- [`.gitkeep`](tables/.gitkeep)
-
-</details>
+- **figures/** — 1 file
+- **scripts/** — 2 files
+- **tables/** — 1 file
 
 <!-- AUTO_REPOSITORY_TREE_END -->
 

@@ -1,0 +1,7 @@
+sample_sheet: smoke_test/samples.verkko.tsv
+
+active_assemblers:
+  - verkko
+
+genome_size: 5m
+threads: 4

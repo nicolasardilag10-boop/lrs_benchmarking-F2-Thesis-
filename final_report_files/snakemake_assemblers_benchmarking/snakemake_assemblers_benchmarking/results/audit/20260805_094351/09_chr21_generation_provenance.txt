@@ -1,0 +1,14 @@
+=== SEARCHING FOR CHR21 DATA-GENERATION COMMANDS ===
+./smoke_test/scripts/generate_chr21_smoke_data.py:15:    / "chr21_1mb.fasta"
+./smoke_test/scripts/generate_chr21_smoke_data.py:22:    / "reads_chr21"
+./smoke_test/scripts/generate_chr21_smoke_data.py:159:        / f"{sample}.{technology}.chr21.smoke.fastq"
+./smoke_test/scripts/generate_chr21_diploid_smoke.py:13:    / "chr21_1mb.fasta"
+./smoke_test/scripts/generate_chr21_diploid_smoke.py:20:    / "reads_chr21"
+./smoke_test/scripts/generate_chr21_diploid_smoke.py:110:        / f"{sample}.{technology}.chr21.smoke.fastq"
+./smoke_test/samples.chr21.tsv:2:HG002	ont	smoke_test/data/reads_chr21/HG002.ont.chr21.smoke.fastq
+./smoke_test/samples.chr21.tsv:3:HG002	pb	smoke_test/data/reads_chr21/HG002.pb.chr21.smoke.fastq
+./smoke_test/samples.chr21.tsv:4:HG003	ont	smoke_test/data/reads_chr21/HG003.ont.chr21.smoke.fastq
+./smoke_test/samples.chr21.tsv:5:HG003	pb	smoke_test/data/reads_chr21/HG003.pb.chr21.smoke.fastq
+./smoke_test/samples.chr21.tsv:6:HG004	ont	smoke_test/data/reads_chr21/HG004.ont.chr21.smoke.fastq
+./smoke_test/samples.chr21.tsv:7:HG004	pb	smoke_test/data/reads_chr21/HG004.pb.chr21.smoke.fastq
+./prepare_chr21_reads.sh:10:OUTPUT_DIR="${PROJECT_DIR}/data/reads_chr21"

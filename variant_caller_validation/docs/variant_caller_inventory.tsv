@@ -1,0 +1,9 @@
+caller	variant_type	technology	snakefile	validation_goal
+Clair3	SNV/indel	ONT	ont.snv_calling.clair3.smk	dry-run
+Clair3	SNV/indel	PacBio HiFi	pb.snv_calling.clair3.smk	dry-run
+DeepVariant	SNV/indel	ONT	ont.snv_calling.deepvariant.smk	dry-run
+DeepVariant	SNV/indel	PacBio HiFi	pb.snv_calling.deepvariant.smk	dry-run
+Sniffles2	SV	ONT/PacBio	sniffles2.hg38.smk	dry-run
+cuteSV	SV	ONT/PacBio	cuteSV.hg38.smk	dry-run
+pbsv	SV	PacBio HiFi	pbsv.hg38.smk	dry-run
+Sawfish	SV	PacBio HiFi	sawfish.hg38.smk	dry-run

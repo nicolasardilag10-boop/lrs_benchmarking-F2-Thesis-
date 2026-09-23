@@ -1,0 +1,7 @@
+sample_sheet: samples.chr21.tsv
+
+active_assemblers:
+  - flye
+
+genome_size: 46709983
+threads: 4

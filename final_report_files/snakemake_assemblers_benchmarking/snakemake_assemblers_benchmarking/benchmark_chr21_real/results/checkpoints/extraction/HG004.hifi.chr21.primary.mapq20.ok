@@ -1,0 +1,8 @@
+EXTRACTED CHROMOSOME-21 BAM READY
+Sample: HG004
+Technology: hifi
+Reads: 88233
+Sequence coverage: 30.244438x
+Read N50: 16821
+BAM: /home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_extracted/HG004/HG004.hifi.chr21.primary.mapq20.bam
+STATUS: PASS

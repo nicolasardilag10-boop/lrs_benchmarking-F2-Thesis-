@@ -1,0 +1,239 @@
+=== ACTIVE HEAVY PROCESSES ===
+1506 /usr/bin/python3 /usr/bin/snakemake --snakefile Snakefile --cores 4 --use-conda --conda-frontend conda --dry-run --printshellcmds results/smoke_test/ntlink/HG00
+8111 /usr/bin/python3 /usr/bin/snakemake --snakefile benchmark_1k/Snakefile --cores 4 --use-conda --conda-frontend conda --rerun-incomplete --printshellcmds benchmark_1k/results/status/flye/HG002.ont.tsv
+
+=== LARGE HG FASTQ FILES, GREATER THAN 100 MB ===
+
+=== LARGE HG BAM OR CRAM FILES, GREATER THAN 100 MB ===
+
+=== HG READ SYMLINKS ===
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG004.ont/work/goldrush_intermediate_files/HG004_ont.fastq	->	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG004.ont/work/HG004_ont.fastq
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG002.ont/work/goldrush_intermediate_files/HG002_ont.fastq	->	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG002.ont/work/HG002_ont.fastq
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG002.pb/work/goldrush_intermediate_files/HG002_pb.fastq	->	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG002.pb/work/HG002_pb.fastq
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG003.pb/work/goldrush_intermediate_files/HG003_pb.fastq	->	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG003.pb/work/HG003_pb.fastq
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG004.pb/work/goldrush_intermediate_files/HG004_pb.fastq	->	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG004.pb/work/HG004_pb.fastq
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG003.ont/work/goldrush_intermediate_files/HG003_ont.fastq	->	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/results/smoke_test/goldrush/HG003.ont/work/HG003_ont.fastq
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/goldrush/HG002_ont/goldrush_intermediate_files/HG002_ont.fastq	->	/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/smoke_test/goldrush/HG002_ont/HG002_ont.fastq
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/data/reads/HG002.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG002.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/data/reads/HG003.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG003.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/data/reads/HG003.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG003.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/data/reads/HG002.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG002.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/data/reads/HG004.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG004.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/data/reads/HG004.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG004.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_1k/inputs/reads/HG002.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG002.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_1k/inputs/reads/HG003.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG003.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_1k/inputs/reads/HG003.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG003.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_1k/inputs/reads/HG002.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG002.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_1k/inputs/reads/HG004.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG004.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/benchmark_1k/inputs/reads/HG004.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG004.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_aligners_benchmarking/data/samples/HG002.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG002.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_aligners_benchmarking/data/samples/HG003.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG003.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_aligners_benchmarking/data/samples/HG003.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG003.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_aligners_benchmarking/data/samples/HG002.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG002.ont.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_aligners_benchmarking/data/samples/HG004.pb.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG004.pb.1k.fastq.gz
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_aligners_benchmarking/data/samples/HG004.ont.1k.fastq.gz	->	/home/nicolas/lrs_benchmarking/samples_try/HG004.ont.1k.fastq.gz
+
+=== HUMAN REFERENCE CANDIDATES ===
+3.0G	/home/nicolas/lrs_benchmarking/reference/GRCh38_GIABv3_no_alt_analysis_set_maskedGRC_decoys_MAP2K3_KMT2C_KCNJ18.fasta
+
+=== HG PATHS MENTIONED IN CONFIGURATION FILES ===
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:2:HG002	ont	mm2-ont	18601777
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:3:HG002	ont	mm2-pb	18396830
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:4:HG002	ont	pbmm2-ont	18183599
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:5:HG002	ont	pbmm2-pb	18079243
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:6:HG002	pb	mm2-ont	13502595
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:7:HG002	pb	mm2-pb	13462607
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:8:HG002	pb	pbmm2-ont	13386641
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:9:HG002	pb	pbmm2-pb	13387151
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:10:HG003	ont	mm2-ont	12492154
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:11:HG003	ont	mm2-pb	12367445
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:12:HG003	ont	pbmm2-ont	12202204
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:13:HG003	ont	pbmm2-pb	12115625
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:14:HG003	pb	mm2-ont	14048332
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:15:HG003	pb	mm2-pb	14032287
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:16:HG003	pb	pbmm2-ont	13932129
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:17:HG003	pb	pbmm2-pb	13886669
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:18:HG004	ont	mm2-ont	13436376
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:19:HG004	ont	mm2-pb	13294688
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:20:HG004	ont	pbmm2-ont	13082137
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:21:HG004	ont	pbmm2-pb	13030881
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:22:HG004	pb	mm2-ont	14380461
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:23:HG004	pb	mm2-pb	14362861
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:24:HG004	pb	pbmm2-ont	14273546
+/home/nicolas/lrs_benchmarking/alignment_analysis/figures/mapped_bases_cigar_reference_style_values.tsv:25:HG004	pb	pbmm2-pb	14251638
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-ccs.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-ccs.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-ccs.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-ccs.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-ccs.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.pbmm2-subread.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.pbmm2-subread.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.pbmm2-subread.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.pbmm2-subread.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.pbmm2-subread.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-ccs.idxstats.tsv:21:chr21	46709983	2	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-ccs.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-ccs.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-ccs.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-ccs.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-subread.idxstats.tsv:21:chr21	46709983	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-subread.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-subread.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-subread.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-subread.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.idxstats.tsv:21:chr21	46709983	11	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_pbmm2.tsv:2:HG002	ONT	HG002.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	18663418	18663418	18601777	99.6697	673855	0.03622530	3.6225			18663.00	315783	4266
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_pbmm2.tsv:3:HG002	PacBio	HG002.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13462607	99.9474	195885	0.01455030	1.4550			13470.00	32674	4345
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_pbmm2.tsv:4:HG003	ONT	HG003.ont.1k.samtools_stats.txt	1000	999	1	99.9000	12808634	12805799	12492154	97.5292	417741	0.03344027	3.3440			12809.00	74299	4452
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_pbmm2.tsv:5:HG003	PacBio	HG003.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	14032287	99.9977	271241	0.01932978	1.9330			14033.00	32907	4282
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_pbmm2.tsv:6:HG004	ONT	HG004.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	13605899	13605899	13436376	98.7540	548148	0.04079582	4.0796			13606.00	78490	4486
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_pbmm2.tsv:7:HG004	PacBio	HG004.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14362861	99.9437	292286	0.02035012	2.0350			14371.00	32998	4190
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:2:HG002	ONT	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG002.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	18663418	18663418	18601777	100.0000	673855	0.03622530	3.6225			18663.00	315783	4266
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:3:HG002	ONT	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG002.ont.1k.mm2-pb.samtools_stats.txt	1000	984	16	98.4000	18663418	18626025	18396830	99.7996	598298	0.03252180	3.2522			18663.00	315783	3961
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:4:HG002	ONT	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG002.ont.1k.pbmm2-subread.samtools_stats.txt	1000	998	2	99.8000	18663418	18639009	18183599	99.8692	577780	0.03177479	3.1775			18663.00	315783	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:5:HG002	ONT	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG002.ont.1k.pbmm2-ccs.samtools_stats.txt	1000	993	7	99.3000	18663418	18629459	18079243	99.8180	544757	0.03013163	3.0132			18663.00	315783	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:6:HG002	PacBio	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG002.pb.1k.mm2-ont.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13502595	100.0000	214725	0.01590250	1.5902			13470.00	32674	4562
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:7:HG002	PacBio	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG002.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13462607	100.0000	195885	0.01455030	1.4550			13470.00	32674	4345
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:8:HG002	PacBio	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG002.pb.1k.pbmm2-subread.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13386641	100.0000	188399	0.01407366	1.4074			13470.00	32674	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:9:HG002	PacBio	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG002.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0000	13469698	13469698	13387151	100.0000	171472	0.01280870	1.2809			13470.00	32674	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:10:HG003	ONT	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG003.ont.1k.samtools_stats.txt	1000	999	1	99.9000	12808634	12805799	12492154	99.9779	417741	0.03344027	3.3440			12809.00	74299	4452
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:11:HG003	ONT	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG003.ont.1k.mm2-pb.samtools_stats.txt	1000	923	77	92.3000	12808634	12793754	12367445	99.8838	368242	0.02977511	2.9775			12809.00	74299	4009
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:12:HG003	ONT	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG003.ont.1k.pbmm2-subread.samtools_stats.txt	1000	997	3	99.7000	12808634	12808043	12202204	99.9954	350172	0.02869744	2.8697			12809.00	74299	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:13:HG003	ONT	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG003.ont.1k.pbmm2-ccs.samtools_stats.txt	1000	990	10	99.0000	12808634	12805442	12115625	99.9751	328682	0.02712877	2.7129			12809.00	74299	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:14:HG003	PacBio	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG003.pb.1k.mm2-ont.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	14048332	100.0000	303323	0.02159139	2.1591			14033.00	32907	4513
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:15:HG003	PacBio	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG003.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	14032287	100.0000	271241	0.01932978	1.9330			14033.00	32907	4282
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:16:HG003	PacBio	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG003.pb.1k.pbmm2-subread.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	13932129	100.0000	235353	0.01689282	1.6893			14033.00	32907	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:17:HG003	PacBio	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG003.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0000	14032604	14032604	13886669	100.0000	210242	0.01513984	1.5140			14033.00	32907	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:18:HG004	ONT	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG004.ont.1k.samtools_stats.txt	1000	1000	0	100.0000	13605899	13605899	13436376	100.0000	548148	0.04079582	4.0796			13606.00	78490	4486
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:19:HG004	ONT	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG004.ont.1k.mm2-pb.samtools_stats.txt	1000	902	98	90.2000	13605899	13581569	13294688	99.8212	491898	0.03699959	3.7000			13606.00	78490	3949
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:20:HG004	ONT	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG004.ont.1k.pbmm2-subread.samtools_stats.txt	1000	992	8	99.2000	13605899	13603937	13082137	99.9856	454494	0.03474157	3.4742			13606.00	78490	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:21:HG004	ONT	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG004.ont.1k.pbmm2-ccs.samtools_stats.txt	1000	988	12	98.8000	13605899	13602008	13030881	99.9714	438494	0.03365037	3.3650			13606.00	78490	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:22:HG004	PacBio	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG004.pb.1k.mm2-ont.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14380461	100.0000	327386	0.02276603	2.2766			14371.00	32998	4425
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:23:HG004	PacBio	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG004.pb.1k.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14362861	100.0000	292286	0.02035012	2.0350			14371.00	32998	4190
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:24:HG004	PacBio	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG004.pb.1k.pbmm2-subread.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14273546	100.0000	273126	0.01913512	1.9135			14371.00	32998	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.tsv:25:HG004	PacBio	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG004.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0000	14370953	14370953	14251638	100.0000	247926	0.01739632	1.7396			14371.00	32998	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.mm2-pb.idxstats.tsv:21:chr21	46709983	4	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.mm2-pb.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.mm2-pb.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.mm2-pb.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.mm2-pb.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_length_summary.tsv:2:HG002.ont.1k.fastq.gz	HG002	ont	1000	18663418	18663.42	17570.50	29653	207	315783
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_length_summary.tsv:3:HG002.pb.1k.fastq.gz	HG002	pb	1000	13469698	13469.70	13989.00	16454	791	32674
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_length_summary.tsv:4:HG003.ont.1k.fastq.gz	HG003	ont	1000	12808634	12808.63	5426.50	31679	71	74299
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_length_summary.tsv:5:HG003.pb.1k.fastq.gz	HG003	pb	1000	14032604	14032.60	14611.50	16634	1663	32907
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_length_summary.tsv:6:HG004.ont.1k.fastq.gz	HG004	ont	1000	13605899	13605.90	5760.50	32458	51	78490
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_length_summary.tsv:7:HG004.pb.1k.fastq.gz	HG004	pb	1000	14370953	14370.95	14926.50	16858	1914	32998
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_quality_all.tsv:2:HG002.ont.1k.fastq.gz	1000	947	94.70	920	92.00
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_quality_all.tsv:3:HG002.pb.1k.fastq.gz	1000	1000	100.00	994	99.40
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_quality_all.tsv:4:HG003.ont.1k.fastq.gz	1000	969	96.90	923	92.30
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_quality_all.tsv:5:HG003.pb.1k.fastq.gz	1000	1000	100.00	997	99.70
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_quality_all.tsv:6:HG004.ont.1k.fastq.gz	1000	957	95.70	908	90.80
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_quality_all.tsv:7:HG004.pb.1k.fastq.gz	1000	1000	100.00	999	99.90
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.idxstats.tsv:21:chr21	46709983	3	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-ccs.idxstats.tsv:21:chr21	46709983	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-ccs.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-ccs.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-ccs.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.pbmm2-ccs.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.mm2-ont.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.mm2-ont.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.mm2-ont.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.mm2-ont.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.mm2-ont.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-subread.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-subread.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-subread.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-subread.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.ont.1k.pbmm2-subread.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_summary.tsv:2:HG002.ont.1k.fastq.gz	HG002	ont	1000	18663418	18663.42	17570.50	29653	207	315783	947	94.70	920	92.00
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_summary.tsv:3:HG002.pb.1k.fastq.gz	HG002	pb	1000	13469698	13469.70	13989.00	16454	791	32674	1000	100.00	994	99.40
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_summary.tsv:4:HG003.ont.1k.fastq.gz	HG003	ont	1000	12808634	12808.63	5426.50	31679	71	74299	969	96.90	923	92.30
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_summary.tsv:5:HG003.pb.1k.fastq.gz	HG003	pb	1000	14032604	14032.60	14611.50	16634	1663	32907	1000	100.00	997	99.70
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_summary.tsv:6:HG004.ont.1k.fastq.gz	HG004	ont	1000	13605899	13605.90	5760.50	32458	51	78490	957	95.70	908	90.80
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/fastq_summary.tsv:7:HG004.pb.1k.fastq.gz	HG004	pb	1000	14370953	14370.95	14926.50	16858	1914	32998	1000	100.00	999	99.90
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-subread.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-subread.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-subread.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-subread.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-subread.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.mm2-ont.idxstats.tsv:21:chr21	46709983	3	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.mm2-ont.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.mm2-ont.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.mm2-ont.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.mm2-ont.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.pbmm2-ccs.idxstats.tsv:21:chr21	46709983	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.pbmm2-ccs.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.pbmm2-ccs.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.pbmm2-ccs.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.pbmm2-ccs.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.mm2-pb.idxstats.tsv:21:chr21	46709983	3	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.mm2-pb.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.mm2-pb.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.mm2-pb.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.mm2-pb.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-subread.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-subread.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-subread.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-subread.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.pbmm2-subread.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.mm2-pb.idxstats.tsv:21:chr21	46709983	11	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.mm2-pb.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.mm2-pb.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.mm2-pb.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.ont.1k.mm2-pb.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.idxstats.tsv:21:chr21	46709983	4	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.pb.1k.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.idxstats.tsv:21:chr21	46709983	2	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.idxstats.tsv:21:chr21	46709983	5	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG003.ont.1k.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:2:HG002	ONT	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG002.ont.1k.samtools_stats.txt	1000	1000	0	100.0	18663418	18663418	18601777	100.0	673855	0.0362253	3.6225			18663.0	315783	4266
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:3:HG002	ONT	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG002.ont.1k.mm2-pb.samtools_stats.txt	1000	984	16	98.4	18663418	18626025	18396830	99.7996	598298	0.0325218	3.2522			18663.0	315783	3961
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:4:HG002	ONT	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG002.ont.1k.pbmm2-subread.samtools_stats.txt	1000	998	2	99.8	18663418	18639009	18183599	99.8692	577780	0.03177479	3.1775			18663.0	315783	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:5:HG002	ONT	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG002.ont.1k.pbmm2-ccs.samtools_stats.txt	1000	993	7	99.3	18663418	18629459	18079243	99.818	544757	0.03013163	3.0132			18663.0	315783	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:6:HG002	PacBio	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG002.pb.1k.mm2-ont.samtools_stats.txt	1000	1000	0	100.0	13469698	13469698	13502595	100.0	214725	0.0159025	1.5902			13470.0	32674	4562
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:7:HG002	PacBio	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG002.pb.1k.samtools_stats.txt	1000	1000	0	100.0	13469698	13469698	13462607	100.0	195885	0.0145503	1.455			13470.0	32674	4345
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:8:HG002	PacBio	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG002.pb.1k.pbmm2-subread.samtools_stats.txt	1000	1000	0	100.0	13469698	13469698	13386641	100.0	188399	0.01407366	1.4074			13470.0	32674	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:9:HG002	PacBio	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG002.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0	13469698	13469698	13387151	100.0	171472	0.0128087	1.2809			13470.0	32674	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:10:HG003	ONT	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG003.ont.1k.samtools_stats.txt	1000	999	1	99.9	12808634	12805799	12492154	99.9779	417741	0.03344027	3.344			12809.0	74299	4452
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:11:HG003	ONT	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG003.ont.1k.mm2-pb.samtools_stats.txt	1000	923	77	92.3	12808634	12793754	12367445	99.8838	368242	0.02977511	2.9775			12809.0	74299	4009
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:12:HG003	ONT	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG003.ont.1k.pbmm2-subread.samtools_stats.txt	1000	997	3	99.7	12808634	12808043	12202204	99.9954	350172	0.02869744	2.8697			12809.0	74299	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:13:HG003	ONT	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG003.ont.1k.pbmm2-ccs.samtools_stats.txt	1000	990	10	99.0	12808634	12805442	12115625	99.9751	328682	0.02712877	2.7129			12809.0	74299	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:14:HG003	PacBio	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG003.pb.1k.mm2-ont.samtools_stats.txt	1000	1000	0	100.0	14032604	14032604	14048332	100.0	303323	0.02159139	2.1591			14033.0	32907	4513
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:15:HG003	PacBio	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG003.pb.1k.samtools_stats.txt	1000	1000	0	100.0	14032604	14032604	14032287	100.0	271241	0.01932978	1.933			14033.0	32907	4282
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:16:HG003	PacBio	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG003.pb.1k.pbmm2-subread.samtools_stats.txt	1000	1000	0	100.0	14032604	14032604	13932129	100.0	235353	0.01689282	1.6893			14033.0	32907	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:17:HG003	PacBio	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG003.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0	14032604	14032604	13886669	100.0	210242	0.01513984	1.514			14033.0	32907	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:18:HG004	ONT	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG004.ont.1k.samtools_stats.txt	1000	1000	0	100.0	13605899	13605899	13436376	100.0	548148	0.04079582	4.0796			13606.0	78490	4486
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:19:HG004	ONT	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG004.ont.1k.mm2-pb.samtools_stats.txt	1000	902	98	90.2	13605899	13581569	13294688	99.8212	491898	0.03699959	3.7			13606.0	78490	3949
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:20:HG004	ONT	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG004.ont.1k.pbmm2-subread.samtools_stats.txt	1000	992	8	99.2	13605899	13603937	13082137	99.9856	454494	0.03474157	3.4742			13606.0	78490	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:21:HG004	ONT	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG004.ont.1k.pbmm2-ccs.samtools_stats.txt	1000	988	12	98.8	13605899	13602008	13030881	99.9714	438494	0.03365037	3.365			13606.0	78490	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:22:HG004	PacBio	minimap2	map-ont	mm2-ont	alignment_analysis/tables/HG004.pb.1k.mm2-ont.samtools_stats.txt	1000	1000	0	100.0	14370953	14370953	14380461	100.0	327386	0.02276603	2.2766			14371.0	32998	4425
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:23:HG004	PacBio	minimap2	map-hifi	mm2-pb	alignment_analysis/tables/HG004.pb.1k.samtools_stats.txt	1000	1000	0	100.0	14370953	14370953	14362861	100.0	292286	0.02035012	2.035			14371.0	32998	4190
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:24:HG004	PacBio	pbmm2	SUBREAD	pbmm2-ont	alignment_analysis/tables/HG004.pb.1k.pbmm2-subread.samtools_stats.txt	1000	1000	0	100.0	14370953	14370953	14273546	100.0	273126	0.01913512	1.9135			14371.0	32998	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/alignment_summary.before_metric_path_fix.20260707_151417.tsv:25:HG004	PacBio	pbmm2	CCS/HIFI	pbmm2-pb	alignment_analysis/tables/HG004.pb.1k.pbmm2-ccs.samtools_stats.txt	1000	1000	0	100.0	14370953	14370953	14251638	100.0	247926	0.01739632	1.7396			14371.0	32998	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG002.pb.1k.idxstats.tsv:214:KMT2C_chr21_8649510_8682182	32672	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-ccs.idxstats.tsv:21:chr21	46709983	1	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-ccs.idxstats.tsv:198:KMT2C_chr21_7687010_7731520	44510	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-ccs.idxstats.tsv:212:KMT2C_chr21_7659652_7674726	15074	0	0
+/home/nicolas/lrs_benchmarking/alignment_analysis/tables/HG004.pb.1k.pbmm2-ccs.idxstats.tsv:213:KMT2C_chr21_8616365_8659521	43156	0	0

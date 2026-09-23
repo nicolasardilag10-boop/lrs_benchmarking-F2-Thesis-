@@ -7,7 +7,7 @@ These are the production whole-genome assembly workflows for Flye, GoldRush, Ver
 ## Repository explorer
 
 <!-- AUTO_REPOSITORY_TREE_START -->
-Generated from Git-tracked files. Expand only the directory you need. On GitHub, press **`t`** for fast filename search.
+Generated from version-control candidates. Directories remain compact; use this module's curated sections for canonical files.
 
 - [`README.md`](README.md)
 - [`hybrid.assembly.verkko.smk`](hybrid.assembly.verkko.smk)
@@ -18,14 +18,7 @@ Generated from Git-tracked files. Expand only the directory you need. On GitHub,
 - [`pb.assembly.goldrush.smk`](pb.assembly.goldrush.smk)
 - [`pb.scaffolding.ntlink.smk`](pb.scaffolding.ntlink.smk)
 
-<details>
-<summary><b>assessment/</b> — 3 files</summary>
-
-- [`README.md`](assessment/README.md)
-- [`assembly_quality_busco.smk`](assessment/assembly_quality_busco.smk)
-- [`assembly_quality_quast.smk`](assessment/assembly_quality_quast.smk)
-
-</details>
+- **assessment/** — 3 files; [`guide`](assessment/README.md)
 
 <!-- AUTO_REPOSITORY_TREE_END -->
 

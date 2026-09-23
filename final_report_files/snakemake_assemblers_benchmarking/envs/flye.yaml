@@ -1,0 +1,9 @@
+name: flye-assembly
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+  - flye
+  - seqkit

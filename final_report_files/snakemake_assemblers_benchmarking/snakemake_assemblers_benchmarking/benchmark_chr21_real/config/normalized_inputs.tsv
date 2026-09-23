@@ -1,0 +1,7 @@
+sample	technology	region	minimum_mapq	target_coverage	seed	extracted_bam	normalized_fastq	status
+HG002	hifi	chr21	20	30	21002	inputs/pacbio/HG002/HG002.hifi.chr21.primary.q20.bam	inputs/normalized/HG002/HG002.hifi.chr21.primary.mapq20.30x.fastq.gz	NORMALIZED_PASS
+HG002	ont	chr21	20	30	22002	inputs/ont/HG002/HG002.ont.chr21.primary.q20.bam	inputs/normalized/HG002/HG002.ont.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+HG003	hifi	chr21	20	30	21003	inputs/pacbio/HG003/HG003.hifi.chr21.primary.q20.bam	inputs/normalized/HG003/HG003.hifi.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+HG003	ont	chr21	20	30	22003	inputs/ont/HG003/HG003.ont.chr21.primary.q20.bam	inputs/normalized/HG003/HG003.ont.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+HG004	hifi	chr21	20	30	21004	inputs/pacbio/HG004/HG004.hifi.chr21.primary.q20.bam	inputs/normalized/HG004/HG004.hifi.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION
+HG004	ont	chr21	20	30	22004	inputs/ont/HG004/HG004.ont.chr21.primary.q20.bam	inputs/normalized/HG004/HG004.ont.chr21.q20.30x.fastq.gz	PENDING_EXTRACTION

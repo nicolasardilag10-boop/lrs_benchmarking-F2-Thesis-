@@ -1,0 +1,4 @@
+Edge	0	3	1	0	0	0	40	-1
+	Sequence	+edge_1_0_+disjointig_1_0_999999 999999 1 1000000 0 999999
+Edge	1	2	0	0	0	0	40	-1
+	Sequence	-edge_1_0_+disjointig_1_0_999999 999999 -1 1000000 0 999999

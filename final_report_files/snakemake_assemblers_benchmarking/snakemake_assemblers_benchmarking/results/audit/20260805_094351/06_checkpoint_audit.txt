@@ -1,0 +1,16 @@
+=== CHECKPOINT DEFINITIONS IN WORKFLOW ===
+Snakefile:32:# Load validation, assembler, scaffolding, and assessment rule modules
+Snakefile:37:include: "rules/validation.smk"
+rules/common.smk:23:VALIDATION_OK = "results/logs/validate_inputs.ok"
+rules/flye.smk:15:        validation=VALIDATION_OK,
+rules/goldrush.smk:7:        validation="results/logs/validate_inputs.ok",
+rules/ntlink.smk:13:#   - Input validation marker
+rules/validation.smk:14:rule validate_inputs:
+rules/validation.smk:81:        # Create the marker file after all validations pass
+rules/validation.smk:83:            "Assembler input validation passed.\n"
+
+=== EXISTING CHECKPOINT AND VALIDATION FILES ===
+35	2026-08-05_08:48:34.5182219890	results/logs/validate_inputs.ok
+543	2026-08-05_09:11:16.1502095230	results/validation/ntlink_HG002_pb_validation.txt
+215	2026-08-04_22:16:48.0649738910	results/validation/verkko_official_test.sha256
+261	2026-08-04_22:16:16.6531132260	results/validation/verkko_official_test.txt

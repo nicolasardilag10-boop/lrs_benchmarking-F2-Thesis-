@@ -1,0 +1,236 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# LRS BENCHMARKING — NAVIGATION SHORTCUTS
+# ==============================================================================
+#
+# Active documentation:
+#   ~/lrs_benchmarking/docs_maps/
+#
+# Active assembler workflow:
+#   ~/lrs_benchmarking/assemblers/
+#
+# Usage:
+#   source "$HOME/lrs_benchmarking/docs_maps/lrs_shortcuts.sh"
+# ==============================================================================
+
+
+# ------------------------------------------------------------------------------
+# PROJECT ROOTS
+# ------------------------------------------------------------------------------
+
+_LRS_SHORTCUTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+export LRS="$(cd "${_LRS_SHORTCUTS_DIR}/.." && pwd)"
+
+# Documentation / maps
+export LRSMAPS="$LRS/docs_maps"
+
+# Active assembler benchmarking project
+export ASM="$LRS/assemblers"
+export ASMCONFIG="$ASM/config"
+export ASMRULES="$ASM/rules"
+export ASMSCRIPTS="$ASM/scripts"
+export ASMCONT="$ASM/containers"
+export ASMRESULTS="$ASM/results"
+
+# Local normalized Chr21 input dataset used for testing.
+# The server uses config/server.yaml instead of this path.
+export ASMINPUT_LOCAL="$LRS/final_report_files/snakemake_assemblers_benchmarking/snakemake_assemblers_benchmarking/benchmark_chr21_real/inputs/final_normalized"
+
+# Other benchmarking domains
+export ALIGN="$LRS/final_report_files/snakemake_aligners_benchmarking"
+export SV="$LRS/SV aligners call"
+
+
+# ------------------------------------------------------------------------------
+# NAVIGATION
+#
+# Memory rule:
+#   go-X = take me to X
+# ------------------------------------------------------------------------------
+
+alias go-lrs='cd "$LRS"'
+
+alias go-maps='cd "$LRSMAPS"'
+
+alias go-asm='cd "$ASM"'
+alias go-config='cd "$ASMCONFIG"'
+alias go-rules='cd "$ASMRULES"'
+alias go-scripts='cd "$ASMSCRIPTS"'
+alias go-cont='cd "$ASMCONT"'
+alias go-results='cd "$ASMRESULTS"'
+alias go-inputs='cd "$ASMINPUT_LOCAL"'
+
+alias go-align='cd "$ALIGN"'
+alias go-sv='cd "$SV"'
+
+
+# ------------------------------------------------------------------------------
+# PROJECT MAP
+# ------------------------------------------------------------------------------
+
+lrs-map() {
+    less "$LRSMAPS/PROJECT_MAP.md"
+}
+
+lrs-map-code() {
+    code "$LRSMAPS/PROJECT_MAP.md"
+}
+
+
+# ------------------------------------------------------------------------------
+# LOCATION INFORMATION
+# ------------------------------------------------------------------------------
+
+lrs-where() {
+    printf '\n'
+    printf 'LRS BENCHMARKING PATHS\n'
+    printf '======================\n'
+    printf 'LRS             %s\n' "$LRS"
+    printf 'LRSMAPS         %s\n' "$LRSMAPS"
+    printf '\n'
+    printf 'ASM             %s\n' "$ASM"
+    printf 'ASMCONFIG       %s\n' "$ASMCONFIG"
+    printf 'ASMRULES        %s\n' "$ASMRULES"
+    printf 'ASMSCRIPTS      %s\n' "$ASMSCRIPTS"
+    printf 'ASMCONT         %s\n' "$ASMCONT"
+    printf 'ASMRESULTS      %s\n' "$ASMRESULTS"
+    printf 'ASMINPUT_LOCAL  %s\n' "$ASMINPUT_LOCAL"
+    printf '\n'
+    printf 'ALIGN           %s\n' "$ALIGN"
+    printf 'SV              %s\n' "$SV"
+    printf '\n'
+    printf 'CURRENT DIRECTORY\n'
+    printf '=================\n'
+    pwd
+    printf '\n'
+}
+
+
+# ------------------------------------------------------------------------------
+# GIT STATUS
+# ------------------------------------------------------------------------------
+
+lrs-status() {
+    git -C "$LRS" status --short
+}
+
+lrs-asm-status() {
+    git -C "$LRS" status --short -- assemblers
+}
+
+
+# ------------------------------------------------------------------------------
+# ACTIVE ASSEMBLER WORKFLOW INSPECTION
+# ------------------------------------------------------------------------------
+
+asm-files() {
+    printf '\nACTIVE ASSEMBLER FILES\n'
+    printf '======================\n'
+
+    find "$ASM" \
+        -maxdepth 2 \
+        -type f \
+        \( \
+            -name 'Snakefile' \
+            -o -name '*.smk' \
+            -o -name '*.yaml' \
+            -o -name '*.yml' \
+            -o -name '*.tsv' \
+            -o -name '*.py' \
+            -o -name '*.sh' \
+            -o -name 'Dockerfile' \
+        \) \
+        ! -path "$ASM/results/*" \
+        ! -path "$ASM/.snakemake/*" \
+        | sort
+}
+
+
+asm-inputs() {
+    printf '\nLOCAL CHR21 INPUTS\n'
+    printf '==================\n'
+
+    find "$ASMINPUT_LOCAL" \
+        -maxdepth 2 \
+        -type f \
+        -name '*.chr21.primary.mapq20.30x.fastq.gz' \
+        -print \
+        2>/dev/null \
+        | sort
+}
+
+
+asm-dry() {
+    (
+        cd "$ASM" || return
+
+        snakemake \
+            --snakefile Snakefile \
+            --configfile config/local.yaml \
+            --cores 4 \
+            --dry-run \
+            --printshellcmds
+    )
+}
+
+
+asm-server-config() {
+    printf '\nSERVER CONFIGURATION\n'
+    printf '====================\n'
+
+    grep -nE \
+        'input_mode|input_root|threads|_threads|_mem_mb' \
+        "$ASM/config/server.yaml"
+}
+
+
+# ------------------------------------------------------------------------------
+# HELP
+# ------------------------------------------------------------------------------
+
+lrs-help() {
+    cat <<'HELP'
+
+LRS NAVIGATION
+==============
+
+Main project:
+  go-lrs          repository root
+  go-maps         project maps / shortcuts
+
+Assembler:
+  go-asm          active assembler workflow
+  go-config       assembler configuration
+  go-rules        assembler Snakemake rules
+  go-scripts      assembler helper scripts
+  go-cont         assembler container definitions
+  go-results      assembler runtime results
+  go-inputs       local normalized Chr21 FASTQs
+
+Other domains:
+  go-align        aligner benchmarking
+  go-sv           structural-variant work
+
+Inspection:
+  lrs-map
+  lrs-map-code
+  lrs-where
+  lrs-status
+  lrs-asm-status
+
+Assembler helpers:
+  asm-files
+  asm-inputs
+  asm-dry
+  asm-server-config
+
+Memory rule:
+  go-X  = navigate
+  lrs-X = inspect project
+  asm-X = inspect/test assembler workflow
+
+HELP
+}
+
+unset _LRS_SHORTCUTS_DIR

@@ -1,0 +1,14 @@
+environment	package	version	build	channel
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/214640c6bd7ea03aa1bd9afdf749c484_	networkx	3.5	pyhe01879c_0	conda-forge
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/214640c6bd7ea03aa1bd9afdf749c484_	python	3.11.15	h7508c33_1_cpython	conda-forge
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/214640c6bd7ea03aa1bd9afdf749c484_	snakemake-minimal	7.32.4	pyhdfd78af_1	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/214640c6bd7ea03aa1bd9afdf749c484_	verkko	2.3.2	hb0edd9e_0	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/b7e368898dd31c80dbf249ab343a5e82_	goldrush	1.2.2	py312h248b54c_1	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/b7e368898dd31c80dbf249ab343a5e82_	ntlink	1.3.11	py312h7896c42_1	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/b7e368898dd31c80dbf249ab343a5e82_	python	3.12.13	hd63d673_0_cpython	conda-forge
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/b7e368898dd31c80dbf249ab343a5e82_	snakemake-minimal	9.24.0	pyhdfd78af_0	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/fc65294765920755e60b8a362445088e_	flye	2.9.6	py313h7fbb527_1	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/fc65294765920755e60b8a362445088e_	python	3.13.14	h6add32d_100_cp313	conda-forge
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/fc65294765920755e60b8a362445088e_	seqkit	2.13.0	he881be0_0	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/fd6a9e2929f4f9664be92c40214bb0b3_	ntlink	1.3.11	py313h380480a_2	bioconda
+/home/nicolas/lrs_benchmarking/final_report_files/snakemake_assemblers_benchmarking/.snakemake/conda/fd6a9e2929f4f9664be92c40214bb0b3_	python	3.13.14	h6add32d_100_cp313	conda-forge

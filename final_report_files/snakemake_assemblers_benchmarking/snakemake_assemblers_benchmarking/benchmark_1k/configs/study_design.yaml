@@ -1,0 +1,43 @@
+experiment:
+  name: hg_trio_1k_technical_assembler_benchmark
+  description: >
+    Technical benchmarking of assembler execution using fixed
+    1,000-read subsets labelled HG002, HG003 and HG004.
+
+dataset:
+  type: fixed_1000_read_subsets
+  complete_genome_coverage: false
+  chromosome_specific: false
+  biological_assembly_benchmark: false
+
+samples:
+  - HG002
+  - HG003
+  - HG004
+
+technologies:
+  - ont
+  - pb
+
+tools:
+  de_novo:
+    - flye
+    - goldrush
+  hybrid:
+    - verkko
+  scaffolding:
+    - ntlink
+
+allowed_conclusions:
+  - input characteristics
+  - workflow execution status
+  - runtime
+  - peak memory
+  - output validity
+  - descriptive sparse-input output metrics
+
+forbidden_conclusions:
+  - complete human assembly quality
+  - chromosome assembly quality
+  - genome completeness ranking
+  - biological superiority of one assembler
