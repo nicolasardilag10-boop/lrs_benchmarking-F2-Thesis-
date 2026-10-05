@@ -3,9 +3,13 @@
 table (wall-clock time, peak RAM, CPU time, CPU efficiency) for the
 assembler RAM/time re-run.
 
-Used by the five *.ram_time.smk rule variants
+Used by the five assembler *.ram_time.smk rule variants
 (assemblers/whole_genome_asm/ram_time/{ont,pb}.assembly.{flye2,goldrush}.ram_time.smk,
-hybrid.assembly.verkko.ram_time.smk). Snakemake's own ``benchmark:``
+hybrid.assembly.verkko.ram_time.smk) and the four aligner ones
+(alignment_analysis/run_metrics/ram_time/{ont,pb}.read_mapping.{vg,vacmap}.ram_time.smk).
+Pass ``--assembler`` or ``--aligner``; the first output column is named after
+whichever was given. The aligners have three timed stages (map, sort, index)
+that are summed like GoldRush stages. Snakemake's own ``benchmark:``
 directive is deliberately not used for this: it samples the host-side
 process tree, but every assembler here runs inside ``docker run`` --
 Docker's real memory usage lives in a separate cgroup that a host-side
@@ -150,7 +154,9 @@ def _gb(value: float | None) -> float | str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--assembler", required=True, choices=["flye", "goldrush", "verkko"])
+    tool = parser.add_mutually_exclusive_group(required=True)
+    tool.add_argument("--assembler", choices=["flye", "goldrush", "verkko"])
+    tool.add_argument("--aligner", choices=["vg_giraffe", "vacmap"])
     parser.add_argument("--sample", required=True, help="e.g. HG002")
     parser.add_argument("--technology", required=True, choices=["ont", "pb", "hybrid"])
     parser.add_argument("--threads", required=True, type=int)
@@ -208,8 +214,11 @@ def main() -> int:
         if peak_disk is None:
             print("WARNING: no scratch disk samples; peak_scratch_disk_gb = NA")
 
+    tool_column = "assembler" if args.assembler else "aligner"
+    tool_name = args.assembler or args.aligner
+
     row = {
-        "assembler": args.assembler,
+        tool_column: tool_name,
         "sample": args.sample,
         "technology": args.technology,
         "threads": args.threads,
@@ -234,7 +243,7 @@ def main() -> int:
             writer.writeheader()
         writer.writerow(row)
 
-    print(f"\n{args.assembler} {args.sample} {args.technology}:")
+    print(f"\n{tool_name} {args.sample} {args.technology}:")
     print(f"  wall_clock: {row['wall_clock_seconds']} s ({row['wall_clock_hours']} h)")
     print(f"  peak_rss:   {row['peak_rss_gb']} GB")
     print(f"  cpu:        {row['cpu_hours']} CPU-h (efficiency {row['cpu_efficiency']})")
